@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-theme="cockpit">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PilotPane</title>
+  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/viewer.css">
+</head>
+<body>
+  <!-- Page shell for PIN entry and status cards -->
+  <div class="shell" id="shell">
+    <header class="top">
+      <div class="brand">
+        <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="5" y="9" width="46" height="36" rx="7" fill="none" stroke="currentColor" stroke-width="5"></rect>
+          <path class="cursor" d="M33 28 L33 57 L40.5 50 L45.5 61 L51 58.5 L46 47.5 L56 47.5 Z"></path>
+        </svg>
+        <span>PilotPane</span>
+      </div>
+      <div class="themes" id="themes" role="group" aria-label="Theme"></div>
+    </header>
+
+    <main class="center">
+      <!-- PIN entry -->
+      <form class="card" id="pin-form" hidden autocomplete="off">
+        <h1 id="pin-title">Connect to this laptop</h1>
+        <p class="muted">Type the 6-digit PIN shown on the laptop you want to see.</p>
+        <fieldset class="pin-fields" id="pin-fieldset">
+          <legend>Pairing PIN</legend>
+          <div class="digits" id="digits"></div>
+        </fieldset>
+        <p class="pin-error" id="pin-error" role="alert" hidden></p>
+        <button class="btn btn-primary btn-wide" id="pin-submit" type="submit">Connect</button>
+        <p class="small muted">Can't read the host screen? Double-click the PilotPane tray icon for the big PIN screen, or restart PilotPane for a new PIN.</p>
+      </form>
+
+      <!-- Status card: connecting, starting, disconnected, busy, errors -->
+      <section class="card" id="status-card" hidden>
+        <div class="card-label" id="card-label">Connecting</div>
+        <div class="spinner" id="card-spinner" aria-hidden="true"></div>
+        <h1 id="card-title">Connecting to the host</h1>
+        <p class="muted" id="card-text"></p>
+        <div class="card-actions">
+          <button class="btn btn-primary" id="card-primary" type="button" hidden>Reconnect</button>
+          <button class="btn" id="card-secondary" type="button" hidden>Enter a new PIN</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span>LAN only. Nothing leaves your network.</span>
+      <span class="mono" id="foot-version">pilotpane</span>
+    </footer>
+  </div>
+
+  <!-- Stream view -->
+  <div class="stage" id="stage" hidden>
+    <video id="video" autoplay playsinline muted></video>
+
+    <div class="toolbar" id="toolbar">
+      <span class="host-label"><span class="dot ok" id="host-dot"></span><span id="host-name">Host</span></span>
+      <span class="badge" id="mode-badge" title="Clipboard and full keyboard capture will need secure mode (v0.5)">HTTP · basic mode</span>
+      <span class="sep" aria-hidden="true"></span>
+      <label class="visually-hidden" for="quality">Quality</label>
+      <select id="quality">
+        <option value="1080p">1080p</option>
+        <option value="720p">720p</option>
+      </select>
+      <button class="btn btn-small" id="btn-stats" type="button" aria-pressed="false">Stats</button>
+      <button class="btn btn-small" id="btn-fullscreen" type="button">Fullscreen</button>
+      <button class="btn btn-small btn-danger" id="btn-disconnect" type="button">Disconnect</button>
+    </div>
+
+    <div class="stats-overlay mono" id="stats" hidden>
+      <span>latency (RTT)</span><b id="s-rtt">-</b>
+      <span>fps</span><b id="s-fps">-</b>
+      <span>bitrate</span><b id="s-kbps">-</b>
+      <span>size</span><b id="s-size">-</b>
+      <span>codec</span><b id="s-codec">-</b>
+      <span>lost</span><b id="s-loss">-</b>
+    </div>
+
+    <div class="reconnecting" id="reconnecting" hidden>
+      <div class="card-label accent">Reconnecting</div>
+      <h2>Connection dropped</h2>
+      <p class="muted" id="reconnecting-text">Trying again. The last picture stays on screen.</p>
+      <button class="btn" id="btn-stop-retry" type="button">Stop trying</button>
+    </div>
+
+    <div class="hint" id="hint">Move the mouse to the top edge to show the toolbar</div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
