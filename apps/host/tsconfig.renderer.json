@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src/renderer",
+    "outDir": "dist/renderer",
+    "tsBuildInfoFile": "dist/renderer.tsbuildinfo",
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
+    "paths": {
+      "/protocol/index.js": ["../../packages/protocol/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/renderer"],
+  "references": [{ "path": "../../packages/protocol" }]
+}
