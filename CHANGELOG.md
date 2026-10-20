@@ -1,0 +1,12 @@
+# Changelog
+
+All notable changes. Versions follow the [roadmap](docs/roadmap.md).
+
+## [Unreleased] v0.1.0: See the screen
+
+- Host app (Electron): primary screen capture, WebRTC streaming (H.264 preferred), 1080p and 720p presets.
+- Own HTTP server and WebSocket (RFC 6455), listening only on private LAN addresses.
+- PIN pairing with a one-time SHA-256 proof, lockout after 5 wrong tries, resume tokens, one viewer at a time.
+- Host window, full-screen PIN on start, tray menu, pause/resume, new PIN, port-busy and no-network screens.
+- Viewer page for Chrome 109+: PIN entry, connection states, auto-reconnect keeping the last frame, toolbar, stats overlay, four themes.
+- Keeps the host display awake while a viewer is watching.

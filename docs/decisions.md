@@ -1,0 +1,51 @@
+# Decisions
+
+Short architecture decision records. Newest last. Each says what we chose, what we didn't, and why.
+
+## ADR-001: Electron for the host
+
+- **Chose**: Electron (desktopCapturer + Chromium WebRTC).
+- **Instead of**: a native capture + ffmpeg pipeline, or a Rust/Tauri app.
+- **Why**: screen capture, hardware-friendly video encoding and WebRTC come built in, and the whole project stays in TypeScript. Cost: a larger download, acceptable for a desktop tool.
+
+## ADR-002: No third-party packages for features
+
+- **Chose**: write features ourselves; only the platform (Node, Electron, browser) at runtime, and official dev tools (TypeScript, `@types/node`).
+- **Instead of**: `ws`, `express`, nut.js, robotjs, bundlers.
+- **Why**: nothing "fishy" or paid in the supply chain, a codebase others can read end to end, and every piece becomes a lesson. nut.js in particular now requires a paid registry for prebuilt packages.
+
+## ADR-003: Own C# helper for input injection (v0.2)
+
+- **Chose**: a tiny `pilotpane-input.exe` compiled from our C# source with the .NET Framework compiler that ships with Windows, calling Win32 `SendInput`. The host talks to it over stdin with a small documented text protocol, behind an `InputInjector` interface.
+- **Instead of**: nut.js (paid prebuilds), koffi or other FFI packages, a C++ Node addon (needs Visual Studio Build Tools and per-Electron rebuilds).
+- **Why**: zero npm packages, nothing extra to install. Switching to a C++ helper later only means replacing the exe behind the same protocol.
+
+## ADR-004: HTTP by default, optional HTTPS in v0.5
+
+- **Chose**: serve the viewer over plain HTTP on the LAN, with fallbacks for secure-context-only APIs; add an optional self-signed HTTPS port in v0.5.
+- **Instead of**: HTTPS only.
+- **Why**: no certificate warnings on old browsers, nothing to install on the viewer. Video and (from v0.2) input are encrypted by WebRTC anyway. HTTPS later unlocks real clipboard sync and Keyboard Lock for those who want it.
+
+## ADR-005: One viewer at a time
+
+- **Chose**: a single active viewer; others get "busy".
+- **Instead of**: multiple simultaneous viewers.
+- **Why**: each viewer needs its own encode, which hurts slow links like Bluetooth, and several people controlling one mouse needs extra rules. The session code keeps the door open for more viewers later.
+
+## ADR-006: pnpm workspaces, no Turborepo, MIT license
+
+- **Chose**: pnpm 10 workspaces (install scripts blocked by default, only Electron allowlisted) and the MIT license.
+- **Instead of**: npm/yarn, Turborepo; AGPL or GPL.
+- **Why**: pnpm's script blocking enforces ADR-002 automatically, and `tsc -b` already orders the builds. MIT is the simplest license for a learning project that should be easy to reuse.
+
+## ADR-007: The PIN never travels
+
+- **Chose**: the host sends a random nonce; the viewer sends `SHA-256("pilotpane-pin:v1:" + nonce + ":" + pin)`, computed with our own SHA-256 because `crypto.subtle` is unavailable on plain-HTTP pages.
+- **Instead of**: sending the PIN, or adding a crypto library.
+- **Why**: anyone sniffing the LAN sees only a one-time hash. Five wrong tries pause pairing for 60 s.
+
+## ADR-008: LAN addresses via mDNS hiding turned off
+
+- **Chose**: start Electron with `WebRtcHideLocalIpsWithMdns` disabled, and use no STUN/TURN.
+- **Instead of**: Chromium's default `.local` mDNS candidates.
+- **Why**: on a direct cable or Bluetooth link there may be no working mDNS, and the viewer could never resolve the host. Real private addresses are fine here: they never leave the LAN.
