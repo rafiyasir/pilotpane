@@ -1,5 +1,15 @@
 # CLAUDE.md: working on PilotPane
 
+@docs/OVERVIEW.md
+@docs/ARCHITECTURE.md
+@docs/CONNECTIONS.md
+@docs/DECISIONS.md
+@docs/ENGINEERING_PRACTICES.md
+@docs/DEPLOYMENT.md
+@docs/ROADMAP.md
+@docs/SECURITY_NOTES.md
+@docs/PUBLIC_PRIVATE.md
+
 Guidelines for anyone (human or AI) writing code in this repo. Read this before every spec.
 
 ## What this is
