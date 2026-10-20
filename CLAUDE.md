@@ -68,12 +68,12 @@ Developed on Windows 11 with Git Bash. Commands must work in Git Bash and PowerS
 - Specs first: each piece of work starts from a spec in `docs/specs/` with acceptance criteria.
 - Lean loop: build to the spec, run `pnpm test`, then write **manual test steps** (exact commands, what to open on the viewer laptop, what should appear). The maintainer tests, then it ships.
 - No heavy multi-agent write/review loops.
-- After a spec merges, add a learning-journal entry in `docs/journal/` (template there).
+- After a spec merges, add a learning-journal page `docs/journal/specs/NNN.js` (data shape in `docs/journal/README.md`), list it in `specs/manifest.js` and update `docs/ROADMAP.md`.
 
 ## Git
 
 - `main` = releases only. `dev` = integration branch; all work branches start from `dev` and merge back into it.
-- Branch names: `feat/<spec-id>-<short-name>`, `fix/<short-name>`, `docs/<short-name>`.
+- Branch names: `spec/NNN-slug`, `fix/<short-name>`, `docs/<short-name>`. Merge PRs into `dev` with "Rebase and merge", then tag `spec-NNN-done`. Details in `docs/ENGINEERING_PRACTICES.md`.
 - Small, focused commits in Conventional Commit style (`feat(host): ...`, `fix(viewer): ...`, `docs: ...`, `test: ...`, `chore: ...`).
 - The maintainer opens PRs by hand: finish each piece with a copyable **PR title and body** (summary, changes, test steps, checklist).
 - After merge: delete the branch, and on a release merge `dev` into `main`, tag `vX.Y.Z`, update `CHANGELOG.md`.

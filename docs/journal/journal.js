@@ -499,10 +499,11 @@
           .join('')}</div>
       </section>
       ${
-        commits.length
+        commits.length || s.commitsNote
           ? `<section class="sec">${secHead(sec(), 'commit', 'Commits', 'What was committed')}
               <div class="card commits">
-                <ul>${commits.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+                ${commits.length ? `<ul>${commits.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
+                ${s.commitsNote ? `<p class="mu" style="margin: 0">${md(s.commitsNote)}</p>` : ''}
                 <a class="btn" href="${esc(compareUrl(s))}" target="_blank" rel="noopener">${icon('link', 15)}View on GitHub</a>
               </div></section>`
           : ''
