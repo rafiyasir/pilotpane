@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="cockpit">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>PilotPane PIN</title>
+  <link rel="stylesheet" href="../shared/theme.css">
+  <link rel="stylesheet" href="pin.css">
+</head>
+<body>
+  <main class="pinscreen">
+    <div class="head">
+      <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="5" y="9" width="46" height="36" rx="7" fill="none" stroke="currentColor" stroke-width="4"></rect>
+        <line x1="5" y1="19" x2="51" y2="19" stroke="currentColor" stroke-width="4"></line>
+        <path class="cursor" d="M33 28 L33 57 L40.5 50 L45.5 61 L51 58.5 L46 47.5 L56 47.5 Z"></path>
+      </svg>
+      <h1 id="title">PilotPane is ready</h1>
+    </div>
+
+    <div class="pinblock">
+      <div class="pinlabel">PIN</div>
+      <div class="bigpin mono" id="pin">000 000</div>
+    </div>
+
+    <div class="where">
+      <div class="wherelabel">On the other laptop, open:</div>
+      <div class="bigurl mono" id="url">0.0.0.0:7420</div>
+      <div class="alt mono" id="alt"></div>
+    </div>
+
+    <div class="foot">
+      <span>Closes by itself when a viewer connects</span>
+      <span class="mono">Esc to hide</span>
+    </div>
+  </main>
+  <script type="module" src="pin.js"></script>
+</body>
+</html>
