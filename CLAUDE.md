@@ -4,7 +4,7 @@ Guidelines for anyone (human or AI) writing code in this repo. Read this before 
 
 ## What this is
 
-A LAN-only remote screen for Windows. The **host** (Electron) captures the screen and serves a **viewer** web page; the viewer pairs with a PIN and receives the screen over WebRTC. Specs live in `docs/specs/`, decisions in `docs/decisions.md`, architecture in `docs/architecture.md`.
+A LAN-only remote screen for Windows. The **host** (Electron) captures the screen and serves a **viewer** web page; the viewer pairs with a PIN and receives the screen over WebRTC. Specs live in `docs/specs/`, decisions in `docs/DECISIONS.md`, architecture in `docs/ARCHITECTURE.md`.
 
 ## Dependency policy (strict)
 
@@ -17,7 +17,7 @@ Everything else is written in this repo. Before adding any package:
 
 - It must have an OSI open-source license, no subscription, no private registry, no account.
 - No unknown single-maintainer packages. No install scripts (pnpm blocks them; only `electron` is allowlisted in `pnpm-workspace.yaml`).
-- Add an entry to `docs/decisions.md` explaining why it is worth it.
+- Add an entry to `docs/DECISIONS.md` explaining why it is worth it.
 
 If in doubt, write it. Current runtime dependencies outside the repo: **none** besides Electron.
 
@@ -70,4 +70,4 @@ Developed on Windows 11 with Git Bash. Commands must work in Git Bash and PowerS
 
 ## Public repo hygiene
 
-This repo is public from the first commit. Follow `docs/public-private.md`. Personal notes and drafts go in `private/` (gitignored).
+This repo is public from the first commit. Follow `docs/PUBLIC_PRIVATE.md`. Personal notes and drafts go in `private/` (gitignored).

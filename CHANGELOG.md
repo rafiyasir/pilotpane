@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes. Versions follow the [roadmap](docs/roadmap.md).
+All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 
 ## [Unreleased] v0.1.0: See the screen
 

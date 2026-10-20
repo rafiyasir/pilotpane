@@ -4,7 +4,7 @@
 
 PilotPane turns any laptop with a browser into a screen for your Windows PC, over your own local network. Nothing to install on the viewer, no account, no cloud. It was built to rescue a laptop with a broken display, using an old Windows 8 laptop running Chrome 109 as the screen.
 
-> **Status: v0.1, "see the screen".** The viewer shows the host's screen live. Mouse control arrives in v0.2 and keyboard control in v0.3 (see the [roadmap](docs/roadmap.md)). Until then, keep using the host's own keyboard and touchpad while you watch the viewer.
+> **Status: v0.1, "see the screen".** The viewer shows the host's screen live. Mouse control arrives in v0.2 and keyboard control in v0.3 (see the [roadmap](docs/ROADMAP.md)). Until then, keep using the host's own keyboard and touchpad while you watch the viewer.
 
 ## Why another remote desktop tool?
 
@@ -28,7 +28,7 @@ pnpm start
 
 What happens:
 
-1. Windows asks whether Electron may use the network. **Allow it on Private networks**, and on Public too if you'll use a direct cable (see [connections](docs/connections.md#firewall)).
+1. Windows asks whether Electron may use the network. **Allow it on Private networks**, and on Public too if you'll use a direct cable (see [connections](docs/CONNECTIONS.md#firewall)).
 2. A full-screen page shows a **6-digit PIN** and an **address** like `192.168.1.12:7420`. A small PilotPane window and a tray icon appear too.
 3. On the other laptop, open Chrome and type that address. Enter the PIN.
 4. The host's screen appears. Press Esc on the host to hide the big PIN at any time; double-click the tray icon to bring it back.
@@ -37,7 +37,7 @@ Options: `pnpm start -- --port 7500` uses another port. Logs go to the terminal;
 
 ## Connecting the two laptops
 
-Any shared local network works. Full steps for each are in **[docs/connections.md](docs/connections.md)**.
+Any shared local network works. Full steps for each are in **[docs/CONNECTIONS.md](docs/CONNECTIONS.md)**.
 
 | Connection | Speed | Notes |
 |---|---|---|
@@ -52,7 +52,7 @@ Any shared local network works. Full steps for each are in **[docs/connections.m
 - Listens only on private LAN addresses (10.x, 172.16-31.x, 192.168.x, 169.254.x), never on public ones.
 - A new 6-digit PIN each start. The PIN itself never crosses the network: the viewer sends a one-time SHA-256 proof.
 - Five wrong PINs pause pairing for 60 seconds. One viewer at a time.
-- Video is encrypted by WebRTC (DTLS-SRTP). The pairing page is plain HTTP on your LAN; see [docs/security.md](docs/security.md) for what that means.
+- Video is encrypted by WebRTC (DTLS-SRTP). The pairing page is plain HTTP on your LAN; see [docs/SECURITY_NOTES.md](docs/SECURITY_NOTES.md) for what that means.
 
 ## Limitations (v0.1)
 

@@ -12,4 +12,4 @@ In scope: anything that lets someone on the same network see or control the host
 
 Out of scope: attacks that need prior access to the host machine, and using PilotPane on untrusted shared networks (documented as unsupported).
 
-The design and its known limits are described in [docs/security.md](docs/security.md).
+The design and its known limits are described in [docs/SECURITY_NOTES.md](docs/SECURITY_NOTES.md).

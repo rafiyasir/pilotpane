@@ -4,7 +4,7 @@ One page per merged spec: what was built, the decisions behind it, how it works 
 
 - Copy [`_template.md`](_template.md) to `NNN-short-name.md` after a spec merges.
 - Keep it honest: real bugs, real dead ends.
-- Drafts and personal notes go in `private/` first; only the finished entry is committed (see [public-private](../public-private.md)).
+- Drafts and personal notes go in `private/` first; only the finished entry is committed (see [public-private](../PUBLIC_PRIVATE.md)).
 
 ## Timeline
 
