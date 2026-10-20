@@ -1,10 +1,20 @@
 # CLAUDE.md: working on PilotPane
 
+@docs/OVERVIEW.md
+@docs/ARCHITECTURE.md
+@docs/CONNECTIONS.md
+@docs/DECISIONS.md
+@docs/ENGINEERING_PRACTICES.md
+@docs/DEPLOYMENT.md
+@docs/ROADMAP.md
+@docs/SECURITY_NOTES.md
+@docs/PUBLIC_PRIVATE.md
+
 Guidelines for anyone (human or AI) writing code in this repo. Read this before every spec.
 
 ## What this is
 
-A LAN-only remote screen for Windows. The **host** (Electron) captures the screen and serves a **viewer** web page; the viewer pairs with a PIN and receives the screen over WebRTC. Specs live in `docs/specs/`, decisions in `docs/decisions.md`, architecture in `docs/architecture.md`.
+A LAN-only remote screen for Windows. The **host** (Electron) captures the screen and serves a **viewer** web page; the viewer pairs with a PIN and receives the screen over WebRTC. Specs live in `docs/specs/`, decisions in `docs/DECISIONS.md`, architecture in `docs/ARCHITECTURE.md`.
 
 ## Dependency policy (strict)
 
@@ -17,7 +27,7 @@ Everything else is written in this repo. Before adding any package:
 
 - It must have an OSI open-source license, no subscription, no private registry, no account.
 - No unknown single-maintainer packages. No install scripts (pnpm blocks them; only `electron` is allowlisted in `pnpm-workspace.yaml`).
-- Add an entry to `docs/decisions.md` explaining why it is worth it.
+- Add an entry to `docs/DECISIONS.md` explaining why it is worth it.
 
 If in doubt, write it. Current runtime dependencies outside the repo: **none** besides Electron.
 
@@ -58,16 +68,16 @@ Developed on Windows 11 with Git Bash. Commands must work in Git Bash and PowerS
 - Specs first: each piece of work starts from a spec in `docs/specs/` with acceptance criteria.
 - Lean loop: build to the spec, run `pnpm test`, then write **manual test steps** (exact commands, what to open on the viewer laptop, what should appear). The maintainer tests, then it ships.
 - No heavy multi-agent write/review loops.
-- After a spec merges, add a learning-journal entry in `docs/journal/` (template there).
+- After a spec merges, add a learning-journal page `docs/journal/specs/NNN.js` (data shape in `docs/journal/README.md`), list it in `specs/manifest.js` and update `docs/ROADMAP.md`.
 
 ## Git
 
 - `main` = releases only. `dev` = integration branch; all work branches start from `dev` and merge back into it.
-- Branch names: `feat/<spec-id>-<short-name>`, `fix/<short-name>`, `docs/<short-name>`.
+- Branch names: `spec/NNN-slug`, `fix/<short-name>`, `docs/<short-name>`. Merge PRs into `dev` with "Rebase and merge", then tag `spec-NNN-done`. Details in `docs/ENGINEERING_PRACTICES.md`.
 - Small, focused commits in Conventional Commit style (`feat(host): ...`, `fix(viewer): ...`, `docs: ...`, `test: ...`, `chore: ...`).
 - The maintainer opens PRs by hand: finish each piece with a copyable **PR title and body** (summary, changes, test steps, checklist).
 - After merge: delete the branch, and on a release merge `dev` into `main`, tag `vX.Y.Z`, update `CHANGELOG.md`.
 
 ## Public repo hygiene
 
-This repo is public from the first commit. Follow `docs/public-private.md`. Personal notes and drafts go in `private/` (gitignored).
+This repo is public from the first commit. Follow `docs/PUBLIC_PRIVATE.md`. Personal notes and drafts go in `private/` (gitignored).

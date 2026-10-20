@@ -22,7 +22,7 @@ A Windows laptop (the **host**) has a hardware display fault: the picture jitter
 - **Usable without the host's screen.** Big PIN on start, tray menu, auto-reconnect, and later a "host screen off" mode.
 - **Private by design.** LAN-only listeners, PIN proof instead of the PIN, one viewer at a time.
 - **Small and readable.** Core features written in the repo, not pulled from packages (see CLAUDE.md).
-- **Ship small versions.** Each version is useful on its own; see the [roadmap](roadmap.md).
+- **Ship small versions.** Each version is useful on its own; see the [roadmap](ROADMAP.md).
 
 ## Out of scope
 
