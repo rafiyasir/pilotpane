@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+
+# pnpm 10 blocks install scripts of dependencies by default.
+# Only Electron may run one (it downloads its own binary).
+# Any other package asking to run a script is skipped with a warning.
+onlyBuiltDependencies:
+  - electron
