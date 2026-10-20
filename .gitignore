@@ -1,0 +1,29 @@
+# Dependencies and build output
+node_modules/
+dist/
+out/
+*.tsbuildinfo
+
+# Logs and local runtime data
+*.log
+logs/
+captures/
+
+# Local config and secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# Private notes, drafts, unredacted screenshots (see docs/public-private.md)
+private/
+
+# Claude Code: personal settings stay local, shared commands are public
+.claude/settings.local.json
+
+# OS and editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
