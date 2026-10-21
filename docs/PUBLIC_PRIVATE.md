@@ -5,22 +5,22 @@ This repository is public from its first commit. Git keeps history forever, so a
 ## Public (committed)
 
 - Source code, tests, build scripts.
-- `docs/`: overview, architecture, specs, decisions, security, connection guides, roadmap.
+- `docs/`: overview, architecture, decisions, security, connection guides, roadmap.
 - `docs/journal/`: curated learning-journal entries (written to be read by others).
 - `docs/design/`: exported mockups and logo files, once exported.
 - `README.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, `CLAUDE.md`.
-- Shared Claude Code commands under `.claude/commands/` if added.
+- Shared Claude Code setup: `.claude/commands/`, `.claude/skills/`, `.claude/specs/`, `.claude/hooks/`, `.claude/settings.json`, plus `DESIGN.md`, `design/` and `RUNBOOK.md`.
 
 ## Private (never committed)
 
-| What | Where it goes |
-|---|---|
-| Personal notes, journal drafts, prompts, to-dos | `private/` (gitignored) |
-| `.env` files, tokens, keys of any kind | not in the repo |
-| Claude Code personal settings | `.claude/settings.local.json` (gitignored) |
-| Logs, captured frames, debug dumps | gitignored (`*.log`, `logs/`, `captures/`) |
-| Real home IPs, MAC addresses, Wi-Fi names, computer names | replace with documentation examples (`192.168.1.12`, `DESKTOP-VICTUS` style placeholders) |
-| Screenshots showing your desktop, files, notifications or chats | crop or redact before adding to docs |
+| What                                                            | Where it goes                                                                             |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Personal notes, journal drafts, prompts, to-dos                 | `private/` (gitignored)                                                                   |
+| `.env` files, tokens, keys of any kind                          | not in the repo                                                                           |
+| Claude Code personal settings                                   | `.claude/settings.local.json` (gitignored)                                                |
+| Logs, captured frames, debug dumps                              | gitignored (`*.log`, `logs/`, `captures/`)                                                |
+| Real home IPs, MAC addresses, Wi-Fi names, computer names       | replace with documentation examples (`192.168.1.12`, `DESKTOP-VICTUS` style placeholders) |
+| Screenshots showing your desktop, files, notifications or chats | crop or redact before adding to docs                                                      |
 
 ## Before every push
 
