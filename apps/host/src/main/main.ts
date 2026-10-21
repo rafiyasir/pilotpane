@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { handleAppScheme, registerAppScheme } from './app-protocol.js';
 import { HostController } from './controller.js';
 import { createLogger } from './log.js';
+import { ElectronScreenCapturer } from './platform/electron-capturer.js';
+import { ElectronKeepAwake } from './platform/electron-keep-awake.js';
+import { NullInputInjector } from './platform/input-injector.js';
 import { loadSettings, portFromArgs } from './settings.js';
 import { windowPaths } from './windows.js';
 
@@ -49,7 +52,10 @@ if (!app.requestSingleInstanceLock()) {
       viewerDir,
       protocolDir,
       windows: windowPaths(mainDir),
-      trayIcon: join(hostDist, 'assets', 'tray.png')
+      trayIcon: join(hostDist, 'assets', 'tray.png'),
+      capturer: new ElectronScreenCapturer(),
+      injector: new NullInputInjector(),
+      keepAwake: new ElectronKeepAwake()
     });
     controller.start();
     log.info(`PilotPane ${app.getVersion()} started, port ${settings.port}`);
