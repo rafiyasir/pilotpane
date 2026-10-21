@@ -38,6 +38,7 @@ const store = {
 const TOKEN_KEY = 'pilotpane.token';
 const THEME_KEY = 'pilotpane.theme';
 const STATS_KEY = 'pilotpane.stats';
+const PINNED_KEY = 'pilotpane.toolbarPinned';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
 // ---------- state ----------
@@ -432,29 +433,54 @@ function stopStats(): void {
 function setupToolbar(): void {
   const stage = $('stage');
   const toolbar = $('toolbar');
+  const tab = $('toolbar-tab');
+  const pinBtn = $('btn-pin');
   const hint = $('hint');
-  let hideTimer: number | undefined;
   let idleTimer: number | undefined;
+  let open = false;
+  let pinned = store.get('local', PINNED_KEY) === '1';
 
-  const showBar = () => {
-    toolbar.classList.add('visible');
-    window.clearTimeout(hideTimer);
+  // The toolbar shows when it is open (tab or shortcut) or pinned as a strip.
+  const renderToolbar = () => {
+    stage.classList.toggle('pinned', pinned);
+    tab.hidden = pinned;
+    toolbar.hidden = !(open || pinned);
+    tab.setAttribute('aria-expanded', String(open));
+    tab.setAttribute('aria-label', open ? 'Hide toolbar' : 'Show toolbar');
+    pinBtn.setAttribute('aria-pressed', String(pinned));
   };
-  const hideBarSoon = () => {
-    window.clearTimeout(hideTimer);
-    hideTimer = window.setTimeout(() => {
-      if (!toolbar.matches(':hover') && !toolbar.contains(document.activeElement)) toolbar.classList.remove('visible');
-    }, 1200);
+  const toggleBar = () => {
+    if (pinned) return;
+    open = !open;
+    renderToolbar();
   };
+  renderToolbar();
 
-  stage.addEventListener('mousemove', (e) => {
+  stage.addEventListener('mousemove', () => {
     stage.classList.remove('idle');
     window.clearTimeout(idleTimer);
     idleTimer = window.setTimeout(() => stage.classList.add('idle'), 3000);
-    if (e.clientY < 90) showBar();
-    else hideBarSoon();
   });
-  toolbar.addEventListener('focusin', showBar);
+  tab.addEventListener('click', toggleBar);
+  $('video').addEventListener('click', () => {
+    if (open && !pinned) {
+      open = false;
+      renderToolbar();
+    }
+  });
+  // Ctrl+Alt+Shift pressed together. Not Esc: Chrome uses it to leave fullscreen.
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat || $('stage').hidden || !(e.ctrlKey && e.altKey && e.shiftKey)) return;
+    if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift') return;
+    e.preventDefault();
+    toggleBar();
+  });
+  pinBtn.addEventListener('click', () => {
+    pinned = !pinned;
+    open = !pinned; // unpinning keeps the toolbar open so the click has a visible result
+    store.set('local', PINNED_KEY, pinned ? '1' : '0');
+    renderToolbar();
+  });
   window.setTimeout(() => hint.classList.add('gone'), 6000);
 
   $<HTMLSelectElement>('quality').addEventListener('change', (e) => {

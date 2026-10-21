@@ -193,11 +193,42 @@
   background: #000;
 }
 
+/* Pull tab: always visible at the top centre; opens the toolbar below it. */
+.toolbar-tab {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 64px;
+  height: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: var(--bg);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.toolbar-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.toolbar-tab[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
 .toolbar {
   position: absolute;
-  top: 12px;
+  top: 18px;
   left: 50%;
-  transform: translate(-50%, -140%);
+  transform: translateX(-50%);
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -207,11 +238,35 @@
   border-radius: 12px;
   border: 1px solid var(--line);
   background: var(--bg);
-  transition: transform 0.18s ease;
 }
 
-.toolbar.visible {
-  transform: translate(-50%, 0);
+/* Pinned: a 40 px strip above the video, so nothing is covered. */
+.stage.pinned .toolbar {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  max-width: none;
+  transform: none;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0 6px;
+  border-width: 0 0 1px;
+  border-radius: 0;
+}
+
+.stage.pinned video {
+  margin-top: 40px;
+  height: calc(100% - 40px);
+}
+
+.stage.pinned .stats-overlay {
+  top: 52px;
+}
+
+#btn-pin[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--surface2);
 }
 
 .host-label {

@@ -61,7 +61,27 @@
     <div class="stage" id="stage" hidden>
       <video id="video" autoplay playsinline muted></video>
 
-      <div class="toolbar" id="toolbar">
+      <button
+        class="toolbar-tab"
+        id="toolbar-tab"
+        type="button"
+        aria-label="Show toolbar"
+        aria-expanded="false"
+        aria-controls="toolbar"
+      >
+        <svg width="16" height="10" viewBox="0 0 16 10" aria-hidden="true">
+          <path
+            d="M2 2 L8 8 L14 2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </button>
+
+      <div class="toolbar" id="toolbar" hidden>
         <span class="host-label"><span class="dot ok" id="host-dot"></span><span id="host-name">Host</span></span>
         <span class="badge" id="mode-badge" title="Clipboard and full keyboard capture will need secure mode (v0.5)"
           >HTTP · basic mode</span
@@ -74,6 +94,7 @@
         </select>
         <button class="btn btn-small" id="btn-stats" type="button" aria-pressed="false">Stats</button>
         <button class="btn btn-small" id="btn-fullscreen" type="button">Fullscreen</button>
+        <button class="btn btn-small" id="btn-pin" type="button" aria-pressed="false">Pin</button>
         <button class="btn btn-small btn-danger" id="btn-disconnect" type="button">Disconnect</button>
       </div>
 
@@ -90,7 +111,7 @@
         <button class="btn" id="btn-stop-retry" type="button">Stop trying</button>
       </div>
 
-      <div class="hint" id="hint">Move the mouse to the top edge to show the toolbar</div>
+      <div class="hint" id="hint">Click the tab at the top, or press Ctrl+Alt+Shift, for the toolbar</div>
     </div>
 
     <script type="module" src="/main.js"></script>
