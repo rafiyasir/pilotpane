@@ -4,13 +4,9 @@
  * (CommonJS because Electron's sandboxed preloads must be CommonJS.)
  */
 import { contextBridge, ipcRenderer } from 'electron';
-import type {
-  EngineCommand,
-  EngineEvent,
-  HostAction,
-  HostState,
-  PilotpaneBridge
-} from '@pilotpane/protocol' with { 'resolution-mode': 'import' };
+import type { EngineCommand, EngineEvent, HostAction, HostState, PilotpaneBridge } from '@pilotpane/protocol' with {
+  'resolution-mode': 'import'
+};
 
 const bridge: PilotpaneBridge = {
   getState: () => ipcRenderer.invoke('pp:get-state') as Promise<HostState>,

@@ -133,7 +133,9 @@ export class LanServer {
       { maxMessageBytes: MAX_MESSAGE_BYTES, pingIntervalMs: 10_000 }
     );
     if (!conn) {
-      log.warn(`refused WebSocket from ${plainIPv4(req.socket.remoteAddress)} (host=${req.headers.host}, origin=${req.headers.origin})`);
+      log.warn(
+        `refused WebSocket from ${plainIPv4(req.socket.remoteAddress)} (host=${req.headers.host}, origin=${req.headers.origin})`
+      );
       return;
     }
     this.opts.onSocket(conn, {

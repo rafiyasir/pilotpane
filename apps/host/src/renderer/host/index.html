@@ -1,97 +1,124 @@
 <!doctype html>
 <html lang="en" data-theme="cockpit">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
-  <title>PilotPane</title>
-  <link rel="stylesheet" href="../shared/theme.css">
-  <link rel="stylesheet" href="host.css">
-</head>
-<body>
-  <main class="host">
-    <header class="top">
-      <div class="brand">
-        <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
-          <rect x="5" y="9" width="46" height="36" rx="7" fill="none" stroke="currentColor" stroke-width="5"></rect>
-          <path class="cursor" d="M33 28 L33 57 L40.5 50 L45.5 61 L51 58.5 L46 47.5 L56 47.5 Z"></path>
-        </svg>
-        <span>PilotPane</span>
-      </div>
-      <div class="themes" id="themes" role="group" aria-label="Theme"></div>
-    </header>
-
-    <!-- Ready: waiting for a viewer -->
-    <section id="view-ready" class="view" hidden>
-      <div class="status"><span class="dot" id="ready-dot"></span><span id="ready-text">Ready, waiting for a viewer</span></div>
-
-      <div class="block">
-        <div class="label">Pairing PIN</div>
-        <div class="pin mono" id="pin">000 000</div>
-        <div class="lock" id="lock" hidden></div>
-      </div>
-
-      <div class="block">
-        <div class="label">Open on the other laptop</div>
-        <div class="url mono" id="url">http://...</div>
-        <ul class="addresses" id="addresses"></ul>
-      </div>
-
-      <div class="actions">
-        <button class="btn" id="btn-new-pin" type="button">New PIN</button>
-        <button class="btn" id="btn-show-pin" type="button">Show big PIN</button>
-        <button class="btn btn-danger" id="btn-pause" type="button">Pause sharing</button>
-      </div>
-    </section>
-
-    <!-- A viewer is connected -->
-    <section id="view-connected" class="view" hidden>
-      <div class="connected-head">
-        <span class="dot ok" id="conn-dot"></span>
-        <h1 id="conn-title">Viewer connected</h1>
-        <span class="since mono" id="since">00:00:00</span>
-      </div>
-
-      <div class="viewer-card">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-          <rect x="4" y="5" width="16" height="11" rx="1.5"></rect><path d="M2 19h20"></path>
-        </svg>
-        <div>
-          <div class="viewer-browser" id="viewer-browser">Browser</div>
-          <div class="viewer-address mono" id="viewer-address">0.0.0.0</div>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:"
+    />
+    <title>PilotPane</title>
+    <link rel="stylesheet" href="../shared/theme.css" />
+    <link rel="stylesheet" href="host.css" />
+  </head>
+  <body>
+    <main class="host">
+      <header class="top">
+        <div class="brand">
+          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="5" y="9" width="46" height="36" rx="7" fill="none" stroke="currentColor" stroke-width="5"></rect>
+            <path class="cursor" d="M33 28 L33 57 L40.5 50 L45.5 61 L51 58.5 L46 47.5 L56 47.5 Z"></path>
+          </svg>
+          <span>PilotPane</span>
         </div>
-        <span class="pill">View only in v0.1</span>
-      </div>
+        <div class="themes" id="themes" role="group" aria-label="Theme"></div>
+      </header>
 
-      <div class="stats">
-        <div class="stat"><div class="label">Resolution</div><div class="stat-value mono" id="st-res">-</div></div>
-        <div class="stat"><div class="label">Frame rate</div><div class="stat-value mono" id="st-fps">-</div></div>
-        <div class="stat"><div class="label">Bitrate</div><div class="stat-value mono" id="st-kbps">-</div></div>
-        <div class="stat"><div class="label">Latency</div><div class="stat-value mono" id="st-rtt">-</div></div>
-      </div>
+      <!-- Ready: waiting for a viewer -->
+      <section id="view-ready" class="view" hidden>
+        <div class="status">
+          <span class="dot" id="ready-dot"></span><span id="ready-text">Ready, waiting for a viewer</span>
+        </div>
 
-      <div class="actions">
-        <button class="btn btn-danger" id="btn-disconnect" type="button">Disconnect viewer</button>
-        <button class="btn" id="btn-new-pin-2" type="button">New PIN</button>
-      </div>
-    </section>
+        <div class="block">
+          <div class="label">Pairing PIN</div>
+          <div class="pin mono" id="pin">000 000</div>
+          <div class="lock" id="lock" hidden></div>
+        </div>
 
-    <!-- Paused, no network, port busy, errors -->
-    <section id="view-problem" class="view" hidden>
-      <div class="problem">
-        <h1 id="problem-title">Problem</h1>
-        <p id="problem-text"></p>
-        <ol id="problem-steps"></ol>
+        <div class="block">
+          <div class="label">Open on the other laptop</div>
+          <div class="url mono" id="url">http://...</div>
+          <ul class="addresses" id="addresses"></ul>
+        </div>
+
         <div class="actions">
-          <button class="btn btn-primary" id="problem-action" type="button">Retry</button>
+          <button class="btn" id="btn-new-pin" type="button">New PIN</button>
+          <button class="btn" id="btn-show-pin" type="button">Show big PIN</button>
+          <button class="btn btn-danger" id="btn-pause" type="button">Pause sharing</button>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <footer class="foot">
-      <span>LAN only · 1 viewer at a time</span>
-      <span class="mono" id="version">v0.1.0</span>
-    </footer>
-  </main>
-  <script type="module" src="host.js"></script>
-</body>
+      <!-- A viewer is connected -->
+      <section id="view-connected" class="view" hidden>
+        <div class="connected-head">
+          <span class="dot ok" id="conn-dot"></span>
+          <h1 id="conn-title">Viewer connected</h1>
+          <span class="since mono" id="since">00:00:00</span>
+        </div>
+
+        <div class="viewer-card">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <rect x="4" y="5" width="16" height="11" rx="1.5"></rect>
+            <path d="M2 19h20"></path>
+          </svg>
+          <div>
+            <div class="viewer-browser" id="viewer-browser">Browser</div>
+            <div class="viewer-address mono" id="viewer-address">0.0.0.0</div>
+          </div>
+          <span class="pill">View only in v0.1</span>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Resolution</div>
+            <div class="stat-value mono" id="st-res">-</div>
+          </div>
+          <div class="stat">
+            <div class="label">Frame rate</div>
+            <div class="stat-value mono" id="st-fps">-</div>
+          </div>
+          <div class="stat">
+            <div class="label">Bitrate</div>
+            <div class="stat-value mono" id="st-kbps">-</div>
+          </div>
+          <div class="stat">
+            <div class="label">Latency</div>
+            <div class="stat-value mono" id="st-rtt">-</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-danger" id="btn-disconnect" type="button">Disconnect viewer</button>
+          <button class="btn" id="btn-new-pin-2" type="button">New PIN</button>
+        </div>
+      </section>
+
+      <!-- Paused, no network, port busy, errors -->
+      <section id="view-problem" class="view" hidden>
+        <div class="problem">
+          <h1 id="problem-title">Problem</h1>
+          <p id="problem-text"></p>
+          <ol id="problem-steps"></ol>
+          <div class="actions">
+            <button class="btn btn-primary" id="problem-action" type="button">Retry</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>LAN only · 1 viewer at a time</span>
+        <span class="mono" id="version">v0.1.0</span>
+      </footer>
+    </main>
+    <script type="module" src="host.js"></script>
+  </body>
 </html>

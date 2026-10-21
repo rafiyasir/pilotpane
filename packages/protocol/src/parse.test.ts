@@ -4,12 +4,15 @@ import { MAX_MESSAGE_BYTES, parseHostMessage, parseViewerMessage } from './parse
 
 test('valid viewer messages parse', () => {
   assert.deepEqual(parseViewerMessage('{"type":"pair","proof":"ab"}'), { type: 'pair', proof: 'ab' });
-  assert.deepEqual(parseViewerMessage('{"type":"set-quality","preset":"720p"}'), { type: 'set-quality', preset: '720p' });
+  assert.deepEqual(parseViewerMessage('{"type":"set-quality","preset":"720p"}'), {
+    type: 'set-quality',
+    preset: '720p'
+  });
   assert.deepEqual(parseViewerMessage('{"type":"ice","candidate":null}'), { type: 'ice', candidate: null });
-  assert.deepEqual(
-    parseViewerMessage('{"type":"ice","candidate":{"candidate":"c","sdpMid":"0","sdpMLineIndex":0}}'),
-    { type: 'ice', candidate: { candidate: 'c', sdpMid: '0', sdpMLineIndex: 0 } }
-  );
+  assert.deepEqual(parseViewerMessage('{"type":"ice","candidate":{"candidate":"c","sdpMid":"0","sdpMLineIndex":0}}'), {
+    type: 'ice',
+    candidate: { candidate: 'c', sdpMid: '0', sdpMLineIndex: 0 }
+  });
 });
 
 test('invalid viewer messages are rejected', () => {

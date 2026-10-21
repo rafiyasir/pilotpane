@@ -7,10 +7,7 @@ export function isPrivateIPv4(ip: string): boolean {
   if (parts.length !== 4 || parts.some((p) => !Number.isInteger(p) || p < 0 || p > 255)) return false;
   const [a, b] = parts as [number, number, number, number];
   return (
-    a === 10 ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) ||
-    (a === 169 && b === 254) // link-local: direct Ethernet cable with no DHCP
+    a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 169 && b === 254) // link-local: direct Ethernet cable with no DHCP
   );
 }
 

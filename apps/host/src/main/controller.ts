@@ -13,13 +13,7 @@ import {
   type DesktopCapturerSource
 } from 'electron';
 import { hostname } from 'node:os';
-import type {
-  EngineCommand,
-  EngineEvent,
-  HostAction,
-  HostState,
-  QualityPreset
-} from '@pilotpane/protocol';
+import type { EngineCommand, EngineEvent, HostAction, HostState, QualityPreset } from '@pilotpane/protocol';
 import { isQualityPreset, isThemeName } from '@pilotpane/protocol';
 import { createLogger } from './log.js';
 import { LanServer } from './net/http-server.js';
@@ -110,7 +104,11 @@ export class HostController {
 
     this.installDisplayMediaHandler();
     this.engineWindow = createEngineWindow(this.opts.windows);
-    this.tray = new HostTray(this.opts.trayIcon, (a) => this.handleAction(a), () => this.showHostWindow());
+    this.tray = new HostTray(
+      this.opts.trayIcon,
+      (a) => this.handleAction(a),
+      () => this.showHostWindow()
+    );
     this.showHostWindow();
     this.showPinWindow();
 
@@ -265,7 +263,11 @@ export class HostController {
   }
 
   private persist(): void {
-    saveSettings(this.opts.settingsFile, { port: this.state.port, theme: this.state.theme, quality: this.state.quality });
+    saveSettings(this.opts.settingsFile, {
+      port: this.state.port,
+      theme: this.state.theme,
+      quality: this.state.quality
+    });
   }
 
   private setQuality(preset: QualityPreset): void {
@@ -293,7 +295,8 @@ export class HostController {
   /** Answers getDisplayMedia() from the engine (the fallback capture route). */
   private installDisplayMediaHandler(): void {
     session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
-      const fromEngine = this.engineWindow && !this.engineWindow.isDestroyed() && request.frame?.url.startsWith('app://bundle/engine/');
+      const fromEngine =
+        this.engineWindow && !this.engineWindow.isDestroyed() && request.frame?.url.startsWith('app://bundle/engine/');
       if (!fromEngine) {
         callback({});
         return;

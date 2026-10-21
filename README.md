@@ -39,13 +39,13 @@ Options: `pnpm start -- --port 7500` uses another port. Logs go to the terminal;
 
 Any shared local network works. Full steps for each are in **[docs/CONNECTIONS.md](docs/CONNECTIONS.md)**.
 
-| Connection | Speed | Notes |
-|---|---|---|
-| Same router (cable or Wi-Fi) | Best | Easiest and most reliable |
-| Direct Ethernet cable | Best | Set two static IPs once (steps included) |
-| Windows Mobile hotspot on the host | Good | Over Wi-Fi, or over Bluetooth if the viewer has no Wi-Fi |
-| Phone USB tethering | Varies | May work, depends on the phone |
-| Bluetooth network (PAN) | Slow | Fallback only; use 720p |
+| Connection                         | Speed  | Notes                                                    |
+| ---------------------------------- | ------ | -------------------------------------------------------- |
+| Same router (cable or Wi-Fi)       | Best   | Easiest and most reliable                                |
+| Direct Ethernet cable              | Best   | Set two static IPs once (steps included)                 |
+| Windows Mobile hotspot on the host | Good   | Over Wi-Fi, or over Bluetooth if the viewer has no Wi-Fi |
+| Phone USB tethering                | Varies | May work, depends on the phone                           |
+| Bluetooth network (PAN)            | Slow   | Fallback only; use 720p                                  |
 
 ## Security
 
@@ -67,7 +67,7 @@ Any shared local network works. Full steps for each are in **[docs/CONNECTIONS.m
 apps/host        Electron app: capture, WebRTC sender, LAN server, pairing, UI, tray
 apps/viewer      Static page served by the host (ES2020, works in Chrome 109)
 packages/protocol  Typed messages, SHA-256 and PIN proof, shared by both
-docs/            Overview, architecture, specs, decisions, connection guides, journal
+docs/            Overview, architecture, decisions, connection guides, journal (specs live in `.claude/specs/`)
 ```
 
 ## Development

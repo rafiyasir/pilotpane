@@ -15,7 +15,7 @@ pnpm start
 ## How work happens
 
 1. Open an issue describing the problem or idea.
-2. For anything bigger than a fix, a short spec in `docs/specs/` comes first, with acceptance criteria.
+2. For anything bigger than a fix, a short spec in `.claude/specs/` comes first, with testable "Done when" items.
 3. Branch from `dev` (`feat/...`, `fix/...`, `docs/...`), make small focused commits, keep `pnpm test` green.
 4. Open a PR against `dev` with: what changed, why, and **manual test steps** (what to run, what to open on the viewer, what you should see).
 5. Test on an old browser if you touched the viewer (Chrome 109 is the baseline).

@@ -11,14 +11,14 @@ Fonts (Space Grotesk, IBM Plex Sans, JetBrains Mono) load from Google Fonts. Off
 
 ## Files
 
-| File | Purpose |
-|---|---|
-| `index.html` | Page shell, brand, theme picker, picks the theme before first paint |
-| `journal.css` | Layout and the four themes (Cockpit, Daylight, Midnight, Contrast), tokens copied from `apps/viewer/src/theme.css` |
-| `journal.js` | Viewer: timeline, spec pages, routing by `#spec-NNN`, code highlighting |
-| `roadmap.js` | Versions and spec titles for the timeline. Edit only when `docs/ROADMAP.md` changes |
-| `specs/manifest.js` | The list of page files to load. Add a line per new page |
-| `specs/NNN.js` | One page per merged spec |
+| File                | Purpose                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `index.html`        | Page shell, brand, theme picker, picks the theme before first paint                                                |
+| `journal.css`       | Layout and the four themes (Cockpit, Daylight, Midnight, Contrast), tokens copied from `apps/viewer/src/theme.css` |
+| `journal.js`        | Viewer: timeline, spec pages, routing by `#spec-NNN`, code highlighting                                            |
+| `roadmap.js`        | Versions and spec titles for the timeline. Edit only when `docs/ROADMAP.md` changes                                |
+| `specs/manifest.js` | The list of page files to load. Add a line per new page                                                            |
+| `specs/NNN.js`      | One page per merged spec                                                                                           |
 
 A spec counts as done when it has a page. Nothing else stores status.
 
@@ -37,44 +37,51 @@ Each `specs/NNN.js` pushes one object onto `window.JOURNAL`. Prose fields accept
 
 ```js
 window.JOURNAL.push({
-  number: '003',                 // three digits, matches roadmap.js
+  number: '003', // three digits, matches roadmap.js
   title: 'Own HTTP and WebSocket server',
-  version: 'v0.1',               // an id from roadmap.js
-  mergedDate: '2026-10-21',      // ISO date
-  technologies: ['Node http'],   // chips; a name that is also a Core concept is highlighted
+  version: 'v0.1', // an id from roadmap.js
+  mergedDate: '2026-10-21', // ISO date
+  technologies: ['Node http'], // chips; a name that is also a Core concept is highlighted
   oneLine: 'One sentence on what this made possible.',
 
-  what: {                        // section 1
+  what: {
+    // section 1
     summary: 'A short paragraph.',
-    partsTouched: [{ path: 'apps/host', note: 'What changed', changed: true }],
+    partsTouched: [{ path: 'apps/host', note: 'What changed', changed: true }]
   },
-  why: {                         // section 2
-    decisions: [{ chose: '...', insteadOf: '...', reason: '...' }],
+  why: {
+    // section 2
+    decisions: [{ chose: '...', insteadOf: '...', reason: '...' }]
   },
-  when: {                        // section 3
+  when: {
+    // section 3
     dependsOn: [{ spec: '002', note: 'what it gave us' }],
-    unlocks: [{ spec: '004', note: 'what builds on it' }],
+    unlocks: [{ spec: '004', note: 'what builds on it' }]
   },
-  how: {                         // section 4
-    steps: [{ title: '...', explanation: '...' }],
+  how: {
+    // section 4
+    steps: [{ title: '...', explanation: '...' }]
   },
-  code: [                        // first entry sits beside "How"; the rest get a "Code" section
-    { file: 'apps/host/src/main/net/ws.ts', excerpt: '...', explanation: '...' },
+  code: [
+    // first entry sits beside "How"; the rest get a "Code" section
+    { file: 'apps/host/src/main/net/ws.ts', excerpt: '...', explanation: '...' }
   ],
-  concepts: [                    // "Learn"; level is Core, Concept or Pattern
+  concepts: [
+    // "Learn"; level is Core, Concept or Pattern
     {
       name: '...',
       level: 'Core',
       explanation: '...',
-      resources: [{ title: '...', url: 'https://...' }],
-    },
+      resources: [{ title: '...', url: 'https://...' }]
+    }
   ],
-  bugs: [                        // optional "Bugs" section; leave out or [] if none
-    { symptom: '...', cause: '...', fix: '...' },
+  bugs: [
+    // optional "Bugs" section; leave out or [] if none
+    { symptom: '...', cause: '...', fix: '...' }
   ],
   quiz: [{ question: '...', answer: '...' }],
-  commits: ['feat(host): ...'],  // optional "Commits" section: subjects, plus a GitHub compare button
-  commitsNote: '...',            // optional text shown in "Commits" (use when commits is empty)
+  commits: ['feat(host): ...'], // optional "Commits" section: subjects, plus a GitHub compare button
+  commitsNote: '...' // optional text shown in "Commits" (use when commits is empty)
 });
 ```
 

@@ -51,7 +51,13 @@ test('parser rejects unmasked client frames and oversized frames', () => {
 test('safeJoin never escapes the folder', () => {
   const dir = resolve('/srv/viewer');
   assert.ok(safeJoin(dir, '/index.html')?.endsWith('index.html'));
-  for (const p of ['/../secret.txt', '/%2e%2e/secret.txt', '/a/../../b', '/..%2f..%2fetc/passwd', '/C:/Windows/win.ini']) {
+  for (const p of [
+    '/../secret.txt',
+    '/%2e%2e/secret.txt',
+    '/a/../../b',
+    '/..%2f..%2fetc/passwd',
+    '/C:/Windows/win.ini'
+  ]) {
     const r = safeJoin(dir, p);
     assert.ok(r === null || r.startsWith(dir + sep), `${p} -> ${r}`);
   }

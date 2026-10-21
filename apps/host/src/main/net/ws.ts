@@ -24,7 +24,9 @@ export const CLOSE = {
 } as const;
 
 export function acceptKey(clientKey: string): string {
-  return createHash('sha1').update(clientKey + WS_GUID).digest('base64');
+  return createHash('sha1')
+    .update(clientKey + WS_GUID)
+    .digest('base64');
 }
 
 export interface Frame {

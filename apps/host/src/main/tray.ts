@@ -48,7 +48,11 @@ export class HostTray {
         { label: 'Open PilotPane', click: () => this.openHostWindow() },
         { label: 'Copy viewer address', enabled: url !== null, click: () => url && clipboard.writeText(url) },
         { label: 'New PIN', click: () => this.act({ action: 'new-pin' }) },
-        { label: 'Disconnect viewer', visible: state.viewer !== null, click: () => this.act({ action: 'disconnect-viewer' }) },
+        {
+          label: 'Disconnect viewer',
+          visible: state.viewer !== null,
+          click: () => this.act({ action: 'disconnect-viewer' })
+        },
         sharing
           ? { label: 'Pause sharing', click: () => this.act({ action: 'pause' }) }
           : { label: 'Resume sharing', click: () => this.act({ action: 'resume' }) },

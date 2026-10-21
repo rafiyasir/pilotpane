@@ -30,10 +30,10 @@ Internet or remote access, accounts, cloud file sync, recording.
 
 ## Platforms
 
-| Part | v0.x | Later |
-|---|---|---|
-| Host | Windows 10/11 | macOS, Linux (capture and input sit behind interfaces) |
-| Viewer | Any browser with WebRTC: Chrome 109+ (incl. Windows 7/8), Edge, Firefox, ChromeOS, macOS, Linux | Touch-friendly tablet and phone viewer |
+| Part   | v0.x                                                                                            | Later                                                  |
+| ------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Host   | Windows 10/11                                                                                   | macOS, Linux (capture and input sit behind interfaces) |
+| Viewer | Any browser with WebRTC: Chrome 109+ (incl. Windows 7/8), Edge, Firefox, ChromeOS, macOS, Linux | Touch-friendly tablet and phone viewer                 |
 
 ## Brand
 

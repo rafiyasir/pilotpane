@@ -44,23 +44,23 @@
 
 All messages are JSON text frames, typed in `packages/protocol/src/messages.ts` and validated in `parse.ts` (anything invalid is dropped; a bad viewer message closes its socket).
 
-| Direction | Type | Fields |
-|---|---|---|
-| host → viewer | `hello` | `protocol`, `hostName`, `nonce`, `appVersion` |
-| | `paired` | `token` |
-| | `pair-failed` | `reason`: wrong-pin, locked, bad-token; `attemptsLeft`; `retryAfterSec` |
-| | `busy` | (another viewer is connected) |
-| | `offer` | `sdp` |
-| | `ice` | `candidate` or null |
-| | `quality` | `preset`: 1080p, 720p |
-| | `bye` | `reason`: host-stopped, kicked, new-pin, capture-failed |
-| viewer → host | `pair` | `proof` |
-| | `resume` | `token` |
-| | `answer` | `sdp` |
-| | `ice` | `candidate` or null |
-| | `set-quality` | `preset` |
-| | `stats` | `fps`, `kbps`, `rttMs`, `width`, `height`, `codec`, `lossPct` |
-| | `leave` | |
+| Direction     | Type          | Fields                                                                  |
+| ------------- | ------------- | ----------------------------------------------------------------------- |
+| host → viewer | `hello`       | `protocol`, `hostName`, `nonce`, `appVersion`                           |
+|               | `paired`      | `token`                                                                 |
+|               | `pair-failed` | `reason`: wrong-pin, locked, bad-token; `attemptsLeft`; `retryAfterSec` |
+|               | `busy`        | (another viewer is connected)                                           |
+|               | `offer`       | `sdp`                                                                   |
+|               | `ice`         | `candidate` or null                                                     |
+|               | `quality`     | `preset`: 1080p, 720p                                                   |
+|               | `bye`         | `reason`: host-stopped, kicked, new-pin, capture-failed                 |
+| viewer → host | `pair`        | `proof`                                                                 |
+|               | `resume`      | `token`                                                                 |
+|               | `answer`      | `sdp`                                                                   |
+|               | `ice`         | `candidate` or null                                                     |
+|               | `set-quality` | `preset`                                                                |
+|               | `stats`       | `fps`, `kbps`, `rttMs`, `width`, `height`, `codec`, `lossPct`           |
+|               | `leave`       |                                                                         |
 
 Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer`, `ice`, `quality`, `stop`) and `EngineEvent` (`offer`, `ice`, `connection`, `stopped`, `error`); UI windows send `HostAction`s. These are in `packages/protocol/src/host-internal.ts` and never cross the network.
 

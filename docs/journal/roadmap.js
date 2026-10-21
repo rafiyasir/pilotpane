@@ -15,8 +15,8 @@ window.JOURNAL_ROADMAP = {
         ['005', 'Capture and WebRTC'],
         ['006', 'Viewer page'],
         ['007', 'Host window and tray'],
-        ['008', 'Stats overlay'],
-      ],
+        ['008', 'Stats overlay']
+      ]
     },
     {
       id: 'v0.2',
@@ -26,8 +26,8 @@ window.JOURNAL_ROADMAP = {
         ['009', 'Host interfaces'],
         ['010', 'SendInput helper'],
         ['011', 'Mouse and pointer lock'],
-        ['012', 'Low-bandwidth preset'],
-      ],
+        ['012', 'Low-bandwidth preset']
+      ]
     },
     {
       id: 'v0.3',
@@ -35,8 +35,8 @@ window.JOURNAL_ROADMAP = {
       note: 'Type from the viewer',
       specs: [
         ['013', 'Keyboard events'],
-        ['014', 'Capture mode and shortcuts'],
-      ],
+        ['014', 'Capture mode and shortcuts']
+      ]
     },
     {
       id: 'v0.4',
@@ -45,8 +45,8 @@ window.JOURNAL_ROADMAP = {
       specs: [
         ['015', 'Quality presets'],
         ['016', 'Auto-reconnect'],
-        ['017', 'Keep host awake'],
-      ],
+        ['017', 'Keep host awake']
+      ]
     },
     {
       id: 'v0.5',
@@ -56,8 +56,8 @@ window.JOURNAL_ROADMAP = {
         ['018', 'Optional HTTPS'],
         ['019', 'Clipboard sync'],
         ['020', 'Start on login'],
-        ['021', 'Trusted devices'],
-      ],
+        ['021', 'Trusted devices']
+      ]
     },
     {
       id: 'v0.6',
@@ -65,8 +65,8 @@ window.JOURNAL_ROADMAP = {
       note: 'Virtual display',
       specs: [
         ['022', 'Virtual display'],
-        ['023', 'Safe panel restore'],
-      ],
-    },
-  ],
+        ['023', 'Safe panel restore']
+      ]
+    }
+  ]
 };
