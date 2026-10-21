@@ -256,7 +256,12 @@ function handleMessage(msg: HostMessage): void {
       store.set('session', TOKEN_KEY, msg.token);
       if (phase === 'reconnecting') return; // keep the last frame on screen
       phase = 'starting';
-      showCard({ label: 'Connecting', title: 'Starting the stream', text: 'PIN accepted. Setting up the video link.', spinner: true });
+      showCard({
+        label: 'Connecting',
+        title: 'Starting the stream',
+        text: 'PIN accepted. Setting up the video link.',
+        spinner: true
+      });
       return;
     case 'pair-failed':
       if (msg.reason === 'bad-token') {
@@ -313,9 +318,15 @@ function handleBye(reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-fail
     return;
   }
   const texts = {
-    'host-stopped': ['The host stopped sharing', `PilotPane was closed or paused on ${hostName}. When it's running again, reconnect.`],
+    'host-stopped': [
+      'The host stopped sharing',
+      `PilotPane was closed or paused on ${hostName}. When it's running again, reconnect.`
+    ],
     kicked: ['The host disconnected you', 'You can reconnect when the host is ready.'],
-    'capture-failed': ["The host couldn't capture its screen", 'Try again. If it keeps happening, restart PilotPane on the host.']
+    'capture-failed': [
+      "The host couldn't capture its screen",
+      'Try again. If it keeps happening, restart PilotPane on the host.'
+    ]
   } as const;
   const [title, text] = texts[reason];
   showCard({

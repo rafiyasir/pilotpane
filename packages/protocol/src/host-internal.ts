@@ -15,14 +15,7 @@ export interface LanAddress {
 }
 
 export type HostStatus =
-  | 'starting'
-  | 'ready'
-  | 'connecting'
-  | 'streaming'
-  | 'paused'
-  | 'no-network'
-  | 'port-busy'
-  | 'error';
+  'starting' | 'ready' | 'connecting' | 'streaming' | 'paused' | 'no-network' | 'port-busy' | 'error';
 
 export interface HostState {
   status: HostStatus;

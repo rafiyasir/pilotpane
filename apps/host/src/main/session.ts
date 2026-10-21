@@ -169,7 +169,11 @@ export class ViewerSessions {
         return;
       }
     }
-    const info: ViewerInfo = { address: client.remoteAddress, browser: describeBrowser(client.userAgent), since: Date.now() };
+    const info: ViewerInfo = {
+      address: client.remoteAddress,
+      browser: describeBrowser(client.userAgent),
+      since: Date.now()
+    };
     this.active = { conn, info };
     this.send(conn, { type: 'paired', token });
     log.info(`paired with ${info.address} (${info.browser})`);

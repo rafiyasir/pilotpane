@@ -99,7 +99,9 @@ async function start(sourceId: string, preset: QualityPreset): Promise<void> {
   sender = transceiver.sender;
   preferH264(transceiver);
 
-  peer.addEventListener('icecandidate', (e) => emit({ evt: 'ice', candidate: e.candidate ? toWire(e.candidate) : null }));
+  peer.addEventListener('icecandidate', (e) =>
+    emit({ evt: 'ice', candidate: e.candidate ? toWire(e.candidate) : null })
+  );
   peer.addEventListener('connectionstatechange', () => emit({ evt: 'connection', state: peer.connectionState }));
 
   const offer = await peer.createOffer();

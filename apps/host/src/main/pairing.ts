@@ -5,13 +5,7 @@
  * a network drop without typing the PIN again (until the PIN changes).
  */
 import { randomBytes, randomInt } from 'node:crypto';
-import {
-  MAX_PIN_ATTEMPTS,
-  PIN_LENGTH,
-  PIN_LOCK_SECONDS,
-  constantTimeEqual,
-  pinProof
-} from '@pilotpane/protocol';
+import { MAX_PIN_ATTEMPTS, PIN_LENGTH, PIN_LOCK_SECONDS, constantTimeEqual, pinProof } from '@pilotpane/protocol';
 
 export type VerifyResult =
   | { ok: true; token: string }
@@ -52,7 +46,12 @@ export class Pairing {
   verify(nonce: string, proof: string): VerifyResult {
     const now = this.now();
     if (this.lockedUntilMs > now) {
-      return { ok: false, reason: 'locked', attemptsLeft: 0, retryAfterSec: Math.ceil((this.lockedUntilMs - now) / 1000) };
+      return {
+        ok: false,
+        reason: 'locked',
+        attemptsLeft: 0,
+        retryAfterSec: Math.ceil((this.lockedUntilMs - now) / 1000)
+      };
     }
     if (this.lockedUntilMs !== 0) {
       // The pause is over: start counting again.

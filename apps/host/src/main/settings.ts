@@ -18,7 +18,10 @@ export function loadSettings(file: string): Settings {
   try {
     const raw: unknown = JSON.parse(readFileSync(file, 'utf8'));
     const s = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
-    const port = typeof s.port === 'number' && Number.isInteger(s.port) && s.port >= 1024 && s.port <= 65535 ? s.port : DEFAULT_SETTINGS.port;
+    const port =
+      typeof s.port === 'number' && Number.isInteger(s.port) && s.port >= 1024 && s.port <= 65535
+        ? s.port
+        : DEFAULT_SETTINGS.port;
     return {
       port,
       theme: isThemeName(s.theme) ? s.theme : DEFAULT_SETTINGS.theme,
