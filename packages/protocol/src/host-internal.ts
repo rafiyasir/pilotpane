@@ -47,6 +47,13 @@ export type EngineEvent =
   | { evt: 'ice'; candidate: IceCandidate | null }
   | { evt: 'connection'; state: string }
   | { evt: 'stopped' }
+  | {
+      evt: 'debug-stats';
+      frameWidth: number;
+      framesPerSecond: number;
+      targetBitrate: number;
+      qualityLimitationReason: string;
+    }
   | { evt: 'error'; message: string };
 
 /** Host window and PIN window -> main process. */

@@ -19,10 +19,17 @@ export const PIN_LENGTH = 6;
 export const QUALITY_PRESETS = ['1080p', '720p'] as const;
 export type QualityPreset = (typeof QUALITY_PRESETS)[number];
 
-/** Target height and bitrate cap for each preset. */
-export const QUALITY_SPECS: Record<QualityPreset, { height: number; maxBitrate: number }> = {
-  '1080p': { height: 1080, maxBitrate: 8_000_000 },
-  '720p': { height: 720, maxBitrate: 4_000_000 }
+/** Target height and bitrate range (bits per second) for each preset. */
+export interface QualitySpec {
+  height: number;
+  minBitrate: number;
+  startBitrate: number;
+  maxBitrate: number;
+}
+
+export const QUALITY_SPECS: Record<QualityPreset, QualitySpec> = {
+  '1080p': { height: 1080, minBitrate: 3_000_000, startBitrate: 6_000_000, maxBitrate: 12_000_000 },
+  '720p': { height: 720, minBitrate: 1_500_000, startBitrate: 3_000_000, maxBitrate: 6_000_000 }
 };
 
 export const THEMES = ['cockpit', 'daylight', 'midnight', 'contrast'] as const;
