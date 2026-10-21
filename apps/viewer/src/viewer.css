@@ -30,7 +30,8 @@
 .themes {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0;
+  margin: -6px;
 }
 
 .center {
@@ -105,19 +106,22 @@
 
 .digits {
   display: flex;
+  justify-content: center;
   gap: 10px;
 }
 
+/* Fixed size; only shrinks if the screen is narrower than the six boxes. */
 .digits input {
-  flex: 1;
+  flex: 0 1 52px;
   min-width: 0;
-  height: 76px;
+  height: 64px;
+  padding: 0;
   text-align: center;
   border-radius: 10px;
   border: 2px solid var(--line);
   background: var(--bg);
   color: var(--text);
-  font: 700 36px var(--font-mono);
+  font: 700 32px var(--font-mono);
 }
 
 .digits input:focus {
@@ -349,13 +353,20 @@
     padding-left: 16px;
     padding-right: 16px;
   }
+}
 
+@media (max-width: 480px) {
   .card {
-    padding: 24px;
+    padding: 20px;
+  }
+
+  .digits {
+    gap: 6px;
   }
 
   .digits input {
-    height: 60px;
-    font-size: 28px;
+    flex-basis: 42px;
+    height: 54px;
+    font-size: 26px;
   }
 }

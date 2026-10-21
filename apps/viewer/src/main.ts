@@ -518,9 +518,10 @@ function setupThemes(): void {
   for (const theme of THEMES) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'chip';
+    b.className = 'swatch';
     b.dataset.themeId = theme;
-    b.textContent = THEME_NAMES[theme];
+    b.setAttribute('aria-label', `${THEME_NAMES[theme]} theme`);
+    b.title = `${THEME_NAMES[theme]} theme`;
     b.addEventListener('click', () => apply(theme));
     box.appendChild(b);
   }
