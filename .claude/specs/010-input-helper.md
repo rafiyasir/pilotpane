@@ -50,7 +50,7 @@ None. `csc.exe` is part of Windows; no SDK, no npm package, no Visual Studio.
 
 - [x] `formatCommand` tests cover every command type, boundary values (0, 65535) and rejected input (negative, NaN, unknown button, huge `vk`).
 - [x] `HelperInputInjector` tests pass under plain `node --test` with no Electron and no real process.
-- [x] `pnpm build` produces `apps/host/dist/helper/pilotpane-input.exe` on Windows with no extra installs, and does not fail on a machine without `csc.exe` (warns, host falls back to Null).
+- [x] `pnpm build` produces `apps/host/dist/helper/pilotpane-input.exe` on Windows with no extra installs, and does not fail on a machine without `csc.exe` (warns, host falls back to Null). It also does not fail while the host is running and holds the exe: it warns and keeps the existing build.
 - [x] The helper survives a malformed line, and exits within a second of stdin closing.
 - [x] Held buttons and keys are released when the injector is disposed or the helper is restarted.
 - [x] `controller.ts` and `net/` do not import the helper or `child_process`.
