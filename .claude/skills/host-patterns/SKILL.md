@@ -45,7 +45,7 @@ export interface KeepAwake {
   stop(): void;
 }
 export interface InputInjector {
-  inject(event: InputEvent): void; // v0.2: backed by the C# SendInput helper over stdin
+  inject(cmd: InputCommand): void; // HelperInputInjector: C# SendInput helper over stdin; Null when it is missing
   dispose(): void;
 }
 ```
