@@ -15,6 +15,18 @@ pnpm start      # build and launch the host
 
 Works in Git Bash and PowerShell. No Docker, no accounts, no environment variables.
 
+## Portable package
+
+```bash
+pnpm package    # builds, then writes out/PilotPane-<version>-win-x64/ and the same name .zip
+```
+
+`scripts/package.mjs` copies the Electron runtime, renames `electron.exe` to `PilotPane.exe`, and puts the compiled app in `resources/app/`. The two workspace packages (`@pilotpane/protocol`, `@pilotpane/viewer`) are copied as real packages under `resources/app/node_modules/@pilotpane/`, so the host finds them the same way as in development. Tests, source maps and type files are left out. There is no asar, because the input helper exe must be spawnable.
+
+Run `PilotPane.exe` in the folder, or unzip the zip anywhere. Windows asks for firewall access the first time (see [connections](CONNECTIONS.md#firewall)). The folder is not an installer; the installer and updates come in later specs.
+
+`pnpm package` only runs on Windows and needs `pnpm install` to have downloaded Electron. `apps/host/assets/icon.ico` is generated from `icon-256.png` with `node scripts/make-ico.mjs` and committed.
+
 ## Branches
 
 | Branch | Purpose       | How it gets there                          |

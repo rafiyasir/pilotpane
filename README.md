@@ -35,6 +35,8 @@ What happens:
 
 Options: `pnpm start -- --port 7500` uses another port. Logs go to the terminal; set `PILOTPANE_LOG=debug` for more.
 
+To build a portable copy that runs without Node or the source (for testing on another PC), run `pnpm package`. It writes `out/PilotPane-<version>-win-x64/` and a zip of it. See [deployment](docs/DEPLOYMENT.md#portable-package).
+
 ## Connecting the two laptops
 
 Any shared local network works. Full steps for each are in **[docs/CONNECTIONS.md](docs/CONNECTIONS.md)**.

@@ -57,6 +57,17 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | 022 | Virtual display    | host    | Todo   |
 | 023 | Safe panel restore | host    | Todo   |
 
+## Distribution: download, install, update
+
+Built before spec 011 so the app can be shared. Spec numbers are permanent, so these come after 023.
+
+| #   | Spec                                  | Package        | Status |
+| --- | ------------------------------------- | -------------- | ------ |
+| 024 | Packaging (portable build)            | host, tooling  | Done   |
+| 025 | Windows installer                     | tooling        | Todo   |
+| 026 | In-app updates (signed manifest)      | protocol, host | Todo   |
+| 027 | Release pipeline and download website | tooling, docs  | Todo   |
+
 ## Later
 
 If people use it: file drop, audio, multi-monitor, touch viewer, extended display, macOS and Linux hosts.
