@@ -37,8 +37,11 @@ Platform-specific work sits behind an interface so a macOS or Linux host replace
 
 ```ts
 export interface ScreenCapturer {
-  list(): Promise<CaptureSource[]>;
-  start(sourceId: string, quality: QualityPreset): Promise<void>;
+  pickPrimary(): Promise<CaptureSource | null>;
+  serveDisplayRequests(isAllowed: (frameUrl: string) => boolean): void;
+}
+export interface KeepAwake {
+  start(): void;
   stop(): void;
 }
 export interface InputInjector {
@@ -47,7 +50,7 @@ export interface InputInjector {
 }
 ```
 
-Controller code depends on the interface, never on `desktopCapturer` or the helper process directly.
+Interfaces live in `apps/host/src/main/platform/`, are built in `main.ts` and passed in `ControllerOptions`. State changes go through `HostStateStore.patch()`. Controller code depends on the interface, never on `desktopCapturer` or the helper process directly.
 
 ## IPC through the preload bridge
 

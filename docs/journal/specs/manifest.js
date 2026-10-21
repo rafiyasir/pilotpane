@@ -10,4 +10,5 @@ window.JOURNAL_FILES = [
   '006.js',
   '007.js',
   '008.js',
+  '009.js',
 ];

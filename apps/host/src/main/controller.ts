@@ -2,23 +2,18 @@
  * The host's brain: owns the state, the LAN server, pairing, viewer sessions,
  * the capture engine window and the UI windows, and wires them together.
  */
-import {
-  BrowserWindow,
-  app,
-  desktopCapturer,
-  ipcMain,
-  powerSaveBlocker,
-  screen,
-  session,
-  type DesktopCapturerSource
-} from 'electron';
+import { BrowserWindow, app, ipcMain } from 'electron';
 import { hostname } from 'node:os';
 import type { EngineCommand, EngineEvent, HostAction, HostState, QualityPreset } from '@pilotpane/protocol';
 import { isQualityPreset, isThemeName } from '@pilotpane/protocol';
+import { HostStateStore } from './host-state.js';
 import { createLogger } from './log.js';
 import { LanServer } from './net/http-server.js';
 import { listLanAddresses } from './net/lan.js';
 import { Pairing } from './pairing.js';
+import type { InputInjector } from './platform/input-injector.js';
+import type { KeepAwake } from './platform/keep-awake.js';
+import type { ScreenCapturer } from './platform/screen-capturer.js';
 import { ViewerSessions } from './session.js';
 import { saveSettings, type Settings } from './settings.js';
 import { HostTray } from './tray.js';
@@ -34,18 +29,20 @@ export interface ControllerOptions {
   protocolDir: string;
   windows: WindowPaths;
   trayIcon: string;
+  capturer: ScreenCapturer;
+  injector: InputInjector;
+  keepAwake: KeepAwake;
 }
 
 export class HostController {
   private readonly pairing = new Pairing();
   private readonly sessions: ViewerSessions;
   private server: LanServer;
-  private state: HostState;
+  private readonly store: HostStateStore;
   private paused = false;
   private quitting = false;
   private pollTimer: NodeJS.Timeout | null = null;
   private lockTimer: NodeJS.Timeout | null = null;
-  private awakeBlocker: number | null = null;
 
   private hostWindow: BrowserWindow | null = null;
   private pinWindow: BrowserWindow | null = null;
@@ -53,7 +50,7 @@ export class HostController {
   private tray: HostTray | null = null;
 
   constructor(private readonly opts: ControllerOptions) {
-    this.state = {
+    this.store = new HostStateStore({
       status: 'starting',
       appVersion: app.getVersion(),
       hostName: hostname(),
@@ -66,7 +63,7 @@ export class HostController {
       stats: null,
       lockedUntil: null,
       message: null
-    };
+    });
 
     this.sessions = new ViewerSessions(this.pairing, {
       hostName: this.state.hostName,
@@ -78,7 +75,7 @@ export class HostController {
       },
       onViewerGone: () => {
         this.engine({ cmd: 'stop' });
-        this.stopKeepAwake();
+        this.opts.keepAwake.stop();
         this.patch({ status: this.paused ? 'paused' : 'ready', viewer: null, stats: null });
       },
       onAnswer: (sdp) => this.engine({ cmd: 'answer', sdp }),
@@ -91,7 +88,17 @@ export class HostController {
     this.server = this.makeServer(this.state.port);
   }
 
+  private get state(): HostState {
+    return this.store.state;
+  }
+
   start(): void {
+    this.store.subscribe((state) => {
+      for (const win of [this.hostWindow, this.pinWindow]) {
+        if (win && !win.isDestroyed()) win.webContents.send('pp:state', state);
+      }
+      this.tray?.update(state);
+    });
     ipcMain.handle('pp:get-state', () => this.state);
     ipcMain.on('pp:act', (event, action: HostAction) => {
       if (!this.isOurWindow(event.sender.id, [this.hostWindow, this.pinWindow])) return;
@@ -102,7 +109,10 @@ export class HostController {
       this.handleEngineEvent(evt);
     });
 
-    this.installDisplayMediaHandler();
+    this.opts.capturer.serveDisplayRequests(
+      (frameUrl) =>
+        !!this.engineWindow && !this.engineWindow.isDestroyed() && frameUrl.startsWith('app://bundle/engine/')
+    );
     this.engineWindow = createEngineWindow(this.opts.windows);
     this.tray = new HostTray(
       this.opts.trayIcon,
@@ -123,7 +133,8 @@ export class HostController {
     if (this.lockTimer) clearTimeout(this.lockTimer);
     this.sessions.kick('host-stopped');
     this.server.closeAll();
-    this.stopKeepAwake();
+    this.opts.keepAwake.stop();
+    this.opts.injector.dispose();
     this.tray?.destroy();
   }
 
@@ -153,11 +164,7 @@ export class HostController {
   // ---------- state ----------
 
   private patch(partial: Partial<HostState>): void {
-    this.state = { ...this.state, ...partial };
-    for (const win of [this.hostWindow, this.pinWindow]) {
-      if (win && !win.isDestroyed()) win.webContents.send('pp:state', this.state);
-    }
-    this.tray?.update(this.state);
+    this.store.patch(partial);
   }
 
   private refreshLock(): void {
@@ -285,31 +292,9 @@ export class HostController {
     if (win && !win.isDestroyed()) win.webContents.send('pp:engine-cmd', command);
   }
 
-  /** The primary screen (multi-monitor choice comes later). */
-  private async pickScreen(): Promise<DesktopCapturerSource | null> {
-    const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 0, height: 0 } });
-    const primaryId = String(screen.getPrimaryDisplay().id);
-    return sources.find((s) => s.display_id === primaryId) ?? sources[0] ?? null;
-  }
-
-  /** Answers getDisplayMedia() from the engine (the fallback capture route). */
-  private installDisplayMediaHandler(): void {
-    session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
-      const fromEngine =
-        this.engineWindow && !this.engineWindow.isDestroyed() && request.frame?.url.startsWith('app://bundle/engine/');
-      if (!fromEngine) {
-        callback({});
-        return;
-      }
-      this.pickScreen()
-        .then((source) => callback(source ? { video: source } : {}))
-        .catch(() => callback({}));
-    });
-  }
-
   private async startEngine(): Promise<void> {
     try {
-      const source = await this.pickScreen();
+      const source = await this.opts.capturer.pickPrimary();
       if (!source) throw new Error('no screen to capture');
       log.info(`capturing "${source.name}"`);
       this.engine({ cmd: 'start', sourceId: source.id, quality: this.state.quality });
@@ -332,7 +317,7 @@ export class HostController {
         log.info(`peer connection: ${evt.state}`);
         if (evt.state === 'connected' && this.sessions.hasViewer) {
           this.patch({ status: 'streaming' });
-          this.startKeepAwake();
+          this.opts.keepAwake.start();
         }
         return;
       case 'stopped':
@@ -372,18 +357,5 @@ export class HostController {
 
   private isOurWindow(senderId: number, wins: Array<BrowserWindow | null>): boolean {
     return wins.some((w) => w !== null && !w.isDestroyed() && w.webContents.id === senderId);
-  }
-
-  // ---------- keep the host awake while streaming ----------
-
-  private startKeepAwake(): void {
-    if (this.awakeBlocker === null) this.awakeBlocker = powerSaveBlocker.start('prevent-display-sleep');
-  }
-
-  private stopKeepAwake(): void {
-    if (this.awakeBlocker !== null) {
-      powerSaveBlocker.stop(this.awakeBlocker);
-      this.awakeBlocker = null;
-    }
   }
 }
