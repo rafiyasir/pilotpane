@@ -4,7 +4,7 @@
  * signaling goes back to it and from there to the viewer over the WebSocket.
  */
 import type { EngineCommand, EngineEvent, IceCandidate, QualityPreset } from '/protocol/index.js';
-import { QUALITY_SPECS } from '/protocol/index.js';
+import { QUALITY_SPECS, withBitrateHints } from '/protocol/index.js';
 import { api } from '../shared/ui.js';
 
 let pc: RTCPeerConnection | null = null;
@@ -12,6 +12,9 @@ let stream: MediaStream | null = null;
 let sender: RTCRtpSender | null = null;
 let quality: QualityPreset = '1080p';
 let pendingIce: RTCIceCandidateInit[] = [];
+let statsTimer: number | undefined;
+
+const STATS_INTERVAL_MS = 5000;
 
 const emit = (e: EngineEvent): void => api.sendEngineEvent(e);
 
@@ -68,6 +71,9 @@ async function applyQuality(): Promise<void> {
   if (!params.encodings || params.encodings.length === 0) params.encodings = [{}];
   const enc = params.encodings[0]!;
   enc.scaleResolutionDownBy = Math.max(1, capturedHeight / spec.height);
+  // Only the cap can change on a live connection. The min and start hints in
+  // the SDP (withBitrateHints) are read once at connect, so a quality change
+  // after that moves the ceiling and the scale, not the floor.
   enc.maxBitrate = spec.maxBitrate;
   enc.maxFramerate = 30;
   // Keep text sharp: under pressure, drop frames before dropping resolution.
@@ -75,7 +81,27 @@ async function applyQuality(): Promise<void> {
   await sender.setParameters(params);
 }
 
+/** Every few seconds, reports what the encoder is really doing (main logs it in debug mode). */
+function startStatsReports(): void {
+  window.clearInterval(statsTimer);
+  statsTimer = window.setInterval(() => {
+    void sender?.getStats().then((report) => {
+      report.forEach((s: Record<string, unknown>) => {
+        if (s.type !== 'outbound-rtp' || s.kind !== 'video') return;
+        emit({
+          evt: 'debug-stats',
+          frameWidth: Number(s.frameWidth ?? 0),
+          framesPerSecond: Number(s.framesPerSecond ?? 0),
+          targetBitrate: Number(s.targetBitrate ?? 0),
+          qualityLimitationReason: String(s.qualityLimitationReason ?? 'none')
+        });
+      });
+    });
+  }, STATS_INTERVAL_MS);
+}
+
 function stop(): void {
+  window.clearInterval(statsTimer);
   pc?.close();
   stream?.getTracks().forEach((t) => t.stop());
   pc = null;
@@ -102,7 +128,10 @@ async function start(sourceId: string, preset: QualityPreset): Promise<void> {
   peer.addEventListener('icecandidate', (e) =>
     emit({ evt: 'ice', candidate: e.candidate ? toWire(e.candidate) : null })
   );
-  peer.addEventListener('connectionstatechange', () => emit({ evt: 'connection', state: peer.connectionState }));
+  peer.addEventListener('connectionstatechange', () => {
+    emit({ evt: 'connection', state: peer.connectionState });
+    if (peer.connectionState === 'connected') startStatsReports();
+  });
 
   const offer = await peer.createOffer();
   await peer.setLocalDescription(offer);
@@ -116,7 +145,10 @@ async function handle(command: EngineCommand): Promise<void> {
       return;
     case 'answer':
       if (!pc) return;
-      await pc.setRemoteDescription({ type: 'answer', sdp: command.sdp });
+      await pc.setRemoteDescription({
+        type: 'answer',
+        sdp: withBitrateHints(command.sdp, QUALITY_SPECS[quality])
+      });
       for (const c of pendingIce) await pc.addIceCandidate(c);
       pendingIce = [];
       await applyQuality();

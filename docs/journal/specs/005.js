@@ -96,7 +96,7 @@ window.JOURNAL.push({
       {
         title: 'Apply the preset',
         explanation:
-          'When the answer arrives, the engine scales down from the captured size and caps the bitrate (8 Mbps for 1080p, 4 Mbps for 720p).',
+          'When the answer arrives, the engine scales down from the captured size and caps the bitrate (originally 8 Mbps for 1080p and 4 Mbps for 720p; raised in the sharper-motion fix, see Bugs).',
       },
       {
         title: 'Stay awake',
@@ -212,7 +212,13 @@ window.JOURNAL.push({
     },
   ],
 
-  bugs: [],
+  bugs: [
+    {
+      symptom: 'Picture went blurry while scrolling or when a terminal printed a lot, then sharpened (found 2026-10-21 09:32).',
+      cause: 'WebRTC starts at a low bitrate and ramps slowly, so bursts of motion were encoded at low quality.',
+      fix: 'Added min, start and max bitrate per preset (1080p 3/6/12 Mbps, 720p 1.5/3/6 Mbps). `withBitrateHints` writes them into the viewer answer as `x-google-*-bitrate` fmtp parameters before `setRemoteDescription`. A 5 s debug report (`debug-stats`) shows `qualityLimitationReason` with `PILOTPANE_LOG=debug`.'
+    }
+  ],
 
   quiz: [
     {

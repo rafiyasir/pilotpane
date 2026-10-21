@@ -337,6 +337,11 @@ export class HostController {
         return;
       case 'stopped':
         return;
+      case 'debug-stats':
+        log.debug(
+          `send: ${evt.frameWidth}px ${evt.framesPerSecond} fps, target ${Math.round(evt.targetBitrate / 1000)} kbps, limited by ${evt.qualityLimitationReason}`
+        );
+        return;
       case 'error':
         log.error(`engine: ${evt.message}`);
         this.sessions.kick('capture-failed');

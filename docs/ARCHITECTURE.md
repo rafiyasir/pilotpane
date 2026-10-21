@@ -68,7 +68,7 @@ Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer
 
 - Capture: primary display, up to 1920×1080 at 30 fps, `contentHint = "text"`.
 - Codec: H.264 preferred when both sides support it, otherwise VP8.
-- Presets: 1080p (8 Mbps cap) and 720p (4 Mbps cap), applied with `scaleResolutionDownBy` and `maxBitrate`; `degradationPreference = maintain-resolution` keeps text sharp by dropping frames first.
+- Presets: 1080p (min 3, start 6, max 12 Mbps) and 720p (min 1.5, start 3, max 6 Mbps). The cap is applied with `scaleResolutionDownBy` and `maxBitrate`; min and start go into the answer SDP as `x-google-*-bitrate` hints (`withBitrateHints`) so motion bursts are not encoded at a low starting bitrate; `degradationPreference = maintain-resolution` keeps text sharp by dropping frames first.
 
 ## Extension points
 
