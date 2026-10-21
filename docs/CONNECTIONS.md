@@ -30,11 +30,13 @@ Modern network ports work with any Ethernet cable between two laptops (no specia
 Without a router there is no DHCP, so give each laptop a fixed address once:
 
 **Host (Windows 11)**
+
 1. Settings > Network & internet > Ethernet > IP assignment > **Edit** > Manual > IPv4 **On**.
 2. IP address `192.168.50.1`, Subnet mask `255.255.255.0` (or prefix length `24`). Leave gateway and DNS empty. Save.
 3. Network profile type: **Private**.
 
 **Viewer (Windows 8)**
+
 1. Control Panel > Network and Sharing Center > **Change adapter settings**.
 2. Right-click **Ethernet** > Properties > **Internet Protocol Version 4 (TCP/IPv4)** > Properties.
 3. **Use the following IP address**: `192.168.50.2`, subnet mask `255.255.255.0`. Leave the rest empty. OK.

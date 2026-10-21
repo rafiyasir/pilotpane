@@ -49,3 +49,9 @@ Short architecture decision records. Newest last. Each says what we chose, what 
 - **Chose**: start Electron with `WebRtcHideLocalIpsWithMdns` disabled, and use no STUN/TURN.
 - **Instead of**: Chromium's default `.local` mDNS candidates.
 - **Why**: on a direct cable or Bluetooth link there may be no working mDNS, and the viewer could never resolve the host. Real private addresses are fine here: they never leave the LAN.
+
+## ADR-009: Dev workflow tooling
+
+- **Chose**: Prettier as the only new dev dependency (`pnpm format`, `pnpm format:check`); a commit-msg hook of our own in `.githooks/` (plain Node, enabled with `pnpm setup-hooks`); small Claude Code hooks and commands in `.claude/`; GitHub Actions CI on `windows-latest` (install with `ELECTRON_SKIP_BINARY_DOWNLOAD=1`, build, test, format check).
+- **Instead of**: husky, commitlint, lint-staged, Turborepo, ESLint plugins.
+- **Why**: Prettier is a widely used open-source dev tool with no install scripts, and it ends style arguments. Everything else is a few lines of Node, which keeps ADR-002 intact: no runtime dependencies are added, and no tool needs an account. The hooks keep the history clean (Conventional Commits, no AI attribution) and stop risky commands (pushes to `main` or `dev`, `git add .`, anything touching `private/`). CI runs the same checks as `pnpm test` on the platform we ship for.
