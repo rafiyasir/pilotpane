@@ -2,7 +2,7 @@
    System fonts only: the app must work with no internet. */
 
 :root,
-[data-theme='cockpit'] {
+:root[data-theme='cockpit'] {
   --bg: #0e1726;
   --surface: #16223a;
   --surface2: #1d2c4a;
@@ -17,7 +17,7 @@
   --desk: #0a101c;
 }
 
-[data-theme='daylight'] {
+:root[data-theme='daylight'] {
   --bg: #f4f6fa;
   --surface: #ffffff;
   --surface2: #e9eef5;
@@ -32,7 +32,7 @@
   --desk: #cbd5e3;
 }
 
-[data-theme='midnight'] {
+:root[data-theme='midnight'] {
   --bg: #000000;
   --surface: #0c0c0f;
   --surface2: #16161a;
@@ -47,7 +47,7 @@
   --desk: #050505;
 }
 
-[data-theme='contrast'] {
+:root[data-theme='contrast'] {
   --bg: #000000;
   --surface: #000000;
   --surface2: #141414;
@@ -161,4 +161,54 @@ body {
 
 .dot.err {
   background: var(--err);
+}
+
+/* Theme swatch: 32 px circle inside a 44 px touch target. Colours are fixed
+   per theme (bg and accent from the blocks above), not theme variables. */
+.swatch {
+  --sw-bg: #0e1726;
+  --sw-accent: #f5a524;
+  width: 44px;
+  height: 44px;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+}
+
+.swatch::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at center, var(--sw-accent) 0, var(--sw-accent) 5px, var(--sw-bg) 5.5px);
+}
+
+.swatch[aria-pressed='true']::before {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+.swatch[data-theme-id='daylight'] {
+  --sw-bg: #f4f6fa;
+  --sw-accent: #a85a0a;
+}
+
+.swatch[data-theme-id='midnight'] {
+  --sw-bg: #000000;
+  --sw-accent: #ffb547;
+}
+
+.swatch[data-theme-id='contrast'] {
+  --sw-bg: #000000;
+  --sw-accent: #ffe500;
 }

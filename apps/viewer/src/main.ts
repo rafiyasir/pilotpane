@@ -38,6 +38,8 @@ const store = {
 const TOKEN_KEY = 'pilotpane.token';
 const THEME_KEY = 'pilotpane.theme';
 const STATS_KEY = 'pilotpane.stats';
+const PINNED_KEY = 'pilotpane.toolbarPinned';
+const TAB_KEY = 'pilotpane.toolbarTab';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
 // ---------- state ----------
@@ -432,29 +434,145 @@ function stopStats(): void {
 function setupToolbar(): void {
   const stage = $('stage');
   const toolbar = $('toolbar');
+  const tab = $('toolbar-tab');
+  const pinBtn = $('btn-pin');
   const hint = $('hint');
-  let hideTimer: number | undefined;
   let idleTimer: number | undefined;
+  let open = false;
+  let pinned = store.get('local', PINNED_KEY) === '1';
 
-  const showBar = () => {
-    toolbar.classList.add('visible');
-    window.clearTimeout(hideTimer);
+  // The toolbar shows when it is open (tab or shortcut) or pinned as a strip.
+  const renderToolbar = () => {
+    stage.classList.toggle('pinned', pinned);
+    tab.hidden = pinned;
+    toolbar.hidden = !(open || pinned);
+    tab.setAttribute('aria-expanded', String(open));
+    tab.setAttribute('aria-label', open ? 'Hide toolbar' : 'Show toolbar');
+    pinBtn.setAttribute('aria-pressed', String(pinned));
+    placeToolbar();
   };
-  const hideBarSoon = () => {
-    window.clearTimeout(hideTimer);
-    hideTimer = window.setTimeout(() => {
-      if (!toolbar.matches(':hover') && !toolbar.contains(document.activeElement)) toolbar.classList.remove('visible');
-    }, 1200);
+  const toggleBar = () => {
+    if (pinned) return;
+    open = !open;
+    renderToolbar();
   };
 
-  stage.addEventListener('mousemove', (e) => {
+  // The tab can be dragged anywhere on the stream. Its position is kept as a
+  // fraction of the stage so it survives resizes and fullscreen.
+  const TAB_W = 64;
+  const TAB_H = 18;
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  let tabFx = 0.5;
+  let tabFy = 0;
+  try {
+    const saved: unknown = JSON.parse(store.get('local', TAB_KEY) ?? 'null');
+    if (saved && typeof saved === 'object') {
+      const { x, y } = saved as { x?: unknown; y?: unknown };
+      if (typeof x === 'number' && typeof y === 'number' && x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+        tabFx = x;
+        tabFy = y;
+      }
+    }
+  } catch {
+    /* keep the default */
+  }
+
+  // Put the open toolbar next to the tab, kept inside the stage.
+  const placeToolbar = () => {
+    if (pinned || toolbar.hidden) {
+      toolbar.style.removeProperty('left');
+      toolbar.style.removeProperty('top');
+      return;
+    }
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    const tabX = clamp(tabFx * w, TAB_W / 2, w - TAB_W / 2);
+    const tabY = clamp(tabFy * h, 0, h - TAB_H);
+    const bw = toolbar.offsetWidth;
+    const bh = toolbar.offsetHeight;
+    const cx = clamp(tabX, bw / 2 + 12, Math.max(bw / 2 + 12, w - bw / 2 - 12));
+    const below = tabY + TAB_H;
+    toolbar.style.left = `${cx}px`;
+    toolbar.style.top = `${below + bh > h ? Math.max(0, tabY - bh) : below}px`;
+  };
+  const placeTab = () => {
+    tab.style.setProperty('--tab-fx', String(tabFx));
+    tab.style.setProperty('--tab-fy', String(tabFy));
+    tab.classList.toggle('floating', tabFy > 0.002);
+    placeToolbar();
+  };
+
+  let drag: { dx: number; dy: number; startX: number; startY: number; moved: boolean } | null = null;
+  let suppressClick = false;
+  tab.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    const r = tab.getBoundingClientRect();
+    drag = {
+      dx: e.clientX - (r.left + r.width / 2),
+      dy: e.clientY - r.top,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false
+    };
+    tab.setPointerCapture(e.pointerId);
+  });
+  tab.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    if (!drag.moved) {
+      if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) < 5) return;
+      drag.moved = true;
+      tab.classList.add('dragging');
+    }
+    const r = stage.getBoundingClientRect();
+    tabFx = clamp((e.clientX - drag.dx - r.left) / r.width, TAB_W / 2 / r.width, 1 - TAB_W / 2 / r.width);
+    tabFy = clamp((e.clientY - drag.dy - r.top) / r.height, 0, 1 - TAB_H / r.height);
+    placeTab();
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    if (drag.moved) {
+      suppressClick = true; // the click that follows a drag must not toggle the toolbar
+      window.setTimeout(() => (suppressClick = false), 0);
+      store.set('local', TAB_KEY, JSON.stringify({ x: tabFx, y: tabFy }));
+    }
+    tab.classList.remove('dragging');
+    drag = null;
+  };
+  tab.addEventListener('pointerup', endDrag);
+  tab.addEventListener('pointercancel', endDrag);
+  window.addEventListener('resize', placeToolbar);
+  document.addEventListener('fullscreenchange', placeToolbar);
+
+  renderToolbar();
+  placeTab();
+
+  stage.addEventListener('mousemove', () => {
     stage.classList.remove('idle');
     window.clearTimeout(idleTimer);
     idleTimer = window.setTimeout(() => stage.classList.add('idle'), 3000);
-    if (e.clientY < 90) showBar();
-    else hideBarSoon();
   });
-  toolbar.addEventListener('focusin', showBar);
+  tab.addEventListener('click', () => {
+    if (!suppressClick) toggleBar();
+  });
+  $('video').addEventListener('click', () => {
+    if (open && !pinned) {
+      open = false;
+      renderToolbar();
+    }
+  });
+  // Ctrl+Alt+Shift pressed together. Not Esc: Chrome uses it to leave fullscreen.
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat || $('stage').hidden || !(e.ctrlKey && e.altKey && e.shiftKey)) return;
+    if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift') return;
+    e.preventDefault();
+    toggleBar();
+  });
+  pinBtn.addEventListener('click', () => {
+    pinned = !pinned;
+    open = !pinned; // unpinning keeps the toolbar open so the click has a visible result
+    store.set('local', PINNED_KEY, pinned ? '1' : '0');
+    renderToolbar();
+  });
   window.setTimeout(() => hint.classList.add('gone'), 6000);
 
   $<HTMLSelectElement>('quality').addEventListener('change', (e) => {
@@ -513,14 +631,15 @@ function setupThemes(): void {
   const apply = (theme: ThemeName) => {
     document.documentElement.dataset.theme = theme;
     store.set('local', THEME_KEY, theme);
-    box.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.theme === theme)));
+    box.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeId === theme)));
   };
   for (const theme of THEMES) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'chip';
-    b.dataset.theme = theme;
-    b.textContent = THEME_NAMES[theme];
+    b.className = 'swatch';
+    b.dataset.themeId = theme;
+    b.setAttribute('aria-label', `${THEME_NAMES[theme]} theme`);
+    b.title = `${THEME_NAMES[theme]} theme`;
     b.addEventListener('click', () => apply(theme));
     box.appendChild(b);
   }

@@ -29,7 +29,8 @@
 .themes {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 0;
+  margin: -6px;
 }
 
 .view {
@@ -59,6 +60,7 @@
   font-size: clamp(64px, 12vw, 112px);
   line-height: 1;
   letter-spacing: 8px;
+  overflow-wrap: anywhere;
 }
 
 .lock {
@@ -122,6 +124,7 @@
 
 .viewer-card {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   padding: 18px 20px;
