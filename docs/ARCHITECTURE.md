@@ -72,8 +72,8 @@ Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer
 
 ## Extension points
 
-- **Platform interfaces** (`apps/host/src/main/platform/`): `ScreenCapturer`, `KeepAwake` and `InputInjector`, injected into the controller from `main.ts`. Electron implementations sit beside them; `NullInputInjector` stands in until spec 010.
-- **Capture** (`engine.ts`) and, from v0.2, **input injection** (an `InputInjector` interface backed by a small C# `SendInput` helper speaking a documented stdin protocol) are the platform-specific parts. A macOS or Linux host replaces only those.
+- **Platform interfaces** (`apps/host/src/main/platform/`): `ScreenCapturer`, `KeepAwake` and `InputInjector`, injected into the controller from `main.ts`. Electron implementations sit beside them; `NullInputInjector` stands in when the helper exe is missing.
+- **Capture** (`engine.ts`) and **input injection** (`HelperInputInjector`, backed by `pilotpane-input.exe`, a small C# `SendInput` helper built from `apps/host/helper/` by `scripts/build-helper.mjs` and driven over a stdin text protocol, see `apps/host/helper/PROTOCOL.md`) are the platform-specific parts. A macOS or Linux host replaces only those.
 - **Transport**: every connection type (router, cable, hotspot, tethering, Bluetooth PAN) is just "an IPv4 LAN" to PilotPane. There is no transport-specific code.
 
 ## Repository layout

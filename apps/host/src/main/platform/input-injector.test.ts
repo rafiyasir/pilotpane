@@ -5,8 +5,8 @@ import { NullInputInjector } from './input-injector.js';
 test('NullInputInjector drops events without throwing', () => {
   const injector = new NullInputInjector();
   assert.doesNotThrow(() => {
-    injector.inject({ kind: 'move' });
-    injector.inject({ kind: 'move' });
+    injector.inject({ kind: 'move', x: 0, y: 0 });
+    injector.inject({ kind: 'move', x: 0, y: 0 });
   });
 });
 

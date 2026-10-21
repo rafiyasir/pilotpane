@@ -1,22 +1,22 @@
 import { createLogger } from '../log.js';
+import type { InputCommand } from './input-command.js';
 
 const log = createLogger('input');
 
-/** Puts viewer mouse and keyboard events on the host. Spec 010 adds the real one. */
+/** Puts mouse and keyboard input on the host. HelperInputInjector is the real one. */
 export interface InputInjector {
-  /** The event type is narrowed to the real input event in spec 011. */
-  inject(event: unknown): void;
+  inject(cmd: InputCommand): void;
   dispose(): void;
 }
 
-/** Used until input injection exists: drops every event. */
+/** Used when the helper is not available: drops every command. */
 export class NullInputInjector implements InputInjector {
   private warned = false;
 
-  inject(_event: unknown): void {
+  inject(_cmd: InputCommand): void {
     if (this.warned) return;
     this.warned = true;
-    log.debug('input injection is not available yet, dropping events');
+    log.debug('input injection is not available, dropping commands');
   }
 
   dispose(): void {
