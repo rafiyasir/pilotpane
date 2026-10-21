@@ -1,0 +1,10 @@
+node_modules/
+dist/
+out/
+private/
+pnpm-lock.yaml
+*.tsbuildinfo
+docs/journal/specs/
+docs/journal/journal.css
+docs/journal/journal.js
+docs/journal/index.html
