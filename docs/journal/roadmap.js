@@ -67,6 +67,17 @@ window.JOURNAL_ROADMAP = {
         ['022', 'Virtual display'],
         ['023', 'Safe panel restore']
       ]
+    },
+    {
+      id: 'dist',
+      name: 'Distribution',
+      note: 'Download, install, update',
+      specs: [
+        ['024', 'Packaging'],
+        ['025', 'Windows installer'],
+        ['026', 'In-app updates'],
+        ['027', 'Release pipeline and site']
+      ]
     }
   ]
 };
