@@ -196,10 +196,14 @@
 /* Pull tab: always visible at the top centre; opens the toolbar below it. */
 .toolbar-tab {
   position: absolute;
-  top: 0;
-  left: 50%;
+  /* Position is a fraction of the stage, set from main.ts (default: top centre). */
+  top: clamp(0px, calc(var(--tab-fy, 0) * 100%), calc(100% - 18px));
+  left: clamp(32px, calc(var(--tab-fx, 0.5) * 100%), calc(100% - 32px));
   transform: translateX(-50%);
   z-index: 2;
+  opacity: 0.55;
+  touch-action: none;
+  transition: opacity 0.15s ease;
   width: 64px;
   height: 18px;
   padding: 0;
@@ -212,6 +216,23 @@
   background: var(--bg);
   color: var(--accent);
   cursor: pointer;
+}
+
+.toolbar-tab:hover,
+.toolbar-tab:focus-visible,
+.toolbar-tab[aria-expanded='true'],
+.toolbar-tab.dragging {
+  opacity: 1;
+}
+
+.toolbar-tab.dragging {
+  cursor: grabbing;
+}
+
+/* Away from the top edge it becomes a full pill. */
+.toolbar-tab.floating {
+  border-top: 1px solid var(--line);
+  border-radius: 8px;
 }
 
 .toolbar-tab:focus-visible {

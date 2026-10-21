@@ -39,6 +39,7 @@ const TOKEN_KEY = 'pilotpane.token';
 const THEME_KEY = 'pilotpane.theme';
 const STATS_KEY = 'pilotpane.stats';
 const PINNED_KEY = 'pilotpane.toolbarPinned';
+const TAB_KEY = 'pilotpane.toolbarTab';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
 // ---------- state ----------
@@ -448,20 +449,111 @@ function setupToolbar(): void {
     tab.setAttribute('aria-expanded', String(open));
     tab.setAttribute('aria-label', open ? 'Hide toolbar' : 'Show toolbar');
     pinBtn.setAttribute('aria-pressed', String(pinned));
+    placeToolbar();
   };
   const toggleBar = () => {
     if (pinned) return;
     open = !open;
     renderToolbar();
   };
+
+  // The tab can be dragged anywhere on the stream. Its position is kept as a
+  // fraction of the stage so it survives resizes and fullscreen.
+  const TAB_W = 64;
+  const TAB_H = 18;
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  let tabFx = 0.5;
+  let tabFy = 0;
+  try {
+    const saved: unknown = JSON.parse(store.get('local', TAB_KEY) ?? 'null');
+    if (saved && typeof saved === 'object') {
+      const { x, y } = saved as { x?: unknown; y?: unknown };
+      if (typeof x === 'number' && typeof y === 'number' && x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+        tabFx = x;
+        tabFy = y;
+      }
+    }
+  } catch {
+    /* keep the default */
+  }
+
+  // Put the open toolbar next to the tab, kept inside the stage.
+  const placeToolbar = () => {
+    if (pinned || toolbar.hidden) {
+      toolbar.style.removeProperty('left');
+      toolbar.style.removeProperty('top');
+      return;
+    }
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    const tabX = clamp(tabFx * w, TAB_W / 2, w - TAB_W / 2);
+    const tabY = clamp(tabFy * h, 0, h - TAB_H);
+    const bw = toolbar.offsetWidth;
+    const bh = toolbar.offsetHeight;
+    const cx = clamp(tabX, bw / 2 + 12, Math.max(bw / 2 + 12, w - bw / 2 - 12));
+    const below = tabY + TAB_H;
+    toolbar.style.left = `${cx}px`;
+    toolbar.style.top = `${below + bh > h ? Math.max(0, tabY - bh) : below}px`;
+  };
+  const placeTab = () => {
+    tab.style.setProperty('--tab-fx', String(tabFx));
+    tab.style.setProperty('--tab-fy', String(tabFy));
+    tab.classList.toggle('floating', tabFy > 0.002);
+    placeToolbar();
+  };
+
+  let drag: { dx: number; dy: number; startX: number; startY: number; moved: boolean } | null = null;
+  let suppressClick = false;
+  tab.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    const r = tab.getBoundingClientRect();
+    drag = {
+      dx: e.clientX - (r.left + r.width / 2),
+      dy: e.clientY - r.top,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false
+    };
+    tab.setPointerCapture(e.pointerId);
+  });
+  tab.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    if (!drag.moved) {
+      if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) < 5) return;
+      drag.moved = true;
+      tab.classList.add('dragging');
+    }
+    const r = stage.getBoundingClientRect();
+    tabFx = clamp((e.clientX - drag.dx - r.left) / r.width, TAB_W / 2 / r.width, 1 - TAB_W / 2 / r.width);
+    tabFy = clamp((e.clientY - drag.dy - r.top) / r.height, 0, 1 - TAB_H / r.height);
+    placeTab();
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    if (drag.moved) {
+      suppressClick = true; // the click that follows a drag must not toggle the toolbar
+      window.setTimeout(() => (suppressClick = false), 0);
+      store.set('local', TAB_KEY, JSON.stringify({ x: tabFx, y: tabFy }));
+    }
+    tab.classList.remove('dragging');
+    drag = null;
+  };
+  tab.addEventListener('pointerup', endDrag);
+  tab.addEventListener('pointercancel', endDrag);
+  window.addEventListener('resize', placeToolbar);
+  document.addEventListener('fullscreenchange', placeToolbar);
+
   renderToolbar();
+  placeTab();
 
   stage.addEventListener('mousemove', () => {
     stage.classList.remove('idle');
     window.clearTimeout(idleTimer);
     idleTimer = window.setTimeout(() => stage.classList.add('idle'), 3000);
   });
-  tab.addEventListener('click', toggleBar);
+  tab.addEventListener('click', () => {
+    if (!suppressClick) toggleBar();
+  });
   $('video').addEventListener('click', () => {
     if (open && !pinned) {
       open = false;
