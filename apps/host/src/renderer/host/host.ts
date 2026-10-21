@@ -17,7 +17,7 @@ function buildThemeChips(): void {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip';
-    b.dataset.theme = theme;
+    b.dataset.themeId = theme;
     b.textContent = THEME_NAMES[theme];
     b.addEventListener('click', () => api.act({ action: 'set-theme', theme }));
     box.appendChild(b);
@@ -82,7 +82,7 @@ function render(s: HostState): void {
   state = s;
   applyTheme(s.theme);
   document.querySelectorAll<HTMLButtonElement>('#themes .chip').forEach((b) => {
-    b.setAttribute('aria-pressed', String(b.dataset.theme === s.theme));
+    b.setAttribute('aria-pressed', String(b.dataset.themeId === s.theme));
   });
   $('version').textContent = `v${s.appVersion}`;
 

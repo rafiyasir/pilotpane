@@ -513,13 +513,13 @@ function setupThemes(): void {
   const apply = (theme: ThemeName) => {
     document.documentElement.dataset.theme = theme;
     store.set('local', THEME_KEY, theme);
-    box.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.theme === theme)));
+    box.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeId === theme)));
   };
   for (const theme of THEMES) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip';
-    b.dataset.theme = theme;
+    b.dataset.themeId = theme;
     b.textContent = THEME_NAMES[theme];
     b.addEventListener('click', () => apply(theme));
     box.appendChild(b);
