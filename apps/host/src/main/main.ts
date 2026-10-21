@@ -2,6 +2,7 @@
  * PilotPane host entry point (Electron main process).
  */
 import { Menu, app } from 'electron';
+import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleAppScheme, registerAppScheme } from './app-protocol.js';
@@ -9,7 +10,9 @@ import { HostController } from './controller.js';
 import { createLogger } from './log.js';
 import { ElectronScreenCapturer } from './platform/electron-capturer.js';
 import { ElectronKeepAwake } from './platform/electron-keep-awake.js';
-import { NullInputInjector } from './platform/input-injector.js';
+import { HelperInputInjector } from './platform/helper-input-injector.js';
+import { NullInputInjector, type InputInjector } from './platform/input-injector.js';
+import { spawnHelper } from './platform/spawn-helper.js';
 import { loadSettings, portFromArgs } from './settings.js';
 import { windowPaths } from './windows.js';
 
@@ -19,6 +22,15 @@ const mainDir = dirname(fileURLToPath(import.meta.url)); // apps/host/dist/main
 const hostDist = join(mainDir, '..');
 const protocolDir = dirname(fileURLToPath(import.meta.resolve('@pilotpane/protocol')));
 const viewerDir = join(dirname(fileURLToPath(import.meta.resolve('@pilotpane/viewer/package.json'))), 'dist');
+
+/** The real injector when the helper exe was built, otherwise one that drops input. */
+function createInjector(exePath: string): InputInjector {
+  if (!existsSync(exePath)) {
+    log.warn('input helper not found, mouse and keyboard control is off');
+    return new NullInputInjector();
+  }
+  return new HelperInputInjector({ spawn: () => spawnHelper(exePath) });
+}
 
 // Chromium hides local IPs behind random ".local" names in WebRTC. On a LAN
 // with no internet (direct cable, Bluetooth) those names may not resolve, so
@@ -54,7 +66,7 @@ if (!app.requestSingleInstanceLock()) {
       windows: windowPaths(mainDir),
       trayIcon: join(hostDist, 'assets', 'tray.png'),
       capturer: new ElectronScreenCapturer(),
-      injector: new NullInputInjector(),
+      injector: createInjector(join(hostDist, 'helper', 'pilotpane-input.exe')),
       keepAwake: new ElectronKeepAwake()
     });
     controller.start();
