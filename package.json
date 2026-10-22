@@ -19,6 +19,7 @@
     "test": "pnpm build && node --test \"packages/protocol/dist/**/*.test.js\" \"apps/host/dist/**/*.test.js\" \"scripts/**/*.test.mjs\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "scan": "node scripts/scan-secrets.mjs",
     "setup-hooks": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
