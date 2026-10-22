@@ -6,6 +6,10 @@ PilotPane turns any laptop with a browser into a screen for your Windows PC, ove
 
 > **Status: v0.1, "see the screen".** The viewer shows the host's screen live. Mouse control arrives in v0.2 and keyboard control in v0.3 (see the [roadmap](docs/ROADMAP.md)). Until then, keep using the host's own keyboard and touchpad while you watch the viewer.
 
+## Download
+
+Get the Windows installer from the [download page](https://rafiyasir.github.io/pilotpane/) or the [releases](https://github.com/rafiyasir/pilotpane/releases). The installer is not code signed yet, so Windows may show "Windows protected your PC": choose **More info**, then **Run anyway**.
+
 ## Why another remote desktop tool?
 
 - **Zero install on the viewer, works on old browsers.** Chrome 109 on Windows 8 is a first-class target.

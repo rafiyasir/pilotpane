@@ -66,7 +66,7 @@ Built before spec 011 so the app can be shared. Spec numbers are permanent, so t
 | 024 | Packaging (portable build)            | host, tooling  | Done   |
 | 025 | Windows installer                     | tooling        | Done   |
 | 026 | In-app updates (signed manifest)      | protocol, host | Done   |
-| 027 | Release pipeline and download website | tooling, docs  | Todo   |
+| 027 | Release pipeline and download website | tooling, docs  | Done   |
 
 ## Later
 

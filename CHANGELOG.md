@@ -10,3 +10,4 @@ All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 - Host window, full-screen PIN on start, tray menu, pause/resume, new PIN, port-busy and no-network screens.
 - Viewer page for Chrome 109+: PIN entry, connection states, auto-reconnect keeping the last frame, toolbar, stats overlay, four themes.
 - Keeps the host display awake while a viewer is watching.
+- Release pipeline: a tag builds the installer and zip on GitHub as a draft release, and `pnpm release:sign` signs the update manifest locally and writes the download page, with a live download count.
