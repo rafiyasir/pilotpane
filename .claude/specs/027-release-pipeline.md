@@ -1,6 +1,6 @@
 # Spec 027: Release pipeline and download website
 
-Status: In progress | Package(s): tooling, docs | Depends on: 024, 025, 026
+Status: Done | Package(s): tooling, docs | Depends on: 024, 025, 026
 
 ## Goal
 
