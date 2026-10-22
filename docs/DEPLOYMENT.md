@@ -44,22 +44,30 @@ pnpm installer  # builds, packages, then writes out/PilotPane-Setup-<version>.ex
 
 The installer is not code signed, so Windows SmartScreen shows "Windows protected your PC" on first run: choose **More info**, then **Run anyway**. Signing is out of scope for now.
 
-## Publishing an update
+## Publishing a release
 
-In-app updates read a signed `manifest.json` from GitHub Pages (ADR-011). For a release, after `pnpm installer`:
+A release is built by GitHub and signed on the maintainer's machine (ADR-012). The private key never leaves that machine. In-app updates read a signed `manifest.json` from GitHub Pages (ADR-011); the download page is `docs/index.html` on the same site.
 
 ```bash
 # once: make a key pair. Keep the private key out of the repo (private/ is ignored).
 node scripts/sign-manifest.mjs keygen private/update-key
 # paste the printed public key into apps/host/src/main/updater/config.ts
-
-node scripts/sign-manifest.mjs sign --key private/update-key/update-private.pem \
-  --installer out/PilotPane-Setup-0.2.0.exe --version 0.2.0 \
-  --url https://github.com/rafiyasir/pilotpane/releases/download/v0.2.0/PilotPane-Setup-0.2.0.exe \
-  --note "What changed" --out docs/update/manifest.json
+# optional: install the GitHub CLI (https://cli.github.com) and run: gh auth login, so release:sign can download the files itself
 ```
 
-Commit `docs/update/manifest.json` to `main` with the release; Pages then serves it at `https://rafiyasir.github.io/pilotpane/update/manifest.json`. The installer itself is a release asset. Up to three notes of 120 characters each. Spec 027 automates these steps.
+1. Tag `main` as `vX.Y.Z` (see "Releasing" below). The tag must equal `v` plus the `package.json` version, or the workflow stops at its first step.
+2. `.github/workflows/release.yml` runs on `windows-latest`: tests, `pnpm package`, `pnpm installer`, `SHA256SUMS`, then a **draft** release holding the installer, the zip and the sums. Nothing is public yet.
+3. On your machine, from a branch off `main` (for example `chore/site-X.Y.Z`):
+
+```bash
+pnpm release:sign -- --version X.Y.Z --key private/update-key/update-private.pem --note "What changed"
+```
+
+It downloads the three files from the draft with the GitHub CLI (or, without the CLI, download them from the draft release page in your browser into a folder and add `--dir <folder>`), refuses if the installer or zip does not match `SHA256SUMS`, signs the manifest, and writes `docs/update/manifest.json` and `docs/index.html` (version, size, SHA-256, download count). Up to three notes of 120 characters each. Use `--dir <folder>` to sign files you already downloaded, and `--out-dir <folder>` to write somewhere other than `docs/` for a trial run.
+
+4. Commit those two files, open a PR into `main`, merge it, then publish the draft release on GitHub (Edit, then Publish release). Pages now serves the download page at `https://rafiyasir.github.io/pilotpane/` and the manifest at `https://rafiyasir.github.io/pilotpane/update/manifest.json`. Merge `main` back into `dev`.
+
+The page makes one request: its script asks the GitHub API for the download count and falls back to the number written at release time. The count means download requests, not installs, and includes in-app updates.
 
 To try an update locally, serve a folder with a manifest and installer on `http://127.0.0.1` and start the app with `PILOTPANE_UPDATE_URL` pointing at the manifest (see the spec 026 test guide).
 
@@ -80,8 +88,9 @@ There is no CI workflow yet. Until one exists, `pnpm test` on Windows is the gat
 2. Bump `version` in the root `package.json` and the workspace packages.
 3. Update `CHANGELOG.md`.
 4. Open a PR `dev` -> `main` and merge it with "Create a merge commit".
-5. Tag `main` as `vX.Y.Z` and push the tag.
-6. Merge `main` back into `dev` if the release commit changed anything there.
+5. Tag `main` as `vX.Y.Z`. Pushing the tag starts the release workflow.
+6. Sign and publish as described in "Publishing a release".
+7. Merge `main` back into `dev` if the release commits changed anything there.
 
 ## Journal site (GitHub Pages)
 
@@ -89,6 +98,6 @@ The learning journal is plain static files in `docs/journal/`, so it needs no bu
 
 1. In the repository settings, open Pages and choose "Deploy from a branch".
 2. Set the branch to `main` and the folder to `/docs`.
-3. After the next release merge, the journal is at `https://rafiyasir.github.io/pilotpane/journal/`.
+3. After the next release merge, the download page is at `https://rafiyasir.github.io/pilotpane/` and the journal is at `https://rafiyasir.github.io/pilotpane/journal/`.
 
 Until then, open `docs/journal/index.html` straight from disk (`file://`). Pages always shows what is on `main`, so new entries appear at the next release.

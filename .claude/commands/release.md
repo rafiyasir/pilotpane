@@ -19,5 +19,12 @@ Phase 1, prepare (on a `chore/release-X.Y.Z` branch from `dev`):
 Phase 2, after the user says the release PR is merged:
 
 1. `git fetch origin --prune && git checkout main && git pull --ff-only`.
-2. `git tag -a vX.Y.Z -m "PilotPane vX.Y.Z"` and `git push origin vX.Y.Z`.
-3. If `main` has anything `dev` lacks, tell the user to open a `main` into `dev` PR. Then `git checkout dev && git pull --ff-only`.
+2. `git tag -a vX.Y.Z -m "PilotPane vX.Y.Z"` and `git push origin vX.Y.Z`. The tag starts `.github/workflows/release.yml`, which builds the installer and zip into a **draft** release (it stops if the tag and the `package.json` version differ).
+3. Wait for the workflow to finish (`gh run watch`, or the Actions tab) and the draft release to appear. If it failed, stop and show the log.
+
+Phase 3, sign and publish (the signing key stays on the user's machine; never read or print it):
+
+1. `git checkout -b chore/site-X.Y.Z` from `main`.
+2. Ask the user for the key path and up to three short notes, then run `pnpm release:sign -- --version X.Y.Z --key <path> --note "..."`. It needs the GitHub CLI logged in, or the three draft files downloaded into a folder and passed with `--dir`. If it refuses with a hash mismatch, stop: do not retry or work around it.
+3. Commit `docs/update/manifest.json` and `docs/index.html` with explicit paths (`chore: publish vX.Y.Z download page and update manifest`), push the work branch, and print a PR title and body for a PR into `main` (merge commit).
+4. Tell the user to merge it, then publish the draft release on GitHub (Edit, then Publish release) and open the download page to check it. If `dev` lacks anything from `main`, tell them to open a `main` into `dev` PR. Then `git checkout dev && git pull --ff-only`.
