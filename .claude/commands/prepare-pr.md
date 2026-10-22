@@ -9,7 +9,7 @@ allowed-tools: Read, Edit, Bash(git:*), Bash(pnpm:*)
 4. Review `git status` and `git diff`. Group changes into logical commits, one concern each, in this order: protocol, host, viewer, tests, docs. Conventional commits with scope: `feat(host): add tray menu`. Lowercase, imperative, under 72 chars. No AI attribution of any kind (no Co-Authored-By, no "Generated with").
 5. Show the proposed commits as a list: message plus files. Wait for approval or edits.
 6. For each commit: `git add <explicit paths>` (never `git add .`, never anything under `private/`), then `git commit -m`. Stop if anything unexpected is left unstaged and ask.
-7. Run `pnpm test` and `pnpm format:check` once. If either fails, stop and report.
+7. Run `pnpm scan` (and `pnpm scan -- --staged` after staging), `pnpm test` and `pnpm format:check` once. If either fails, stop and report.
 8. `git push -u origin <branch>`.
 9. Print, each in its own code block so it can be copied:
    - PR title: plain English, no prefix, under 70 chars.

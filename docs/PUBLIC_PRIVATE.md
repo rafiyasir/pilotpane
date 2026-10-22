@@ -24,12 +24,13 @@ This repository is public from its first commit. Git keeps history forever, so a
 
 ## Before every push
 
-1. `git status` and `git diff --staged`: read what you are committing.
-2. Search the diff for anything personal: real IPs, emails, names, paths like `C:\Users\<you>`.
+1. `git status` and `git diff --staged`: read what you are committing, then run `pnpm scan -- --staged`.
+2. `pnpm scan` checks every tracked file for keys, tokens, real IPs, emails and `C:\Users\<name>` paths. Also read the diff yourself for names and anything it cannot recognise.
 3. Screenshots: check every corner (taskbar, notifications, open tabs).
 
 ## Before announcing the repo
 
-- Run a secret scan over the whole history, for example with gitleaks (free, open source) installed locally: `gitleaks detect --source .`
+- Run `pnpm scan -- --history`: it checks every line added in every commit on every branch. It reads file contents only, so also check commit author emails with `git log --format=%ae%n%ce | sort -u`.
+- A finding is removed or, for a documentation example, added to `scripts/secret-scan.allow.json` as a reviewed entry. A line can also carry `scan:ignore`. The scanner is our own script (`scripts/scan-secrets.mjs`, ADR-002). Switch on GitHub secret scanning in the repo settings once the repo is public.
 - Check the README renders well on GitHub and the license is correct.
 - Make sure issues are enabled and `SECURITY.md` says how to report problems.
