@@ -6,6 +6,7 @@ import { copyFile, mkdir, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findCsc } from './lib/csc.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const source = join(root, 'apps/host/helper/InputHelper.cs');
@@ -18,10 +19,7 @@ if (process.platform !== 'win32') {
   process.exit(0);
 }
 
-const windir = process.env.WINDIR ?? 'C:\\Windows';
-const csc = ['Framework64', 'Framework']
-  .map((f) => join(windir, 'Microsoft.NET', f, 'v4.0.30319', 'csc.exe'))
-  .find((p) => existsSync(p));
+const csc = findCsc();
 
 if (!csc) {
   console.warn('warning: csc.exe not found, input helper not built (input will be disabled)');
