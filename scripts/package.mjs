@@ -36,7 +36,9 @@ async function stageElectron(stageDir) {
   try {
     await stat(join(electronDist, 'electron.exe'));
   } catch {
-    throw new Error('Electron is not installed. Run `pnpm install` first (the electron download must not be skipped).');
+    throw new Error(
+      'The Electron binary is missing. Run `pnpm install`, then `node apps/host/node_modules/electron/install.js` (or start the app once with `pnpm start`).'
+    );
   }
   await cp(electronDist, stageDir, { recursive: true, dereference: true });
   await rename(join(stageDir, 'electron.exe'), join(stageDir, 'PilotPane.exe'));

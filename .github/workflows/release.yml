@@ -26,6 +26,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
+
+      # Electron downloads its binary on first run, not at install, so fetch it here for the package step.
+      - name: Download the Electron binary
+        run: node apps/host/node_modules/electron/install.js
+
       - run: pnpm package
       - run: pnpm installer
 
