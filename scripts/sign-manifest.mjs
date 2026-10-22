@@ -9,17 +9,10 @@
 //       Hashes the installer, signs the manifest and writes it.
 //
 // The signed text comes from canonicalPayload() in packages/protocol, so the host verifies exactly what is signed here.
-import { createHash, createPrivateKey, generateKeyPairSync, sign } from 'node:crypto';
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { generateKeyPairSync } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const { canonicalPayload, parseUpdateManifest } = await import(
-  pathToFileURL(join(root, 'packages/protocol/dist/index.js')).href
-);
+import { buildSignedManifest } from './lib/sign.mjs';
 
 function fail(message) {
   console.error(message);
@@ -54,24 +47,24 @@ if (command === 'keygen') {
 } else if (command === 'sign') {
   const a = parseArgs(rest);
   for (const need of ['key', 'installer', 'version', 'url']) if (!a[need]) fail(`missing --${need}`);
-  const installer = readFileSync(a.installer);
-  const unsigned = {
-    version: a.version,
-    url: a.url,
-    sha256: createHash('sha256').update(installer).digest('hex'),
-    size: statSync(a.installer).size,
-    notes: a.notes
-  };
-  const key = createPrivateKey(readFileSync(a.key));
-  const signature = sign(null, Buffer.from(canonicalPayload(unsigned), 'utf8'), key).toString('base64');
-  const text = JSON.stringify({ ...unsigned, signature }, null, 2) + '\n';
-
-  const check = parseUpdateManifest(text);
-  if (!check.ok) fail(`manifest would be rejected by the host: ${check.reason}`);
+  let signed;
+  try {
+    signed = await buildSignedManifest({
+      installer: readFileSync(a.installer),
+      version: a.version,
+      url: a.url,
+      notes: a.notes,
+      privateKeyPem: readFileSync(a.key)
+    });
+  } catch (error) {
+    fail(error.message);
+  }
 
   const out = a.out ?? 'manifest.json';
-  writeFileSync(out, text);
-  console.log(`wrote ${resolve(out)} (${unsigned.size} bytes installer, sha256 ${unsigned.sha256.slice(0, 12)}...)`);
+  writeFileSync(out, signed.text);
+  console.log(
+    `wrote ${resolve(out)} (${signed.manifest.size} bytes installer, sha256 ${signed.manifest.sha256.slice(0, 12)}...)`
+  );
 } else {
   fail('usage: sign-manifest.mjs keygen <folder> | sign --key ... --installer ... --version ... --url ...');
 }
