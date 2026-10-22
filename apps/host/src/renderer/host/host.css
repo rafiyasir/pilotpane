@@ -210,3 +210,60 @@
   font-size: 13px;
   color: var(--muted);
 }
+
+.foot {
+  align-items: center;
+}
+
+.foot-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Update card (Card: surface, 1 px line, radius 8, padding 16) */
+.update-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.update-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.update-head h2 {
+  margin: 0;
+  font: 600 18px var(--font-display);
+}
+
+.update-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.update-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+}

@@ -48,6 +48,7 @@ export class HostTray {
         { label: 'Open PilotPane', click: () => this.openHostWindow() },
         { label: 'Copy viewer address', enabled: url !== null, click: () => url && clipboard.writeText(url) },
         { label: 'New PIN', click: () => this.act({ action: 'new-pin' }) },
+        { label: 'Check for updates', click: () => this.act({ action: 'check-for-updates' }) },
         {
           label: 'Disconnect viewer',
           visible: state.viewer !== null,
