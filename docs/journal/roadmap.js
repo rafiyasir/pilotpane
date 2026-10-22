@@ -76,7 +76,8 @@ window.JOURNAL_ROADMAP = {
         ['024', 'Packaging'],
         ['025', 'Windows installer'],
         ['026', 'In-app updates'],
-        ['027', 'Release pipeline and site']
+        ['027', 'Release pipeline and site'],
+        ['028', 'Secret scan']
       ]
     }
   ]
