@@ -30,6 +30,10 @@ PilotPane makes no internet requests on its own. The one exception is "Check for
 - The private signing key is kept by the maintainer and is never in the repo.
 - Viewers and pairing stay on the LAN only; this does not change that.
 
+## The download page
+
+The download website (GitHub Pages) makes one request: a script asks `api.github.com` for the release download counts, which GitHub already keeps. That request sends the visitor's IP address to GitHub, as any GitHub page does. Nothing else is requested, nothing is stored on a server we run, and the app itself collects nothing. If the request fails the page shows the number written at release time. The count means download requests, not installs.
+
 ## What plain HTTP means
 
 The viewer page and the WebSocket use plain HTTP on your LAN. That is a deliberate trade-off (no certificate warnings on old browsers):
