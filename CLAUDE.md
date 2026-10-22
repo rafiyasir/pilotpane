@@ -82,7 +82,7 @@ Developed on Windows 11 with Git Bash. Commands must work in Git Bash and PowerS
 3. Every network message is typed in `packages/protocol` with a parser and a test; no `JSON.parse` of network input anywhere else.
 4. LAN-only binding and the `Host`/`Origin` checks are untouched, or the change is called out and reviewed.
 5. The viewer stays ES2020 and Chrome 109 safe; secure-context APIs have an `isSecureContext` check and a fallback.
-6. No secrets or personal data (IPs, hostnames, names, paths, screenshots) in the diff.
+6. No secrets or personal data (IPs, hostnames, names, paths, screenshots) in the diff: `pnpm scan` is clean.
 7. The manual test guide is written in the spec: host steps in Git Bash, viewer steps on the Windows 8 / Chrome 109 laptop, expected results, at least one failure case.
 8. The journal page is written with `/learn NNN`.
 
