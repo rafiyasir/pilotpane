@@ -15,7 +15,8 @@ const initial: HostState = {
   viewer: null,
   stats: null,
   lockedUntil: null,
-  message: null
+  message: null,
+  update: { phase: 'idle' }
 };
 
 test('patch merges into the state and keeps other fields', () => {

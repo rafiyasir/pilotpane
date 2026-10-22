@@ -114,9 +114,31 @@
         </div>
       </section>
 
+      <!-- Update card: only shown after the user clicks "Check for updates" -->
+      <section id="update-card" class="update-card" aria-live="polite" hidden>
+        <div class="update-head">
+          <span class="dot" id="update-dot"></span>
+          <h2 id="update-title">Update available</h2>
+          <span class="mono" id="update-version"></span>
+        </div>
+        <p id="update-text"></p>
+        <ul id="update-notes"></ul>
+        <div class="bar" id="update-bar" role="progressbar" aria-label="Download progress" hidden>
+          <i id="update-bar-fill"></i>
+        </div>
+        <div class="mono" id="update-progress" hidden></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="update-primary" type="button"></button>
+          <button class="btn" id="update-secondary" type="button"></button>
+        </div>
+      </section>
+
       <footer class="foot">
         <span>LAN only · 1 viewer at a time</span>
-        <span class="mono" id="version">v0.1.0</span>
+        <span class="foot-right">
+          <button class="btn" id="btn-check-update" type="button">Check for updates</button>
+          <span class="mono" id="version">v0.1.0</span>
+        </span>
       </footer>
     </main>
     <script type="module" src="host.js"></script>

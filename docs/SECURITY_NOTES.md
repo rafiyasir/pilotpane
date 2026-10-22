@@ -19,6 +19,16 @@ PilotPane gives someone your screen (and later your mouse and keyboard), so it i
 | Video is end-to-end encrypted by WebRTC (DTLS-SRTP), no STUN/TURN servers                                                               | `engine.ts`                        |
 | Strict Content-Security-Policy, `nosniff`, `no-referrer`, `no-store`                                                                    | `http-server.ts`                   |
 | Renderers sandboxed with context isolation; IPC senders checked                                                                         | `windows.ts`, `controller.ts`      |
+| Updates: signed Ed25519 manifest, SHA-256 and size of the installer checked, only after a click                                         | `updater/`                         |
+
+## Updates and the internet
+
+PilotPane makes no internet requests on its own. The one exception is "Check for updates": after a click it fetches a small manifest from GitHub Pages, and after a second click ("Download") it fetches the installer the manifest names.
+
+- The manifest must carry a valid Ed25519 signature from the key built into the app. A wrong, missing or edited signature stops everything before any download.
+- The installer must match the signed SHA-256 and size, or it is deleted and not run.
+- The private signing key is kept by the maintainer and is never in the repo.
+- Viewers and pairing stay on the LAN only; this does not change that.
 
 ## What plain HTTP means
 

@@ -2,6 +2,8 @@
  * PilotPane host entry point (Electron main process).
  */
 import { Menu, app } from 'electron';
+import { spawn } from 'node:child_process';
+import { rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +16,9 @@ import { HelperInputInjector } from './platform/helper-input-injector.js';
 import { NullInputInjector, type InputInjector } from './platform/input-injector.js';
 import { spawnHelper } from './platform/spawn-helper.js';
 import { loadSettings, portFromArgs } from './settings.js';
+import { DEFAULT_MANIFEST_URL, UPDATE_PUBLIC_KEY } from './updater/config.js';
+import { downloadFile, fetchText } from './updater/electron-net.js';
+import { inspectFile } from './updater/verify.js';
 import { windowPaths } from './windows.js';
 
 const log = createLogger('main');
@@ -30,6 +35,12 @@ function createInjector(exePath: string): InputInjector {
     return new NullInputInjector();
   }
   return new HelperInputInjector({ spawn: () => spawnHelper(exePath) });
+}
+
+/** The per-user install from the installer, or this exe when it was not installed. */
+function installedExePath(): string {
+  const installed = join(process.env.LOCALAPPDATA ?? '', 'Programs', 'PilotPane', 'PilotPane.exe');
+  return existsSync(installed) ? installed : process.execPath;
 }
 
 // Chromium hides local IPs behind random ".local" names in WebRTC. On a LAN
@@ -67,7 +78,28 @@ if (!app.requestSingleInstanceLock()) {
       trayIcon: join(hostDist, 'assets', 'tray.png'),
       capturer: new ElectronScreenCapturer(),
       injector: createInjector(join(hostDist, 'helper', 'pilotpane-input.exe')),
-      keepAwake: new ElectronKeepAwake()
+      keepAwake: new ElectronKeepAwake(),
+      update: {
+        updater: {
+          manifestUrl: process.env.PILOTPANE_UPDATE_URL || DEFAULT_MANIFEST_URL,
+          publicKey: UPDATE_PUBLIC_KEY,
+          downloadDir: join(app.getPath('temp'), 'PilotPane-update'),
+          fetchText,
+          download: downloadFile,
+          inspect: inspectFile,
+          remove: (path) => rm(path, { force: true })
+        },
+        relaunchPath: installedExePath(),
+        canInstall: app.isPackaged,
+        spawn: (command, args) => {
+          spawn(command, args, {
+            detached: true,
+            stdio: 'ignore',
+            windowsHide: true,
+            windowsVerbatimArguments: true
+          }).unref();
+        }
+      }
     });
     controller.start();
     log.info(`PilotPane ${app.getVersion()} started, port ${settings.port}`);

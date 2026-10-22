@@ -15,6 +15,8 @@ import type { InputInjector } from './platform/input-injector.js';
 import type { KeepAwake } from './platform/keep-awake.js';
 import type { ScreenCapturer } from './platform/screen-capturer.js';
 import { ViewerSessions } from './session.js';
+import { applyUpdate } from './updater/apply.js';
+import { Updater, type UpdaterOptions } from './updater/updater.js';
 import { saveSettings, type Settings } from './settings.js';
 import { HostTray } from './tray.js';
 import { createEngineWindow, createHostWindow, createPinWindow, type WindowPaths } from './windows.js';
@@ -32,6 +34,17 @@ export interface ControllerOptions {
   capturer: ScreenCapturer;
   injector: InputInjector;
   keepAwake: KeepAwake;
+  update: UpdateServices;
+}
+
+/** Everything the updater needs from the outside world. Built in main.ts. */
+export interface UpdateServices {
+  updater: Omit<UpdaterOptions, 'currentVersion' | 'onState'>;
+  /** The installed PilotPane.exe to start again after an update. */
+  relaunchPath: string;
+  /** False when running from source: the installer must not replace a dev checkout. */
+  canInstall: boolean;
+  spawn(command: string, args: string[]): void;
 }
 
 export class HostController {
@@ -39,6 +52,7 @@ export class HostController {
   private readonly sessions: ViewerSessions;
   private server: LanServer;
   private readonly store: HostStateStore;
+  private readonly updater: Updater;
   private paused = false;
   private quitting = false;
   private pollTimer: NodeJS.Timeout | null = null;
@@ -62,7 +76,14 @@ export class HostController {
       viewer: null,
       stats: null,
       lockedUntil: null,
-      message: null
+      message: null,
+      update: { phase: 'idle' }
+    });
+
+    this.updater = new Updater({
+      ...opts.update.updater,
+      currentVersion: this.state.appVersion,
+      onState: (update) => this.patch({ update })
     });
 
     this.sessions = new ViewerSessions(this.pairing, {
@@ -263,9 +284,39 @@ export class HostController {
         this.pollNetwork();
         return;
       }
+      case 'check-for-updates':
+        this.showHostWindow(); // the result shows in the host window
+        void this.updater.check();
+        return;
+      case 'download-update':
+        void this.updater.download();
+        return;
+      case 'install-update':
+        this.installUpdate();
+        return;
+      case 'dismiss-update':
+        this.updater.dismiss();
+        return;
       case 'quit':
         app.quit();
         return;
+    }
+  }
+
+  private installUpdate(): void {
+    const installerPath = this.updater.readyInstaller;
+    if (!installerPath) return;
+    const { canInstall, relaunchPath, spawn } = this.opts.update;
+    if (!canInstall) {
+      log.warn('updates can only be installed in the installed app');
+      this.updater.markFailed('install-failed');
+      return;
+    }
+    try {
+      applyUpdate({ installerPath, relaunchPath, spawn, quit: () => app.quit() });
+    } catch (err) {
+      log.error('could not start the installer', err);
+      this.updater.markFailed('install-failed');
     }
   }
 
