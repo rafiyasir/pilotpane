@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 import { cp, mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findCsc } from './lib/csc.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outRoot = join(root, 'out');
@@ -40,6 +41,29 @@ async function stageElectron(stageDir) {
   await cp(electronDist, stageDir, { recursive: true, dereference: true });
   await rename(join(stageDir, 'electron.exe'), join(stageDir, 'PilotPane.exe'));
   await rm(join(stageDir, 'resources', 'default_app.asar'), { force: true });
+}
+
+// Electron's exe says "Electron" and "GitHub, Inc." in its version info, and Windows shows that in the firewall
+// prompt. scripts/rebrand/Rebrand.cs rewrites the version info and icon. Without a compiler this is only a warning.
+async function brandExe(stageDir, version) {
+  const csc = findCsc();
+  if (!csc) {
+    console.warn('warning: csc.exe not found, so the exe keeps the name "Electron" in Windows prompts.');
+    return;
+  }
+  const tool = join(outRoot, 'rebrand.exe');
+  await mkdir(outRoot, { recursive: true });
+  const compiled = spawnSync(csc, ['/nologo', '/optimize+', `/out:${tool}`, join(root, 'scripts/rebrand/Rebrand.cs')], {
+    encoding: 'utf8'
+  });
+  if (compiled.status !== 0) throw new Error(`rebrand tool failed to compile:\n${compiled.stdout}${compiled.stderr}`);
+  try {
+    const icon = join(root, 'apps/host/assets/icon.ico');
+    const run = spawnSync(tool, [join(stageDir, 'PilotPane.exe'), icon, version], { stdio: 'inherit' });
+    if (run.status !== 0) throw new Error('could not set the name and icon on PilotPane.exe');
+  } finally {
+    await rm(tool, { force: true });
+  }
 }
 
 async function stageApp(appDir, version) {
@@ -138,6 +162,7 @@ const appDir = join(stageDir, 'resources', 'app');
 await rm(stageDir, { recursive: true, force: true });
 await rm(`${stageDir}.zip`, { force: true });
 await stageElectron(stageDir);
+await brandExe(stageDir, version);
 await stageApp(appDir, version);
 await stageWorkspacePackages(appDir);
 await verifyStage(stageDir);
