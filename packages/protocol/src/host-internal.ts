@@ -17,6 +17,20 @@ export interface LanAddress {
 export type HostStatus =
   'starting' | 'ready' | 'connecting' | 'streaming' | 'paused' | 'no-network' | 'port-busy' | 'error';
 
+export type UpdateFailure =
+  'offline' | 'bad-manifest' | 'bad-signature' | 'bad-download' | 'download-failed' | 'install-failed';
+
+/** Where "Check for updates" is. Nothing leaves `idle` unless the user clicks. */
+export type UpdateState =
+  | { phase: 'idle' }
+  | { phase: 'checking' }
+  | { phase: 'up-to-date' }
+  | { phase: 'available'; version: string; notes: string[] }
+  | { phase: 'downloading'; version: string; receivedBytes: number; totalBytes: number }
+  | { phase: 'verifying'; version: string }
+  | { phase: 'ready'; version: string }
+  | { phase: 'failed'; reason: UpdateFailure };
+
 export interface HostState {
   status: HostStatus;
   appVersion: string;
@@ -31,6 +45,7 @@ export interface HostState {
   stats: StreamStats | null;
   lockedUntil: number | null;
   message: string | null;
+  update: UpdateState;
 }
 
 /** Main process -> engine window. */
@@ -66,6 +81,10 @@ export type HostAction =
   | { action: 'hide-pin-screen' }
   | { action: 'set-theme'; theme: ThemeName }
   | { action: 'use-next-port' }
+  | { action: 'check-for-updates' }
+  | { action: 'download-update' }
+  | { action: 'install-update' }
+  | { action: 'dismiss-update' }
   | { action: 'quit' };
 
 /** What the preload script exposes as window.pilotpane. */
