@@ -25,7 +25,7 @@ pnpm package    # builds, then writes out/PilotPane-<version>-win-x64/ and the s
 
 Run `PilotPane.exe` in the folder, or unzip the zip anywhere. Windows asks for firewall access the first time (see [connections](CONNECTIONS.md#firewall)). The folder is not an installer; the installer and updates come in later specs.
 
-`pnpm package` only runs on Windows and needs `pnpm install` to have downloaded Electron. `apps/host/assets/icon.ico` is generated from `icon-256.png` with `node scripts/make-ico.mjs` and committed.
+`pnpm package` only runs on Windows and needs the Electron binary. Electron downloads it on first run, not at install, so run `pnpm start` once or `node apps/host/node_modules/electron/install.js` before packaging (the release workflow does the second). `apps/host/assets/icon.ico` is generated from `icon-256.png` with `node scripts/make-ico.mjs` and committed.
 
 ## Installer
 
