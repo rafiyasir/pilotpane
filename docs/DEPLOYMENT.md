@@ -44,6 +44,25 @@ pnpm installer  # builds, packages, then writes out/PilotPane-Setup-<version>.ex
 
 The installer is not code signed, so Windows SmartScreen shows "Windows protected your PC" on first run: choose **More info**, then **Run anyway**. Signing is out of scope for now.
 
+## Publishing an update
+
+In-app updates read a signed `manifest.json` from GitHub Pages (ADR-011). For a release, after `pnpm installer`:
+
+```bash
+# once: make a key pair. Keep the private key out of the repo (private/ is ignored).
+node scripts/sign-manifest.mjs keygen private/update-key
+# paste the printed public key into apps/host/src/main/updater/config.ts
+
+node scripts/sign-manifest.mjs sign --key private/update-key/update-private.pem \
+  --installer out/PilotPane-Setup-0.2.0.exe --version 0.2.0 \
+  --url https://github.com/rafiyasir/pilotpane/releases/download/v0.2.0/PilotPane-Setup-0.2.0.exe \
+  --note "What changed" --out docs/update/manifest.json
+```
+
+Commit `docs/update/manifest.json` to `main` with the release; Pages then serves it at `https://rafiyasir.github.io/pilotpane/update/manifest.json`. The installer itself is a release asset. Up to three notes of 120 characters each. Spec 027 automates these steps.
+
+To try an update locally, serve a folder with a manifest and installer on `http://127.0.0.1` and start the app with `PILOTPANE_UPDATE_URL` pointing at the manifest (see the spec 026 test guide).
+
 ## Branches
 
 | Branch | Purpose       | How it gets there                          |
