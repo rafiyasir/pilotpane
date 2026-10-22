@@ -21,11 +21,28 @@ Works in Git Bash and PowerShell. No Docker, no accounts, no environment variabl
 pnpm package    # builds, then writes out/PilotPane-<version>-win-x64/ and the same name .zip
 ```
 
-`scripts/package.mjs` copies the Electron runtime, renames `electron.exe` to `PilotPane.exe`, and puts the compiled app in `resources/app/`. The two workspace packages (`@pilotpane/protocol`, `@pilotpane/viewer`) are copied as real packages under `resources/app/node_modules/@pilotpane/`, so the host finds them the same way as in development. Tests, source maps and type files are left out. There is no asar, because the input helper exe must be spawnable.
+`scripts/package.mjs` copies the Electron runtime, renames `electron.exe` to `PilotPane.exe`, and puts the compiled app in `resources/app/`. The two workspace packages (`@pilotpane/protocol`, `@pilotpane/viewer`) are copied as real packages under `resources/app/node_modules/@pilotpane/`, so the host finds them the same way as in development. `scripts/rebrand/Rebrand.cs` (compiled on the fly with the Windows `csc.exe`) rewrites the exe's version info and icon so Windows prompts such as the firewall one say PilotPane instead of Electron. Tests, source maps and type files are left out. There is no asar, because the input helper exe must be spawnable.
 
 Run `PilotPane.exe` in the folder, or unzip the zip anywhere. Windows asks for firewall access the first time (see [connections](CONNECTIONS.md#firewall)). The folder is not an installer; the installer and updates come in later specs.
 
 `pnpm package` only runs on Windows and needs `pnpm install` to have downloaded Electron. `apps/host/assets/icon.ico` is generated from `icon-256.png` with `node scripts/make-ico.mjs` and committed.
+
+## Installer
+
+```bash
+pnpm installer  # builds, packages, then writes out/PilotPane-Setup-<version>.exe
+```
+
+`apps/installer/Setup.cs` is a small C# program compiled by `scripts/build-installer.mjs` with the `csc.exe` that ships with Windows (ADR-010). The portable zip from the section above is embedded in it, and so is a small uninstaller built from the same source.
+
+- Installs for the current user only, into `%LOCALAPPDATA%\Programs\PilotPane`. No admin prompt.
+- Adds a Start menu shortcut and an entry in Settings > Apps > Installed apps.
+- Running the installer again upgrades in place. The new version is unpacked beside the old one and swapped in, so a failed upgrade keeps the old version.
+- `PilotPane-Setup-<version>.exe /S` installs silently and does not start the app. Errors in silent mode go to `%TEMP%\PilotPane-setup.log`. In Git Bash set `MSYS_NO_PATHCONV=1` first, or it rewrites `/S`.
+- If PilotPane is running, the installer asks once, then closes it and continues (silent mode never closes it and exits with code 2).
+- Uninstall removes the folder, the shortcut and the registry entry. Settings in `%APPDATA%` are kept.
+
+The installer is not code signed, so Windows SmartScreen shows "Windows protected your PC" on first run: choose **More info**, then **Run anyway**. Signing is out of scope for now.
 
 ## Branches
 

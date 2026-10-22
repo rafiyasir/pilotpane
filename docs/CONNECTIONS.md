@@ -6,7 +6,7 @@ Examples below call the laptop being controlled the **host** (Windows 10/11) and
 
 ## Firewall
 
-The first time PilotPane starts, Windows Defender Firewall asks whether "Electron" (or "PilotPane" once packaged) may communicate on networks.
+The first time PilotPane starts, Windows Defender Firewall asks whether "PilotPane" (or "Electron" when run from source with `pnpm start`) may communicate on networks.
 
 - Tick **Private networks** and click **Allow access**.
 - If you'll use a **direct cable** or Bluetooth, Windows usually labels that network "Unidentified network" and treats it as **Public**. Either tick Public too, or set that network to Private:

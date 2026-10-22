@@ -55,3 +55,9 @@ Short architecture decision records. Newest last. Each says what we chose, what 
 - **Chose**: Prettier as the only new dev dependency (`pnpm format`, `pnpm format:check`); a commit-msg hook of our own in `.githooks/` (plain Node, enabled with `pnpm setup-hooks`); small Claude Code hooks and commands in `.claude/`; GitHub Actions CI on `windows-latest` (install with `ELECTRON_SKIP_BINARY_DOWNLOAD=1`, build, test, format check).
 - **Instead of**: husky, commitlint, lint-staged, Turborepo, ESLint plugins.
 - **Why**: Prettier is a widely used open-source dev tool with no install scripts, and it ends style arguments. Everything else is a few lines of Node, which keeps ADR-002 intact: no runtime dependencies are added, and no tool needs an account. The hooks keep the history clean (Conventional Commits, no AI attribution) and stop risky commands (pushes to `main` or `dev`, `git add .`, anything touching `private/`). CI runs the same checks as `pnpm test` on the platform we ship for.
+
+## ADR-010: Own C# installer, per-user
+
+- **Chose**: a small `Setup.cs` compiled with the Windows `csc.exe`, with the portable zip embedded. It installs per user into `%LOCALAPPDATA%\Programs\PilotPane`, adds a Start menu shortcut and a registry uninstall entry, and ships a small uninstaller built from the same source.
+- **Instead of**: Inno Setup, NSIS, WiX/MSI, electron-builder.
+- **Why**: every one of those is a separate tool to install (or a package with install scripts), and none ships with Windows. The C# compiler already builds the input helper (ADR-003), so there is nothing new to trust. Per-user means no UAC prompt and fits a tool that runs in the user's session. Cost: no installer UI, no code signing yet, and setup is C# 5 (the compiler that ships with Windows).
