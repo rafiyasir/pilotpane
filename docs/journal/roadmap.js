@@ -35,7 +35,7 @@ window.JOURNAL_ROADMAP = {
       note: 'Type from the viewer',
       specs: [
         ['013', 'Keyboard events'],
-        ['014', 'Capture mode and shortcuts']
+        ['014', 'Capture mode and shortcut bar']
       ]
     },
     {

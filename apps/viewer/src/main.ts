@@ -7,6 +7,7 @@ import { PIN_LENGTH, PROTOCOL_VERSION, THEMES, isQualityPreset, isThemeName, pin
 import { ControlUi } from './control.js';
 import { KeyboardController } from './keyboard.js';
 import { PointerController } from './pointer.js';
+import { ShortcutBar } from './shortcut-bar.js';
 import { Receiver } from './receiver.js';
 import { HostSocket } from './socket.js';
 
@@ -44,6 +45,8 @@ const STATS_KEY = 'pilotpane.stats';
 const PINNED_KEY = 'pilotpane.toolbarPinned';
 const MOUSE_HINT_KEY = 'pilotpane.mouseHintSeen';
 const LOW_HINT_KEY = 'pilotpane.lowHintSeen';
+const SHORTCUT_HINT_KEY = 'pilotpane.shortcutHintSeen';
+const SHORTCUT_BAR_KEY = 'pilotpane.shortcutBar';
 const TAB_KEY = 'pilotpane.toolbarTab';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
@@ -92,7 +95,15 @@ const controlUi = new ControlUi({
   hintSeen: () => store.get('local', MOUSE_HINT_KEY) === '1',
   markHintSeen: () => store.set('local', MOUSE_HINT_KEY, '1'),
   lowHintSeen: () => store.get('local', LOW_HINT_KEY) === '1',
-  markLowHintSeen: () => store.set('local', LOW_HINT_KEY, '1')
+  markLowHintSeen: () => store.set('local', LOW_HINT_KEY, '1'),
+  shortcutHintSeen: () => store.get('local', SHORTCUT_HINT_KEY) === '1',
+  markShortcutHintSeen: () => store.set('local', SHORTCUT_HINT_KEY, '1')
+});
+
+const shortcutBar = new ShortcutBar({
+  send: (msg) => receiver.sendInput(msg),
+  load: () => store.get('local', SHORTCUT_BAR_KEY),
+  save: (json) => store.set('local', SHORTCUT_BAR_KEY, json)
 });
 
 const pointer = new PointerController($('stage'), video, {
@@ -100,6 +111,7 @@ const pointer = new PointerController($('stage'), video, {
   onChange: (state) => {
     if (state === 'viewing') keyboard.release();
     controlUi.onState(state);
+    shortcutBar.setControlling(state === 'controlling');
   },
   onLockUnavailable: () => controlUi.lockUnavailable()
 });
@@ -333,6 +345,7 @@ function handleMessage(msg: HostMessage): void {
       return;
     case 'input-state':
       controlUi.setAvailable(msg.available);
+      shortcutBar.setAvailable(msg.available);
       pointer.setEnabled(msg.available);
       return;
     case 'bye':
@@ -377,6 +390,7 @@ function endControl(): void {
   pointer.release();
   pointer.setEnabled(false);
   controlUi.reset();
+  shortcutBar.reset();
 }
 
 function onDrop(): void {
@@ -490,11 +504,12 @@ function setupToolbar(): void {
     pinBtn.setAttribute('aria-pressed', String(pinned));
     placeToolbar();
   };
-  const toggleBar = () => {
+  const setToolbarOpen = (on: boolean) => {
     if (pinned) return;
-    open = !open;
+    open = on;
     renderToolbar();
   };
+  const toggleBar = () => setToolbarOpen(!open);
 
   // The tab can be dragged anywhere on the stream. Its position is kept as a
   // fraction of the stage so it survives resizes and fullscreen.
@@ -604,7 +619,15 @@ function setupToolbar(): void {
     if (e.repeat || $('stage').hidden || !(e.ctrlKey && e.altKey && e.shiftKey)) return;
     if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift') return;
     e.preventDefault();
-    toggleBar();
+    if (pointer.isControlling) {
+      // A locked pointer cannot click the toolbar or the shortcut bar: free it and show the
+      // toolbar, keeping control. The chord again locks the pointer and hides the toolbar.
+      const freeing = pointer.isLocked;
+      pointer.toggleLock();
+      setToolbarOpen(freeing);
+    } else {
+      toggleBar();
+    }
   });
   pinBtn.addEventListener('click', () => {
     pinned = !pinned;

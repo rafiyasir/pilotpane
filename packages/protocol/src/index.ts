@@ -8,5 +8,6 @@ export * from './pin.js';
 export * from './pointer-map.js';
 export * from './sdp.js';
 export * from './sha256.js';
+export * from './shortcuts.js';
 export * from './update.js';
 export type * from './host-internal.js';
