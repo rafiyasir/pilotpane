@@ -1,6 +1,6 @@
 # Spec 011: Mouse events and pointer lock
 
-Status: In progress | Package(s): protocol, host, viewer | Depends on: 005, 009, 010
+Status: Done | Package(s): protocol, host, viewer | Depends on: 005, 009, 010
 
 Part of v0.2, "Mouse and low bandwidth". First spec where the viewer controls the host. Keyboard is 013.
 
@@ -58,21 +58,41 @@ None.
 
 ## Done when
 
-- [ ] `parseInputMessage` rejects every malformed or out-of-range case and never throws; tests pass under plain `node --test`.
-- [ ] No input message is read from or sent over the WebSocket; `JSON.parse` of network input exists only in `packages/protocol`.
-- [ ] `input-bridge` tests pass with no Electron: moves above 250 per second are dropped, buttons and wheel are not, `end()` releases held buttons.
-- [ ] Mouse move, left, right, middle click and wheel on the viewer act on the host's primary screen at the right place, including when the video is letterboxed.
-- [ ] Clicking the picture locks the pointer; Esc releases it and the badge changes between "Controlling" and "Viewing".
-- [ ] When the viewer disconnects or the page closes while a button is held, the button is released on the host.
-- [ ] Without the helper exe the viewer shows "Watching only" and the host does not crash.
-- [ ] The viewer stays ES2020 and Chrome 109 safe, with `isSecureContext` checks where needed; UI uses only existing tokens in all four themes.
-- [ ] `pnpm format:check`, `pnpm build`, `pnpm test` and `pnpm scan` pass.
+- [x] `parseInputMessage` rejects every malformed or out-of-range case and never throws; tests pass under plain `node --test`.
+- [x] No input message is read from or sent over the WebSocket; `JSON.parse` of network input exists only in `packages/protocol`.
+- [x] `input-bridge` tests pass with no Electron: moves above 250 per second are dropped, buttons and wheel are not, `end()` releases held buttons.
+- [x] Mouse move, left, right, middle click and wheel on the viewer act on the host's primary screen at the right place, including when the video is letterboxed.
+- [x] Clicking the picture locks the pointer; Esc releases it and the badge changes between "Controlling" and "Viewing".
+- [x] When the viewer disconnects or the page closes while a button is held, the button is released on the host.
+- [x] Without the helper exe the viewer shows "Watching only" and the host does not crash.
+- [x] The viewer stays ES2020 and Chrome 109 safe, with `isSecureContext` checks where needed; UI uses only existing tokens in all four themes.
+- [x] `pnpm format:check`, `pnpm build`, `pnpm test` and `pnpm scan` pass.
 
 ## Manual test guide
 
-Filled in by `/build`.
+Needs both laptops on one network (see docs/CONNECTIONS.md). Before you start, open something harmless on the host, for example Notepad and an empty desktop, and keep the host screen visible so you can see the pointer move.
 
-- **Host (Git Bash):** exact commands.
-- **Viewer (Windows 8 / Chrome 109 laptop):** what to open, click and look for.
-- **Expected results** for each step.
-- **Failure case** (at least one): what to break, and what should happen.
+**Host (Git Bash)**
+
+1. `pnpm build`. Expect `built apps/host/dist/helper/pilotpane-input.exe`.
+2. `PILOTPANE_LOG=debug pnpm start`. Expect the big PIN screen and a log line `input helper ready` after the first mouse event.
+
+**Viewer (Windows 8 / Chrome 109 laptop)**
+
+3. Open the address the host shows, type the PIN. The picture appears. Expect: the toolbar badge (open the toolbar with the tab at the top) reads **Viewing**, and a card at the bottom says "Click the screen to control it. Press Esc to let go."
+4. Click the picture once. Expect: the card goes away, an amber outline appears around the picture, the badge reads **Controlling**, and a small pill says "Esc to let go". The viewer's pointer disappears (locked). Nothing is clicked on the host by this first click.
+5. Move the mouse. Expect: the pointer on the host moves the same way, with no visible lag on a router or cable. Move it to each corner of the picture; the host pointer reaches the matching corner.
+6. Left-click an icon or window on the host, double-click to open it, right-click for a menu, scroll in a long window (Notepad with many lines), drag a window by its title bar. Expect each to happen on the host.
+7. Press Esc. Expect: the outline goes, the badge reads **Viewing**, a pill says "Click to control again." and your own pointer returns. Click the picture again to take control back.
+8. Hold the left mouse button over the host desktop (drag a selection box), then press Esc. Expect: the selection ends, no button stays held on the host.
+9. Reload the viewer page and connect again. Expect: no first-time card this time (it is shown only until you take control once). To see it again, clear site data for the page.
+10. Pick **720p** in the toolbar while controlling. Expect: mouse control keeps working.
+
+**Failure cases**
+
+- **No helper:** close PilotPane. Rename `apps/host/dist/helper/pilotpane-input.exe` to `.bak`, then start with `pnpm --filter @pilotpane/host start` (this skips the build). Connect from the viewer. Expect: the badge reads **Watching only**, a card says "Control is not available on this host. You can still watch the screen.", clicking the picture does nothing, the picture keeps streaming, and the host log shows one warning. Rename the file back afterwards.
+- **Network drop while holding:** hold the left button on the host desktop through the viewer, then unplug the cable or turn off the viewer's network. Expect: within a few seconds the host button is released (the selection ends) and the viewer shows "Reconnecting". After it reconnects, click the picture to control again.
+- **Pointer lock refused:** press Esc right as you click the picture (or use a browser without pointer lock). Expect: a card "Your mouse still works. This browser cannot lock the pointer, so it can leave the window." Control still works with the plain mouse and Esc still releases it.
+- **Other viewer:** with one viewer connected and controlling, open the page on a second device. Expect "Someone else is connected" and the first viewer is unaffected.
+
+Not covered here: keyboard (spec 013), touch and multi-monitor.

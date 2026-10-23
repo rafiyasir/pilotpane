@@ -19,12 +19,12 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 
 ## v0.2: Mouse and low bandwidth
 
-| #   | Spec                                         | Package                | Status      |
-| --- | -------------------------------------------- | ---------------------- | ----------- |
-| 009 | Host interfaces and smaller services         | host                   | Done        |
-| 010 | Own C# SendInput helper behind InputInjector | host                   | Done        |
-| 011 | Mouse events and pointer lock                | protocol, host, viewer | In progress |
-| 012 | Low-bandwidth preset                         | host, viewer           | Todo        |
+| #   | Spec                                         | Package                | Status |
+| --- | -------------------------------------------- | ---------------------- | ------ |
+| 009 | Host interfaces and smaller services         | host                   | Done   |
+| 010 | Own C# SendInput helper behind InputInjector | host                   | Done   |
+| 011 | Mouse events and pointer lock                | protocol, host, viewer | Done   |
+| 012 | Low-bandwidth preset                         | host, viewer           | Todo   |
 
 ## v0.3: Keyboard
 
