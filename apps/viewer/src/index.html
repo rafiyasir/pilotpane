@@ -64,6 +64,7 @@
       <button
         class="toolbar-tab"
         id="toolbar-tab"
+        data-no-control
         type="button"
         aria-label="Show toolbar"
         aria-expanded="false"
@@ -81,7 +82,7 @@
         </svg>
       </button>
 
-      <div class="toolbar" id="toolbar" hidden>
+      <div class="toolbar" id="toolbar" data-no-control hidden>
         <span class="host-label"><span class="dot ok" id="host-dot"></span><span id="host-name">Host</span></span>
         <span class="badge" id="mode-badge" title="Clipboard and full keyboard capture will need secure mode (v0.5)"
           >HTTP · basic mode</span
@@ -94,6 +95,7 @@
           <option value="720p">720p</option>
           <option value="low">Low</option>
         </select>
+        <button class="btn btn-small" id="btn-shortcuts" type="button" aria-pressed="false" disabled>Shortcuts</button>
         <button class="btn btn-small" id="btn-stats" type="button" aria-pressed="false">Stats</button>
         <button class="btn btn-small" id="btn-fullscreen" type="button">Fullscreen</button>
         <button class="btn btn-small" id="btn-pin" type="button" aria-pressed="false">Pin</button>
@@ -115,7 +117,7 @@
 
       <!-- Mouse control: outline while controlling, a hint card, and a small pill -->
       <div class="control-outline" id="control-outline" hidden></div>
-      <div class="control-card" id="control-card" role="status" hidden>
+      <div class="control-card" id="control-card" role="status" data-no-control hidden>
         <svg id="control-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
           <rect x="6" y="2" width="12" height="20" rx="6" fill="none" stroke="currentColor" stroke-width="2"></rect>
           <path d="M12 2v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -128,6 +130,7 @@
         <button class="btn" id="control-ok" type="button">Got it</button>
       </div>
       <div class="control-pill" id="control-pill" role="status" hidden></div>
+      <div class="shortcut-bar" id="shortcut-bar" role="group" aria-label="Shortcuts" data-no-control hidden></div>
 
       <div class="hint" id="hint">Click the tab at the top, or press Ctrl+Alt+Shift, for the toolbar</div>
     </div>

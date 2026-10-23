@@ -10,9 +10,11 @@ export interface ControlStore {
   markHintSeen(): void;
   lowHintSeen(): boolean;
   markLowHintSeen(): void;
+  shortcutHintSeen(): boolean;
+  markShortcutHintSeen(): void;
 }
 
-type CardKind = 'first' | 'no-lock' | 'no-input' | 'low';
+type CardKind = 'first' | 'no-lock' | 'no-input' | 'low' | 'shortcuts';
 
 const CARDS: Record<CardKind, { title: string; sub: string }> = {
   first: { title: 'Click the screen to control it.', sub: 'Press Esc to let go.' },
@@ -24,6 +26,10 @@ const CARDS: Record<CardKind, { title: string; sub: string }> = {
   low: {
     title: 'Low data mode is on.',
     sub: 'Smaller picture and fewer frames, for slow links. Pick 720p when the link is better.'
+  },
+  shortcuts: {
+    title: 'Some keys stay with this browser.',
+    sub: 'Use the Shortcuts bar for Alt+Tab, Win and similar keys.'
   }
 };
 
@@ -51,6 +57,7 @@ export class ControlUi {
   constructor(private readonly store: ControlStore) {
     byId('control-ok').addEventListener('click', () => {
       if (this.cardKind === 'low') this.store.markLowHintSeen();
+      else if (this.cardKind === 'shortcuts') this.store.markShortcutHintSeen();
       else this.store.markHintSeen();
       this.hideCard();
     });
@@ -81,7 +88,11 @@ export class ControlUi {
     if (state === 'controlling') {
       this.store.markHintSeen();
       this.hideCard();
-      this.showPill('Esc to let go', PILL_MS);
+      this.showPill('Esc to let go · Ctrl+Alt+Shift for toolbar', PILL_MS);
+      if (this.available === true && !this.store.shortcutHintSeen()) {
+        this.showCard('shortcuts', true);
+        this.store.markShortcutHintSeen(); // shown once per browser, like the mouse hint
+      }
     } else if (was === 'controlling') {
       this.hideCard();
       this.showPill('Click to control again.', PILL_MS);
@@ -119,6 +130,7 @@ export class ControlUi {
     byId('control-sub').textContent = CARDS[kind].sub;
     byId('control-icon').style.display = first ? '' : 'none';
     byId('control-dot').hidden = first;
+    this.card.classList.toggle('above', kind === 'shortcuts');
     this.card.hidden = false;
     if (autoHide) this.cardTimer = window.setTimeout(() => this.hideCard(), FIRST_HINT_MS);
   }
