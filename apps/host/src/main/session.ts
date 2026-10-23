@@ -154,6 +154,14 @@ export class ViewerSessions {
     current.conn.close(CLOSE.NORMAL, reason);
   }
 
+  /**
+   * Closes the active viewer's socket like a network drop, with no `bye`, so the
+   * viewer keeps its token and retries (used when the host goes to sleep).
+   */
+  dropActive(reason: string): void {
+    this.active?.conn.close(CLOSE.GOING_AWAY, reason);
+  }
+
   private promote(conn: WebSocketConnection, client: ClientInfo, token: string): void {
     const current = this.active;
     if (current && current.conn !== conn) {

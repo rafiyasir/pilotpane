@@ -38,7 +38,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | #   | Spec                            | Package          | Status |
 | --- | ------------------------------- | ---------------- | ------ |
 | 015 | Quality presets                 | protocol, viewer | Done   |
-| 016 | Auto-reconnect after host sleep | host, viewer     | Todo   |
+| 016 | Auto-reconnect after host sleep | host, viewer     | Done   |
 | 017 | Keep host from sleeping         | host             | Todo   |
 
 ## v0.5: Daily-use comfort

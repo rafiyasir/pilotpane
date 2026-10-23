@@ -98,6 +98,18 @@ export class Receiver {
     this.prev = null;
   }
 
+  /** Total bytes the transport has received (video, RTCP, ICE checks), or null with no connection. */
+  async transportBytes(): Promise<number | null> {
+    const pc = this.pc;
+    if (!pc) return null;
+    const report = await pc.getStats();
+    let total: number | null = null;
+    report.forEach((r: Record<string, unknown>) => {
+      if (r.type === 'transport' && typeof r.bytesReceived === 'number') total = (total ?? 0) + r.bytesReceived;
+    });
+    return total;
+  }
+
   async stats(): Promise<StreamStats | null> {
     const pc = this.pc;
     if (!pc) return null;
