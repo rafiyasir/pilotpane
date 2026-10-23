@@ -2,8 +2,17 @@
  * PilotPane viewer: pair with a PIN, receive the host's screen, and recover
  * from network drops. Built for Chrome 109 (ES2020, no newer browser APIs).
  */
-import type { HostMessage, ThemeName } from '/protocol/index.js';
-import { PIN_LENGTH, PROTOCOL_VERSION, THEMES, isQualityPreset, isThemeName, pinProof } from '/protocol/index.js';
+import type { HostMessage, QualityPreset, ThemeName } from '/protocol/index.js';
+import {
+  PIN_LENGTH,
+  autoStart,
+  autoStep,
+  PROTOCOL_VERSION,
+  THEMES,
+  isQualityPreset,
+  isThemeName,
+  pinProof
+} from '/protocol/index.js';
 import { ControlUi } from './control.js';
 import { KeyboardController } from './keyboard.js';
 import { PointerController } from './pointer.js';
@@ -47,6 +56,7 @@ const MOUSE_HINT_KEY = 'pilotpane.mouseHintSeen';
 const LOW_HINT_KEY = 'pilotpane.lowHintSeen';
 const SHORTCUT_HINT_KEY = 'pilotpane.shortcutHintSeen';
 const SHORTCUT_BAR_KEY = 'pilotpane.shortcutBar';
+const QUALITY_KEY = 'pilotpane.quality';
 const TAB_KEY = 'pilotpane.toolbarTab';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
@@ -63,6 +73,10 @@ let retryTimer: number | undefined;
 let lockTimer: number | undefined;
 let statsTimer: number | undefined;
 let statsTick = 0;
+/** 'auto' or a fixed preset. Remembered per browser. */
+let qualityMode: QualityPreset | 'auto' = 'auto';
+let currentPreset: QualityPreset = '720p';
+let auto = autoStart(currentPreset, 0);
 
 const video = $<HTMLVideoElement>('video');
 
@@ -83,6 +97,7 @@ const receiver = new Receiver(video, {
     phase = 'streaming';
     showStage();
     startStats();
+    applyStoredQuality();
     controlUi.onStreaming();
   },
   onFailed: () => {
@@ -340,8 +355,12 @@ function handleMessage(msg: HostMessage): void {
       receiver.addIce(msg.candidate).catch((err: unknown) => console.warn('[pilotpane] ice', err));
       return;
     case 'quality':
-      $<HTMLSelectElement>('quality').value = msg.preset;
-      if (msg.preset === 'low') controlUi.onLowSelected();
+      currentPreset = msg.preset;
+      $('s-quality').textContent = msg.preset;
+      if (qualityMode !== 'auto') {
+        $<HTMLSelectElement>('quality').value = msg.preset;
+        if (msg.preset === 'low') controlUi.onLowSelected();
+      }
       return;
     case 'input-state':
       controlUi.setAvailable(msg.available);
@@ -475,7 +494,29 @@ function startStats(): void {
     $('s-codec').textContent = s.codec;
     $('s-loss').textContent = `${s.lossPct.toFixed(1)}%`;
     if (statsTick % 2 === 0) socket.send({ type: 'stats', stats: s });
+    if (qualityMode === 'auto') {
+      auto = autoStep(auto, s, Date.now());
+      if (auto.preset !== currentPreset) socket.send({ type: 'set-quality', preset: auto.preset });
+    }
   }, 1000);
+}
+
+function setQualityMode(mode: QualityPreset | 'auto'): void {
+  qualityMode = mode;
+  store.set('local', QUALITY_KEY, mode);
+  $<HTMLSelectElement>('quality').value = mode;
+}
+
+/** After the picture starts, go back to the last choice this browser made (Auto if none). */
+function applyStoredQuality(): void {
+  const stored = store.get('local', QUALITY_KEY);
+  if (isQualityPreset(stored)) {
+    setQualityMode(stored);
+    if (stored !== currentPreset) socket.send({ type: 'set-quality', preset: stored });
+  } else {
+    setQualityMode('auto');
+    auto = autoStart(currentPreset, Date.now());
+  }
 }
 
 function stopStats(): void {
@@ -639,7 +680,13 @@ function setupToolbar(): void {
 
   $<HTMLSelectElement>('quality').addEventListener('change', (e) => {
     const value = (e.target as HTMLSelectElement).value;
-    if (isQualityPreset(value)) socket.send({ type: 'set-quality', preset: value });
+    if (value === 'auto') {
+      setQualityMode('auto');
+      auto = autoStart(currentPreset, Date.now());
+    } else if (isQualityPreset(value)) {
+      setQualityMode(value);
+      socket.send({ type: 'set-quality', preset: value });
+    }
   });
 
   const statsBtn = $('btn-stats');
