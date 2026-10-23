@@ -69,6 +69,8 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 
 Built only from existing components and tokens. The viewer's quality control is the existing select in the toolbar; it gains one option, "Low", after 720p. The first time someone picks Low, a Card appears at the bottom of the stream, like the mouse hint: `info` dot, "Low data mode is on.", "Smaller picture and fewer frames, for slow links. Pick 720p when the link is better.", and a plain "Got it". Shown once per browser, then hidden. No other states.
 
+The select also gains "Auto" (spec 015), listed first. The stats overlay gains one more pair, "quality", showing the preset in use. No other UI.
+
 ## Keyboard shortcuts (v0.3)
 
 Built only from existing components and tokens. Capture mode is the existing Controlling state from the mouse hint: while controlling, the viewer sends every key the browser lets it have. On plain HTTP the browser keeps a few combinations for itself, so a shortcut bar sends those instead.
