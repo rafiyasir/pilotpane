@@ -91,6 +91,7 @@
         <span class="sep" aria-hidden="true"></span>
         <label class="visually-hidden" for="quality">Quality</label>
         <select id="quality">
+          <option value="auto">Auto</option>
           <option value="1080p">1080p</option>
           <option value="720p">720p</option>
           <option value="low">Low</option>
@@ -105,7 +106,7 @@
       <div class="stats-overlay mono" id="stats" hidden>
         <span>round trip</span><b id="s-rtt">-</b> <span>fps</span><b id="s-fps">-</b> <span>bitrate</span
         ><b id="s-kbps">-</b> <span>size</span><b id="s-size">-</b> <span>codec</span><b id="s-codec">-</b>
-        <span>lost</span><b id="s-loss">-</b>
+        <span>lost</span><b id="s-loss">-</b> <span>quality</span><b id="s-quality">-</b>
       </div>
 
       <div class="reconnecting" id="reconnecting" hidden>
