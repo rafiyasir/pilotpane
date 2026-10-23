@@ -35,6 +35,10 @@ export class HelperInputInjector implements InputInjector {
     this.launch();
   }
 
+  get available(): boolean {
+    return !this.disposed && this.proc !== null;
+  }
+
   inject(cmd: InputCommand): void {
     const line = formatCommand(cmd);
     if (line === null) {
@@ -50,6 +54,10 @@ export class HelperInputInjector implements InputInjector {
     }
     this.track(cmd);
     this.send(line);
+  }
+
+  releaseAll(): void {
+    if (this.proc && this.ready) this.releaseHeld();
   }
 
   dispose(): void {

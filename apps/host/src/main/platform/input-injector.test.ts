@@ -17,3 +17,9 @@ test('dispose is safe to call twice', () => {
     injector.dispose();
   });
 });
+
+test('NullInputInjector says it is not available and releaseAll is safe', () => {
+  const injector = new NullInputInjector();
+  assert.equal(injector.available, false);
+  assert.doesNotThrow(() => injector.releaseAll());
+});
