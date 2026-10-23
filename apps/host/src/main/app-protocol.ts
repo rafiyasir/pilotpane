@@ -30,6 +30,10 @@ export function handleAppScheme(rendererDir: string, protocolDir: string): void 
     if (!file || !ALLOWED.has(extname(file).toLowerCase()) || file.includes('.test.')) {
       return new Response('Not found', { status: 404 });
     }
-    return net.fetch(pathToFileURL(file).toString());
+    // The bundle changes between builds: never let Chromium reuse an old copy of a module.
+    const res = await net.fetch(pathToFileURL(file).toString());
+    const headers = new Headers(res.headers);
+    headers.set('Cache-Control', 'no-store');
+    return new Response(res.body, { status: res.status, headers });
   });
 }
