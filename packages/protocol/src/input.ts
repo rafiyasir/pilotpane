@@ -3,6 +3,8 @@
  * WebRTC data channel (encrypted), never over the WebSocket.
  */
 
+import { keyCodeToVk } from './keys.js';
+
 export const INPUT_CHANNEL_LABEL = 'input';
 
 /** Mouse positions are absolute across the host's primary screen. */
@@ -16,7 +18,9 @@ export type InputMessage =
   | { type: 'mouse-move'; x: number; y: number }
   | { type: 'mouse-button'; button: InputButton; down: boolean }
   /** Notches: positive dy scrolls up, positive dx scrolls right. */
-  | { type: 'mouse-wheel'; dx: number; dy: number };
+  | { type: 'mouse-wheel'; dx: number; dy: number }
+  /** A physical key (KeyboardEvent.code), see keys.ts. */
+  | { type: 'key'; code: string; down: boolean };
 
 const isInt = (v: unknown, min: number, max: number): v is number =>
   typeof v === 'number' && Number.isInteger(v) && v >= min && v <= max;
@@ -44,6 +48,10 @@ export function parseInputMessage(raw: unknown): InputMessage | null {
     case 'mouse-wheel':
       return isInt(o.dx, -WHEEL_MAX, WHEEL_MAX) && isInt(o.dy, -WHEEL_MAX, WHEEL_MAX)
         ? { type: 'mouse-wheel', dx: o.dx, dy: o.dy }
+        : null;
+    case 'key':
+      return keyCodeToVk(o.code) !== null && typeof o.down === 'boolean'
+        ? { type: 'key', code: o.code as string, down: o.down }
         : null;
     default:
       return null;

@@ -1,5 +1,7 @@
 export * from './constants.js';
 export * from './input.js';
+export * from './key-tracker.js';
+export * from './keys.js';
 export * from './messages.js';
 export * from './parse.js';
 export * from './pin.js';
