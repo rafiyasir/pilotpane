@@ -1,4 +1,5 @@
-import type { IceCandidate, StreamStats } from '/protocol/index.js';
+import type { IceCandidate, InputMessage, StreamStats } from '/protocol/index.js';
+import { INPUT_CHANNEL_LABEL } from '/protocol/index.js';
 
 /**
  * The receiving side of the WebRTC connection. The host makes the offer;
@@ -6,6 +7,7 @@ import type { IceCandidate, StreamStats } from '/protocol/index.js';
  */
 export class Receiver {
   private pc: RTCPeerConnection | null = null;
+  private input: RTCDataChannel | null = null;
   private pendingIce: RTCIceCandidateInit[] = [];
   private prev: { bytes: number; frames: number; at: number } | null = null;
 
@@ -32,6 +34,10 @@ export class Receiver {
           /* autoplay of muted video is allowed; ignore */
         });
       }
+    };
+    // The host opens the input channel; the viewer only sends on it.
+    pc.ondatachannel = (e) => {
+      if (pc === this.pc && e.channel.label === INPUT_CHANNEL_LABEL) this.input = e.channel;
     };
     pc.onicecandidate = (e) => {
       const c = e.candidate;
@@ -60,9 +66,28 @@ export class Receiver {
     await this.pc.addIceCandidate(candidate);
   }
 
+  /** True when the host's input channel is open. */
+  get inputOpen(): boolean {
+    return this.input?.readyState === 'open';
+  }
+
+  /**
+   * Sends one input message. A mouse move is skipped while the channel is
+   * backed up (the next one replaces it anyway). Returns false if not sent.
+   */
+  sendInput(msg: InputMessage): boolean {
+    const ch = this.input;
+    if (!ch || ch.readyState !== 'open') return false;
+    if (msg.type === 'mouse-move' && ch.bufferedAmount > 16 * 1024) return false;
+    ch.send(JSON.stringify(msg));
+    return true;
+  }
+
   /** Closes the connection but leaves the last frame on screen. */
   close(): void {
+    this.input = null;
     if (this.pc) {
+      this.pc.ondatachannel = null;
       this.pc.ontrack = null;
       this.pc.onicecandidate = null;
       this.pc.onconnectionstatechange = null;
