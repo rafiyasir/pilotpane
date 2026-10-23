@@ -42,17 +42,47 @@ export function toHostCoords(clientX: number, clientY: number, box: Box): { x: n
 const PIXELS_PER_NOTCH = 100;
 const LINES_PER_NOTCH = 3;
 
-function notches(delta: number, mode: number): number {
+/** A pause this long (ms) forgets any leftover fraction of a notch. */
+const WHEEL_IDLE_MS = 250;
+
+function notchUnits(delta: number, mode: number): number {
   if (!delta || !Number.isFinite(delta)) return 0;
   const unit = mode === 0 ? PIXELS_PER_NOTCH : mode === 1 ? LINES_PER_NOTCH : 1;
-  const n = Math.max(1, Math.round(Math.abs(delta) / unit));
-  return Math.sign(delta) * Math.min(n, WHEEL_MAX);
+  return delta / unit;
 }
 
 /**
- * Browser wheel deltas (down and right are positive) to host notches
- * (positive dy scrolls up, positive dx scrolls right). Any movement is at least one notch.
+ * Turns browser wheel deltas (down and right are positive) into whole host notches
+ * (positive dy scrolls up, positive dx scrolls right). A touchpad sends many tiny
+ * deltas for one swipe, so the fractions are added up and a notch is sent only when
+ * a whole one has built up. A mouse wheel click is one full notch at once.
  */
-export function wheelToNotches(deltaX: number, deltaY: number, mode: number): { dx: number; dy: number } {
-  return { dx: notches(deltaX, mode), dy: -notches(deltaY, mode) || 0 };
+export class WheelAccumulator {
+  private x = 0;
+  private y = 0;
+  private last = 0;
+
+  add(deltaX: number, deltaY: number, mode: number, now: number): { dx: number; dy: number } {
+    if (now - this.last > WHEEL_IDLE_MS) this.reset();
+    this.last = now;
+    this.x = this.take(this.x, notchUnits(deltaX, mode));
+    this.y = this.take(this.y, notchUnits(deltaY, mode));
+    const dx = Math.trunc(this.x);
+    const dy = Math.trunc(this.y);
+    this.x -= dx;
+    this.y -= dy;
+    const limit = (n: number) => Math.sign(n) * Math.min(Math.abs(n), WHEEL_MAX);
+    return { dx: limit(dx) || 0, dy: -limit(dy) || 0 };
+  }
+
+  /** Forget leftovers, for example when control ends. */
+  reset(): void {
+    this.x = 0;
+    this.y = 0;
+  }
+
+  /** Add to the running total; turning around drops what was left going the other way. */
+  private take(total: number, add: number): number {
+    return Math.sign(total) === -Math.sign(add) ? add : total + add;
+  }
 }

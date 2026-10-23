@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { toHostCoords, videoBox, wheelToNotches } from './pointer-map.js';
+import { toHostCoords, videoBox, WheelAccumulator } from './pointer-map.js';
 
 const screen = { left: 0, top: 0, width: 1000, height: 500 };
 
@@ -45,16 +45,32 @@ test('toHostCoords clamps outside the picture and handles an empty box', () => {
   assert.deepEqual(toHostCoords(5, 5, { left: 0, top: 0, width: 0, height: 0 }), { x: 0, y: 0 });
 });
 
-test('wheelToNotches flips vertical direction and gives at least one notch', () => {
-  assert.deepEqual(wheelToNotches(0, 100, 0), { dx: 0, dy: -1 }); // wheel down scrolls down
-  assert.deepEqual(wheelToNotches(0, -100, 0), { dx: 0, dy: 1 });
-  assert.deepEqual(wheelToNotches(0, 3, 0), { dx: 0, dy: -1 });
-  assert.deepEqual(wheelToNotches(250, 0, 0), { dx: 3, dy: 0 });
-  assert.deepEqual(wheelToNotches(0, 3, 1), { dx: 0, dy: -1 }); // lines
-  assert.deepEqual(wheelToNotches(0, 0, 0), { dx: 0, dy: 0 });
+test('a mouse wheel click is one notch and down scrolls down', () => {
+  const w = new WheelAccumulator();
+  assert.deepEqual(w.add(0, 100, 0, 1000), { dx: 0, dy: -1 });
+  assert.deepEqual(w.add(0, -100, 0, 2000), { dx: 0, dy: 1 });
+  assert.deepEqual(w.add(250, 0, 0, 3000), { dx: 2, dy: 0 }); // 0.5 is kept
+  assert.deepEqual(w.add(0, 3, 1, 4000), { dx: 0, dy: -1 }); // 3 lines are one notch
+  assert.deepEqual(w.add(0, 0, 0, 5000), { dx: 0, dy: 0 });
 });
 
-test('wheelToNotches stays within the protocol limit', () => {
-  assert.deepEqual(wheelToNotches(0, 1e9, 0), { dx: 0, dy: -100 });
-  assert.deepEqual(wheelToNotches(Number.NaN, Infinity, 0), { dx: 0, dy: 0 });
+test('tiny touchpad deltas add up instead of each being a notch', () => {
+  const w = new WheelAccumulator();
+  let total = 0;
+  for (let i = 0; i < 40; i += 1) total += w.add(0, 4, 0, 1000 + i * 8).dy; // 160 px in 40 events
+  assert.equal(total, -1);
+});
+
+test('a pause or a turn-around forgets the leftover', () => {
+  const w = new WheelAccumulator();
+  assert.deepEqual(w.add(0, 60, 0, 1000), { dx: 0, dy: 0 });
+  assert.deepEqual(w.add(0, 60, 0, 5000), { dx: 0, dy: 0 }); // long pause: 60 not 120
+  assert.deepEqual(w.add(0, -60, 0, 5050), { dx: 0, dy: 0 }); // turned around
+  assert.deepEqual(w.add(0, -60, 0, 5100), { dx: 0, dy: 1 });
+});
+
+test('the wheel stays within the protocol limit', () => {
+  const w = new WheelAccumulator();
+  assert.deepEqual(w.add(0, 1e9, 0, 1000), { dx: 0, dy: -100 });
+  assert.deepEqual(new WheelAccumulator().add(Number.NaN, Infinity, 0, 1000), { dx: 0, dy: 0 });
 });
