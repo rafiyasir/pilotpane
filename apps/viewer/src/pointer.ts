@@ -5,7 +5,7 @@
  * Plain HTTP is fine: pointer lock needs no secure context in Chrome 109.
  */
 import type { Box, InputButton, InputMessage } from '/protocol/index.js';
-import { COORD_MAX, toHostCoords, videoBox, wheelToNotches } from '/protocol/index.js';
+import { COORD_MAX, toHostCoords, videoBox, WheelAccumulator } from '/protocol/index.js';
 
 export type ControlState = 'viewing' | 'controlling';
 
@@ -38,6 +38,7 @@ export class PointerController {
   private frame = 0;
   private swallowUp = false;
   private readonly pressed = new Set<InputButton>();
+  private readonly wheel = new WheelAccumulator();
 
   constructor(
     private readonly stage: HTMLElement,
@@ -82,6 +83,7 @@ export class PointerController {
     this.pending = null;
     for (const button of this.pressed) this.hooks.send({ type: 'mouse-button', button, down: false });
     this.pressed.clear();
+    this.wheel.reset();
     const wasLocked = this.locked;
     this.locked = false;
     if (wasLocked && document.pointerLockElement === this.stage) document.exitPointerLock();
@@ -193,7 +195,7 @@ export class PointerController {
   private onWheel(e: WheelEvent): void {
     if (!this.controlling || this.isViewerUi(e)) return;
     e.preventDefault();
-    const { dx, dy } = wheelToNotches(e.deltaX, e.deltaY, e.deltaMode);
+    const { dx, dy } = this.wheel.add(e.deltaX, e.deltaY, e.deltaMode, performance.now());
     if (dx || dy) this.hooks.send({ type: 'mouse-wheel', dx, dy });
   }
 
