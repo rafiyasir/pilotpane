@@ -73,3 +73,7 @@ Bluetooth PAN support varies between laptops and drivers. If "Connect using" is 
 ## Checking the connection
 
 On the viewer, press Win+R, type `cmd`, then `ping 192.168.50.1` (the host address). Replies mean the network is fine; if the page still doesn't load, it's the firewall (see the top of this page).
+
+## When the host sleeps
+
+If the host laptop sleeps or loses the network, the viewer keeps the last picture and keeps trying. When the host is awake again and has an address, the picture comes back without a PIN. If the host got a new PIN or restarted in between, the viewer asks for the new PIN. A sleeping laptop cannot be woken from the viewer.
