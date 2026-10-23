@@ -65,6 +65,10 @@ export class PointerController {
     return this.controlling;
   }
 
+  get isLocked(): boolean {
+    return this.locked;
+  }
+
   /** Whether the host accepts input. Turning it off ends any control. */
   setEnabled(on: boolean): void {
     this.enabled = on;
@@ -85,6 +89,35 @@ export class PointerController {
       this.controlling = false;
       this.hooks.onChange('viewing', false);
     }
+  }
+
+  /**
+   * Frees the mouse so the toolbar and shortcut bar can be clicked, but keeps
+   * control: keys still go to the host and the plain mouse position is used.
+   */
+  suspendLock(): void {
+    if (!this.locked) return;
+    this.locked = false;
+    if (document.pointerLockElement === this.stage) document.exitPointerLock();
+    this.hooks.onChange('controlling', false);
+  }
+
+  /** Locks the pointer again after `suspendLock`; the host pointer carries on from where it is. */
+  resumeLock(): void {
+    if (!this.controlling || this.locked) return;
+    if (typeof this.stage.requestPointerLock === 'function') this.stage.requestPointerLock();
+    else this.hooks.onLockUnavailable();
+  }
+
+  /** Frees the pointer if it is locked, locks it if control is on without the lock. */
+  toggleLock(): void {
+    if (this.locked) this.suspendLock();
+    else this.resumeLock();
+  }
+
+  /** Clicks on the shortcut bar are for the viewer, not the host. */
+  private isViewerUi(e: Event): boolean {
+    return e.target instanceof Element && e.target.closest('[data-no-control]') !== null;
   }
 
   private begin(e: MouseEvent): void {
@@ -121,6 +154,7 @@ export class PointerController {
       this.begin(e);
       return;
     }
+    if (this.isViewerUi(e)) return;
     const button = BUTTONS[e.button];
     if (!button) return;
     e.preventDefault();
@@ -141,7 +175,7 @@ export class PointerController {
   }
 
   private onMove(e: MouseEvent): void {
-    if (!this.controlling) return;
+    if (!this.controlling || this.isViewerUi(e)) return;
     if (this.locked) {
       const box = this.box();
       if (box.width <= 0 || box.height <= 0) return;
@@ -150,12 +184,14 @@ export class PointerController {
       this.queue(Math.round(this.fx * COORD_MAX), Math.round(this.fy * COORD_MAX));
     } else {
       const { x, y } = toHostCoords(e.clientX, e.clientY, this.box());
+      this.fx = x / COORD_MAX; // so a later `resumeLock` continues from here
+      this.fy = y / COORD_MAX;
       this.queue(x, y);
     }
   }
 
   private onWheel(e: WheelEvent): void {
-    if (!this.controlling) return;
+    if (!this.controlling || this.isViewerUi(e)) return;
     e.preventDefault();
     const { dx, dy } = wheelToNotches(e.deltaX, e.deltaY, e.deltaMode);
     if (dx || dy) this.hooks.send({ type: 'mouse-wheel', dx, dy });
