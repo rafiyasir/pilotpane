@@ -1,6 +1,6 @@
 # Spec 012: Low-bandwidth preset
 
-Status: In progress | Package(s): protocol, host, viewer | Depends on: 005, 008
+Status: Done | Package(s): protocol, host, viewer | Depends on: 005, 008
 
 Part of v0.2, "Mouse and low bandwidth". Makes the Bluetooth fallback in `docs/CONNECTIONS.md` usable. Automatic adaptation is a later idea (see Out).
 
@@ -52,9 +52,19 @@ None.
 
 ## Manual test guide
 
-Filled in by `/build`.
-
-- **Host (Git Bash):** exact commands.
-- **Viewer (Windows 8 / Chrome 109 laptop):** what to open, click and look for.
-- **Expected results** for each step.
-- **Failure case** (at least one): what to break, and what should happen.
+- **Host (Git Bash):** quit any running PilotPane first (the build keeps the old input helper while it runs), then
+  `cd /d/dream/pilotpane && pnpm build && PILOTPANE_LOG=debug pnpm start`
+  Note the address and PIN. Debug mode logs `targetBitrate`, `framesPerSecond` and `frameWidth` every few seconds.
+- **Viewer (Windows 8 / Chrome 109):** open `http://<host address>:7420`, enter the PIN, wait for the picture.
+  1. Open the toolbar (click the tab at the top). The quality select shows 1080p, 720p and **Low**.
+  2. Choose **Low**. A card appears at the bottom: "Low data mode is on." Click **Got it**; it closes.
+  3. Choose 720p, then Low again. The card does not come back (it shows once per browser).
+  4. Choose Low and move a window on the host. The picture gets smaller and softer and stays steady.
+  5. Choose 720p, then 1080p. The picture sharpens again with no reconnect.
+  6. Refresh the page and pair again. The select shows the last quality the host remembers.
+- **Expected on the host (debug log):** with Low, `frameWidth` about 854, `framesPerSecond` at 15 or below, `targetBitrate` at 1,000,000 or below. With 1080p, 30 fps and a higher bitrate.
+- **Restart check:** pick Low, quit PilotPane from the tray, start it again. It starts normally and the viewer shows Low after pairing.
+- **Bluetooth (optional):** follow `docs/CONNECTIONS.md` section 5, choose Low, and compare with 720p. Low should keep moving where 720p stalls.
+- **Failure cases:**
+  - Open the page with browser storage blocked (private window). Low still works and the card shows each time, with no error.
+  - In `%APPDATA%` open the PilotPane `settings.json`, set `"quality": "4k"`, and start the host. It starts with 1080p and no crash.

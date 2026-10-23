@@ -53,7 +53,7 @@ Any shared local network works. Full steps for each are in **[docs/CONNECTIONS.m
 | Direct Ethernet cable              | Best   | Set two static IPs once (steps included)                 |
 | Windows Mobile hotspot on the host | Good   | Over Wi-Fi, or over Bluetooth if the viewer has no Wi-Fi |
 | Phone USB tethering                | Varies | May work, depends on the phone                           |
-| Bluetooth network (PAN)            | Slow   | Fallback only; use 720p                                  |
+| Bluetooth network (PAN)            | Slow   | Fallback only; use Low                                   |
 
 ## Security
 

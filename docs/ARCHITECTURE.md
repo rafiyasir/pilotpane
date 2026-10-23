@@ -52,7 +52,7 @@ All messages are JSON text frames, typed in `packages/protocol/src/messages.ts` 
 |               | `busy`        | (another viewer is connected)                                           |
 |               | `offer`       | `sdp`                                                                   |
 |               | `ice`         | `candidate` or null                                                     |
-|               | `quality`     | `preset`: 1080p, 720p                                                   |
+|               | `quality`     | `preset`: 1080p, 720p, low                                              |
 |               | `input-state` | `available` (the host can put the viewer's mouse on its screen)         |
 |               | `bye`         | `reason`: host-stopped, kicked, new-pin, capture-failed                 |
 | viewer → host | `pair`        | `proof`                                                                 |
@@ -71,7 +71,7 @@ Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer
 
 - Capture: primary display, up to 1920×1080 at 30 fps, `contentHint = "text"`.
 - Codec: H.264 preferred when both sides support it, otherwise VP8.
-- Presets: 1080p (min 3, start 6, max 12 Mbps) and 720p (min 1.5, start 3, max 6 Mbps). The cap is applied with `scaleResolutionDownBy` and `maxBitrate`; min and start go into the answer SDP as `x-google-*-bitrate` hints (`withBitrateHints`) so motion bursts are not encoded at a low starting bitrate; `degradationPreference = maintain-resolution` keeps text sharp by dropping frames first.
+- Presets: 1080p (min 3, start 6, max 12 Mbps), 720p (min 1.5, start 3, max 6 Mbps) and Low (480p, 15 fps, min 0.3, start 0.6, max 1 Mbps, for Bluetooth and other very slow links). Each preset also sets the frame rate cap. The cap is applied with `scaleResolutionDownBy` and `maxBitrate`; min and start go into the answer SDP as `x-google-*-bitrate` hints (`withBitrateHints`) so motion bursts are not encoded at a low starting bitrate; `degradationPreference = maintain-resolution` keeps text sharp by dropping frames first.
 
 ## Extension points
 
