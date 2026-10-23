@@ -13,8 +13,10 @@ export class KeyTracker {
     // Esc is how the viewer lets go of control, so it is never typed on the host.
     if (code === 'Escape' || keyCodeToVk(code) === null) return null;
     if (down) {
-      // The host's own OS repeats a held key; sending repeats would only flood the channel.
-      if (repeat || this.held.has(code)) return null;
+      // Windows does not repeat a key that was injected, so the browser's repeats are forwarded
+      // (about 30 a second). A repeat for a key we never saw go down is ignored.
+      if (this.held.has(code)) return repeat ? { type: 'key', code, down: true } : null;
+      if (repeat) return null;
       this.held.add(code);
       return { type: 'key', code, down: true };
     }
