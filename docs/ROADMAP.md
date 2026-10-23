@@ -30,7 +30,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 
 | #   | Spec                          | Package                | Status |
 | --- | ----------------------------- | ---------------------- | ------ |
-| 013 | Keyboard events               | protocol, host, viewer | Todo   |
+| 013 | Keyboard events               | protocol, host, viewer | Done   |
 | 014 | Capture mode and shortcut bar | viewer                 | Todo   |
 
 ## v0.4: Quality and reliability

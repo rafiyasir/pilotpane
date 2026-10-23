@@ -85,3 +85,9 @@ Short architecture decision records. Newest last. Each says what we chose, what 
 - **Chose**: add a `low` preset (480p, 15 fps, 0.3 / 0.6 / 1 Mbps min / start / max) next to 1080p and 720p, with a frame rate cap per preset. `PROTOCOL_VERSION` goes to 2 because `quality` and `set-quality` now carry a value an old peer would drop.
 - **Instead of**: automatic quality adaptation, or lowering the 720p floor.
 - **Why**: Bluetooth PAN gives roughly 1 to 2 Mbps, and the 720p floor of 1.5 Mbps stalls there. A fixed preset is small, testable and needs no new messages. The viewer is served by the host, so both sides always match. Automatic adaptation from the `stats` the viewer already sends is a later idea, and would also suit any future internet use. Cost: the user picks Low by hand.
+
+## ADR-015: Keys travel as physical codes, mapped on the host
+
+- **Chose**: the viewer sends `key { code, down }` with the W3C `KeyboardEvent.code` over the existing `input` data channel. A shared table in `packages/protocol` (`keys.ts`) turns the code into a Windows virtual-key code, and the helper types it with `SendInput`. Unknown codes are rejected by the parser. Held keys are tracked on both sides and lifted when control ends. Esc is never sent, because it lets go of control.
+- **Instead of**: sending typed characters, sending virtual-key codes from the viewer, or sending keys over the WebSocket.
+- **Why**: a physical code is the same on any viewer layout, and the host's own layout then makes the right character, so shortcuts such as Ctrl+C work and nothing depends on the viewer's language. One table in the shared package is tested once and used by both sides. Cost: no input-method (IME) or dead-key composition from the viewer, and browser-reserved shortcuts (Alt+Tab, Win, Ctrl+W) are not reachable until the capture mode and shortcut bar of spec 014.
