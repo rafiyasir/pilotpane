@@ -11,6 +11,7 @@ import {
   THEMES,
   isQualityPreset,
   isThemeName,
+  LinkWatch,
   pinProof
 } from '/protocol/index.js';
 import { ControlUi } from './control.js';
@@ -77,6 +78,7 @@ let statsTick = 0;
 let qualityMode: QualityPreset | 'auto' = 'auto';
 let currentPreset: QualityPreset = '720p';
 let auto = autoStart(currentPreset, 0);
+const linkWatch = new LinkWatch();
 
 const video = $<HTMLVideoElement>('video');
 
@@ -442,6 +444,20 @@ function scheduleRetry(overStage: boolean): void {
   retryTimer = window.setTimeout(() => socket.connect(), delay);
 }
 
+/** The browser is back (network up, tab shown): skip the wait before the next try. */
+function retrySoon(): void {
+  if (userStopped || retryCount === 0) return;
+  if (phase !== 'reconnecting' && phase !== 'connecting') return;
+  window.clearTimeout(retryTimer);
+  retryCount = 0;
+  socket.connect();
+}
+
+window.addEventListener('online', retrySoon);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) retrySoon();
+});
+
 function stop(): void {
   userStopped = true;
   window.clearTimeout(retryTimer);
@@ -483,9 +499,17 @@ function newPin(): void {
 function startStats(): void {
   stopStats();
   statsTick = 0;
+  linkWatch.reset();
   statsTimer = window.setInterval(async () => {
+    const bytes = await receiver.transportBytes().catch(() => null);
+    if (bytes !== null && phase === 'streaming' && linkWatch.sample(Date.now(), bytes)) {
+      console.warn('[pilotpane] the link went quiet, reconnecting');
+      socket.dispose();
+      onDrop();
+      return;
+    }
     const s = await receiver.stats().catch(() => null);
-    if (!s) return;
+    if (!s || phase !== 'streaming') return;
     statsTick += 1;
     $('s-rtt').textContent = s.rttMs === null ? '-' : `${Math.round(s.rttMs)} ms`;
     $('s-fps').textContent = String(Math.round(s.fps));
