@@ -446,3 +446,79 @@
     font-size: 26px;
   }
 }
+
+/* ---------- mouse control ---------- */
+
+.badge.control {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.control-outline {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.control-card {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  transform: translateX(-50%);
+  width: min(440px, calc(100% - 32px));
+  box-sizing: border-box;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.control-card svg {
+  flex: none;
+  color: var(--accent);
+}
+
+.control-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.control-title {
+  font: 600 15px var(--font-ui);
+}
+
+.control-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.control-pill {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  transform: translateX(-50%);
+  height: 34px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: 600 13px var(--font-ui);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.control-pill.gone {
+  opacity: 0;
+}

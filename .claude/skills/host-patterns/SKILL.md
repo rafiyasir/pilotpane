@@ -45,7 +45,9 @@ export interface KeepAwake {
   stop(): void;
 }
 export interface InputInjector {
+  readonly available: boolean; // false for Null, so the viewer can say "Watching only"
   inject(cmd: InputCommand): void; // HelperInputInjector: C# SendInput helper over stdin; Null when it is missing
+  releaseAll(): void; // buttons and keys up, when control ends
   dispose(): void;
 }
 ```

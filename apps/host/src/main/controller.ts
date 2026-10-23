@@ -14,6 +14,7 @@ import { Pairing } from './pairing.js';
 import type { InputInjector } from './platform/input-injector.js';
 import type { KeepAwake } from './platform/keep-awake.js';
 import type { ScreenCapturer } from './platform/screen-capturer.js';
+import { InputBridge } from './input-bridge.js';
 import { ViewerSessions } from './session.js';
 import { applyUpdate } from './updater/apply.js';
 import { Updater, type UpdaterOptions } from './updater/updater.js';
@@ -50,6 +51,7 @@ export interface UpdateServices {
 export class HostController {
   private readonly pairing = new Pairing();
   private readonly sessions: ViewerSessions;
+  private readonly input: InputBridge;
   private server: LanServer;
   private readonly store: HostStateStore;
   private readonly updater: Updater;
@@ -86,15 +88,18 @@ export class HostController {
       onState: (update) => this.patch({ update })
     });
 
+    this.input = new InputBridge(opts.injector);
     this.sessions = new ViewerSessions(this.pairing, {
       hostName: this.state.hostName,
       appVersion: this.state.appVersion,
       onPaired: (viewer) => {
         this.patch({ status: 'connecting', viewer, stats: null, message: null });
         this.closePinWindow();
+        this.sessions.toViewer({ type: 'input-state', available: this.input.available });
         void this.startEngine();
       },
       onViewerGone: () => {
+        this.input.end();
         this.engine({ cmd: 'stop' });
         this.opts.keepAwake.stop();
         this.patch({ status: this.paused ? 'paused' : 'ready', viewer: null, stats: null });
@@ -366,12 +371,17 @@ export class HostController {
         return;
       case 'connection':
         log.info(`peer connection: ${evt.state}`);
+        if (evt.state !== 'connected' && evt.state !== 'connecting') this.input.end();
         if (evt.state === 'connected' && this.sessions.hasViewer) {
           this.patch({ status: 'streaming' });
           this.opts.keepAwake.start();
         }
         return;
       case 'stopped':
+        return;
+      case 'input':
+        // Only the paired viewer has the data channel, but check anyway.
+        if (this.sessions.hasViewer) this.input.handle(evt.msg);
         return;
       case 'debug-stats':
         log.debug(

@@ -86,6 +86,7 @@
         <span class="badge" id="mode-badge" title="Clipboard and full keyboard capture will need secure mode (v0.5)"
           >HTTP · basic mode</span
         >
+        <span class="badge" id="control-badge" hidden>Viewing</span>
         <span class="sep" aria-hidden="true"></span>
         <label class="visually-hidden" for="quality">Quality</label>
         <select id="quality">
@@ -110,6 +111,22 @@
         <p class="muted" id="reconnecting-text">Trying again. The last picture stays on screen.</p>
         <button class="btn" id="btn-stop-retry" type="button">Stop trying</button>
       </div>
+
+      <!-- Mouse control: outline while controlling, a hint card, and a small pill -->
+      <div class="control-outline" id="control-outline" hidden></div>
+      <div class="control-card" id="control-card" role="status" hidden>
+        <svg id="control-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="6" y="2" width="12" height="20" rx="6" fill="none" stroke="currentColor" stroke-width="2"></rect>
+          <path d="M12 2v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span class="dot info" id="control-dot" hidden></span>
+        <div class="control-text">
+          <div class="control-title" id="control-title"></div>
+          <div class="control-sub" id="control-sub"></div>
+        </div>
+        <button class="btn" id="control-ok" type="button">Got it</button>
+      </div>
+      <div class="control-pill" id="control-pill" role="status" hidden></div>
 
       <div class="hint" id="hint">Click the tab at the top, or press Ctrl+Alt+Shift, for the toolbar</div>
     </div>

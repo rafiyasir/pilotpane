@@ -53,7 +53,7 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 | Viewer stats overlay                                  | Viewer: stats overlay  | v0.1    | Confirmed    |
 | Viewer reconnecting                                   | Viewer: reconnecting   | v0.1    | Confirmed    |
 | Viewer error (version mismatch, cannot play, stopped) | Viewer: error          | v0.1    | Confirmed    |
-| Mouse and pointer lock hint                           | none                   | v0.2    | Not designed |
+| Mouse and pointer lock hint                           | Mouse hint             | v0.2    | Confirmed    |
 | Low-bandwidth preset in the toolbar                   | none                   | v0.2    | Not designed |
 | Keyboard capture mode and shortcut bar                | none                   | v0.3    | Not designed |
 | Host update available (version, notes, Download)      | Host: update available | v0.4    | Confirmed    |
@@ -75,6 +75,18 @@ Built only from existing components and tokens, in all four themes. They appear 
 | Updating       | Status dot `accent`, "Downloading X". Thin progress bar (8 px, `line` track, `accent` fill), mono "41 of 66 MB". Then "Checking the update". When ready: primary "Restart to install".                                                                                                               |
 | Update problem | Status dot `err`, "Could not update". Card explains in plain words and says the current version is kept (for example "The update did not pass the safety check, so it was not installed."). Primary "Try again", plain "Keep this version". Covers no connection, bad signature and failed download. |
 | Tray item      | One menu item "Check for updates" after "New PIN". Always this text; results show in the host window.                                                                                                                                                                                                |
+
+## Mouse and pointer lock hint (v0.2)
+
+Built only from existing components and tokens. The canvas "Mouse hint" shows each state in Cockpit and the first hint plus Controlling in all four themes.
+
+| State                | Content                                                                                                                                                                             |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First hint           | Card at the bottom of the stream: "Click the screen to control it." and "Press Esc to let go." with a plain "Got it". Toolbar badge "Viewing". Shown once per browser, then hidden. |
+| Controlling          | 2 px `accent` outline around the stream. Badge becomes "Controlling" (`accent` bg, `on-accent` text). A small pill "Esc to let go" at the bottom.                                   |
+| Released             | Badge back to "Viewing". A pill at the bottom says "Click to control again."                                                                                                        |
+| Pointer lock missing | Card with an `info` dot: "Your mouse still works." and "This browser cannot lock the pointer, so it can leave the window." with "Got it". Not an error.                             |
+| Host has no input    | Badge "Watching only". Card with an `info` dot: "Control is not available on this host." and "You can still watch the screen." with "Got it".                                       |
 
 ## Download page (website)
 

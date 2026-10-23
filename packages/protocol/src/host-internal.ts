@@ -4,6 +4,7 @@
  * They never travel over the network.
  */
 import type { QualityPreset, ThemeName } from './constants.js';
+import type { InputMessage } from './input.js';
 import type { IceCandidate, StreamStats } from './messages.js';
 
 export type NetKind = 'ethernet' | 'wifi' | 'hotspot' | 'bluetooth' | 'loopback' | 'virtual' | 'other';
@@ -62,6 +63,7 @@ export type EngineEvent =
   | { evt: 'ice'; candidate: IceCandidate | null }
   | { evt: 'connection'; state: string }
   | { evt: 'stopped' }
+  | { evt: 'input'; msg: InputMessage }
   | {
       evt: 'debug-stats';
       frameWidth: number;

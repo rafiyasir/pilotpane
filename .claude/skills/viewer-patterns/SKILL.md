@@ -50,6 +50,10 @@ function read(area: 'local' | 'session', key: string): string | null {
 Store only convenience values (theme, stats shown). The PIN is never stored; the resume token lives in
 `sessionStorage`.
 
+## Mouse control
+
+Mouse input goes out only through `PointerController` (`pointer.ts`) over the data channel (`receiver.sendInput`), never the WebSocket. Pointer lock needs a user gesture and no secure context in Chrome 109; if it is missing or refused, control continues with the plain mouse and `ControlUi` shows the "pointer lock" card. Position maths (letterbox, wheel notches) lives in `@pilotpane/protocol` (`pointer-map.ts`) so it is unit tested. Anything that ends a stream or drops the connection must call `endControl()` so no button is left held.
+
 ## Styling
 
 Colours, fonts and radii come from `theme.css` tokens (`var(--accent)`). No hard-coded colours in components.

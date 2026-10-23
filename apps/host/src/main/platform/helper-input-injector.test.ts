@@ -118,3 +118,26 @@ test('a write that throws does not reach the caller', () => {
   proc.say('ready');
   assert.doesNotThrow(() => injector.inject({ kind: 'move', x: 1, y: 1 }));
 });
+
+test('releaseAll lets go of held buttons and keys but keeps the helper running', () => {
+  const { injector, procs } = setup();
+  const proc = procs[0]!;
+  proc.say('ready');
+  injector.inject({ kind: 'button', button: 'left', down: true });
+  injector.inject({ kind: 'button', button: 'middle', down: true });
+  injector.inject({ kind: 'button', button: 'middle', down: false });
+  proc.written.length = 0;
+  injector.releaseAll();
+  assert.deepEqual(proc.written, ['B L 0']);
+  injector.releaseAll();
+  assert.deepEqual(proc.written, ['B L 0']);
+  assert.equal(proc.closed, false);
+});
+
+test('available is true while the helper runs and false after dispose', () => {
+  const { injector, procs } = setup();
+  procs[0]!.say('ready');
+  assert.equal(injector.available, true);
+  injector.dispose();
+  assert.equal(injector.available, false);
+});

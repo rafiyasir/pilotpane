@@ -163,6 +163,10 @@ body {
   background: var(--err);
 }
 
+.dot.info {
+  background: var(--info);
+}
+
 /* Theme swatch: 32 px circle inside a 44 px touch target. Colours are fixed
    per theme (bg and accent from the blocks above), not theme variables. */
 .swatch {

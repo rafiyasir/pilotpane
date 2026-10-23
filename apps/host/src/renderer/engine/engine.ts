@@ -4,7 +4,7 @@
  * signaling goes back to it and from there to the viewer over the WebSocket.
  */
 import type { EngineCommand, EngineEvent, IceCandidate, QualityPreset } from '/protocol/index.js';
-import { QUALITY_SPECS, withBitrateHints } from '/protocol/index.js';
+import { INPUT_CHANNEL_LABEL, QUALITY_SPECS, parseInputMessage, withBitrateHints } from '/protocol/index.js';
 import { api } from '../shared/ui.js';
 
 let pc: RTCPeerConnection | null = null;
@@ -124,6 +124,13 @@ async function start(sourceId: string, preset: QualityPreset): Promise<void> {
   const transceiver = peer.addTransceiver(track, { direction: 'sendonly', streams: [stream] });
   sender = transceiver.sender;
   preferH264(transceiver);
+
+  // Created before the offer so the viewer receives it. Only the viewer's mouse goes this way.
+  const inputChannel = peer.createDataChannel(INPUT_CHANNEL_LABEL, { ordered: true });
+  inputChannel.addEventListener('message', (e: MessageEvent<unknown>) => {
+    const msg = parseInputMessage(e.data);
+    if (msg) emit({ evt: 'input', msg });
+  });
 
   peer.addEventListener('icecandidate', (e) =>
     emit({ evt: 'ice', candidate: e.candidate ? toWire(e.candidate) : null })

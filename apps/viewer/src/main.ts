@@ -4,6 +4,8 @@
  */
 import type { HostMessage, ThemeName } from '/protocol/index.js';
 import { PIN_LENGTH, PROTOCOL_VERSION, THEMES, isQualityPreset, isThemeName, pinProof } from '/protocol/index.js';
+import { ControlUi } from './control.js';
+import { PointerController } from './pointer.js';
 import { Receiver } from './receiver.js';
 import { HostSocket } from './socket.js';
 
@@ -39,6 +41,7 @@ const TOKEN_KEY = 'pilotpane.token';
 const THEME_KEY = 'pilotpane.theme';
 const STATS_KEY = 'pilotpane.stats';
 const PINNED_KEY = 'pilotpane.toolbarPinned';
+const MOUSE_HINT_KEY = 'pilotpane.mouseHintSeen';
 const TAB_KEY = 'pilotpane.toolbarTab';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
@@ -75,11 +78,23 @@ const receiver = new Receiver(video, {
     phase = 'streaming';
     showStage();
     startStats();
+    controlUi.onStreaming();
   },
   onFailed: () => {
     socket.dispose();
     onDrop();
   }
+});
+
+const controlUi = new ControlUi({
+  hintSeen: () => store.get('local', MOUSE_HINT_KEY) === '1',
+  markHintSeen: () => store.set('local', MOUSE_HINT_KEY, '1')
+});
+
+const pointer = new PointerController($('stage'), video, {
+  send: (msg) => receiver.sendInput(msg),
+  onChange: (state) => controlUi.onState(state),
+  onLockUnavailable: () => controlUi.lockUnavailable()
 });
 
 // ---------- screens ----------
@@ -304,6 +319,10 @@ function handleMessage(msg: HostMessage): void {
     case 'quality':
       $<HTMLSelectElement>('quality').value = msg.preset;
       return;
+    case 'input-state':
+      controlUi.setAvailable(msg.available);
+      pointer.setEnabled(msg.available);
+      return;
     case 'bye':
       handleBye(msg.reason);
       return;
@@ -342,7 +361,14 @@ function handleBye(reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-fail
 
 // ---------- connection lifecycle ----------
 
+function endControl(): void {
+  pointer.release();
+  pointer.setEnabled(false);
+  controlUi.reset();
+}
+
 function onDrop(): void {
+  endControl();
   receiver.close();
   stopStats();
   const wasWatching = phase === 'streaming' || phase === 'reconnecting';
@@ -375,6 +401,7 @@ function stop(): void {
   userStopped = true;
   window.clearTimeout(retryTimer);
   window.clearInterval(lockTimer);
+  endControl();
   receiver.close();
   stopStats();
   socket.dispose();
