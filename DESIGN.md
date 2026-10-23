@@ -55,7 +55,7 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 | Viewer error (version mismatch, cannot play, stopped) | Viewer: error          | v0.1    | Confirmed    |
 | Mouse and pointer lock hint                           | Mouse hint             | v0.2    | Confirmed    |
 | Low-bandwidth preset in the toolbar                   | Low-bandwidth preset   | v0.2    | Confirmed    |
-| Keyboard capture mode and shortcut bar                | none                   | v0.3    | Not designed |
+| Keyboard capture mode and shortcut bar                | Shortcut bar           | v0.3    | Confirmed    |
 | Host update available (version, notes, Download)      | Host: update available | v0.4    | Confirmed    |
 | Host updating (progress, then Restart to install)     | Host: updating         | v0.4    | Confirmed    |
 | Host update problem (check failed, bad signature)     | Host: update problem   | v0.4    | Confirmed    |
@@ -68,6 +68,19 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 ## Low-bandwidth preset (v0.2)
 
 Built only from existing components and tokens. The viewer's quality control is the existing select in the toolbar; it gains one option, "Low", after 720p. The first time someone picks Low, a Card appears at the bottom of the stream, like the mouse hint: `info` dot, "Low data mode is on.", "Smaller picture and fewer frames, for slow links. Pick 720p when the link is better.", and a plain "Got it". Shown once per browser, then hidden. No other states.
+
+## Keyboard shortcuts (v0.3)
+
+Built only from existing components and tokens. Capture mode is the existing Controlling state from the mouse hint: while controlling, the viewer sends every key the browser lets it have. On plain HTTP the browser keeps a few combinations for itself, so a shortcut bar sends those instead.
+
+| State                   | Content                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shortcut bar            | Card strip of four Chips at the bottom centre of the stream, above the "Esc to let go" pill: "Alt+Tab", "Win", "Alt+F4", "Ctrl+W". One tap or click sends the whole combination once (down, then up). Chips are not toggles. The bar has a grip on the left (drag to move it), a small opacity slider (40% to 100%) and a corner handle on the bottom right (drag to resize, 75% to 200%). Position, size and opacity are kept per browser. The bar never leaves the stream. |
+| Toolbar chip            | A "Shortcuts" Chip in the toolbar shows or hides the bar (pressed = `accent` bg + `on-accent` while the bar is open). Disabled while Viewing or Watching only.                                                                                                                                                                                                                                                                                                               |
+| Viewing / Watching only | Bar hidden, toolbar chip disabled.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| First time              | Card at the bottom with an `info` dot: "Some keys stay with this browser." and "Use the Shortcuts bar for Alt+Tab, Win and similar keys." with a plain "Got it". Shown once per browser, then hidden.                                                                                                                                                                                                                                                                        |
+
+The grip, slider and handle use only existing tokens (`muted` for the grip and handle, `accent` for the slider). Esc is not on the bar: it always lets go of control and is never sent to the host. Ctrl+Alt+Del is not on the bar because Windows blocks it from software. Using the bar must not release control.
 
 ## Update screens (v0.4)
 
@@ -87,7 +100,7 @@ Built only from existing components and tokens. The canvas "Mouse hint" shows ea
 | State                | Content                                                                                                                                                                             |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | First hint           | Card at the bottom of the stream: "Click the screen to control it." and "Press Esc to let go." with a plain "Got it". Toolbar badge "Viewing". Shown once per browser, then hidden. |
-| Controlling          | 2 px `accent` outline around the stream. Badge becomes "Controlling" (`accent` bg, `on-accent` text). A small pill "Esc to let go" at the bottom.                                   |
+| Controlling          | 2 px `accent` outline around the stream. Badge becomes "Controlling" (`accent` bg, `on-accent` text). A small pill "Esc to let go · Ctrl+Alt+Shift for toolbar" at the bottom.      |
 | Released             | Badge back to "Viewing". A pill at the bottom says "Click to control again."                                                                                                        |
 | Pointer lock missing | Card with an `info` dot: "Your mouse still works." and "This browser cannot lock the pointer, so it can leave the window." with "Got it". Not an error.                             |
 | Host has no input    | Badge "Watching only". Card with an `info` dot: "Control is not available on this host." and "You can still watch the screen." with "Got it".                                       |
