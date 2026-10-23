@@ -8,9 +8,11 @@ import type { ControlState } from './pointer.js';
 export interface ControlStore {
   hintSeen(): boolean;
   markHintSeen(): void;
+  lowHintSeen(): boolean;
+  markLowHintSeen(): void;
 }
 
-type CardKind = 'first' | 'no-lock' | 'no-input';
+type CardKind = 'first' | 'no-lock' | 'no-input' | 'low';
 
 const CARDS: Record<CardKind, { title: string; sub: string }> = {
   first: { title: 'Click the screen to control it.', sub: 'Press Esc to let go.' },
@@ -18,7 +20,11 @@ const CARDS: Record<CardKind, { title: string; sub: string }> = {
     title: 'Your mouse still works.',
     sub: 'This browser cannot lock the pointer, so it can leave the window.'
   },
-  'no-input': { title: 'Control is not available on this host.', sub: 'You can still watch the screen.' }
+  'no-input': { title: 'Control is not available on this host.', sub: 'You can still watch the screen.' },
+  low: {
+    title: 'Low data mode is on.',
+    sub: 'Smaller picture and fewer frames, for slow links. Pick 720p when the link is better.'
+  }
 };
 
 const FIRST_HINT_MS = 6000;
@@ -33,6 +39,7 @@ function byId(id: string): HTMLElement {
 export class ControlUi {
   private available: boolean | null = null;
   private state: ControlState = 'viewing';
+  private cardKind: CardKind | null = null;
   private cardTimer: number | undefined;
   private pillTimer: number | undefined;
 
@@ -43,9 +50,15 @@ export class ControlUi {
 
   constructor(private readonly store: ControlStore) {
     byId('control-ok').addEventListener('click', () => {
-      this.store.markHintSeen();
+      if (this.cardKind === 'low') this.store.markLowHintSeen();
+      else this.store.markHintSeen();
       this.hideCard();
     });
+  }
+
+  /** The Low preset is active: explain it once per browser. */
+  onLowSelected(): void {
+    if (!this.store.lowHintSeen()) this.showCard('low', false);
   }
 
   /** The host says whether it can put the mouse on its screen. */
@@ -101,6 +114,7 @@ export class ControlUi {
   private showCard(kind: CardKind, autoHide: boolean): void {
     window.clearTimeout(this.cardTimer);
     const first = kind === 'first';
+    this.cardKind = kind;
     byId('control-title').textContent = CARDS[kind].title;
     byId('control-sub').textContent = CARDS[kind].sub;
     byId('control-icon').style.display = first ? '' : 'none';
@@ -111,6 +125,7 @@ export class ControlUi {
 
   private hideCard(): void {
     window.clearTimeout(this.cardTimer);
+    this.cardKind = null;
     this.card.hidden = true;
   }
 

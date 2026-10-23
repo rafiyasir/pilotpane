@@ -42,6 +42,7 @@ const THEME_KEY = 'pilotpane.theme';
 const STATS_KEY = 'pilotpane.stats';
 const PINNED_KEY = 'pilotpane.toolbarPinned';
 const MOUSE_HINT_KEY = 'pilotpane.mouseHintSeen';
+const LOW_HINT_KEY = 'pilotpane.lowHintSeen';
 const TAB_KEY = 'pilotpane.toolbarTab';
 const RETRY_DELAYS_S = [1, 2, 4, 8, 10];
 
@@ -88,7 +89,9 @@ const receiver = new Receiver(video, {
 
 const controlUi = new ControlUi({
   hintSeen: () => store.get('local', MOUSE_HINT_KEY) === '1',
-  markHintSeen: () => store.set('local', MOUSE_HINT_KEY, '1')
+  markHintSeen: () => store.set('local', MOUSE_HINT_KEY, '1'),
+  lowHintSeen: () => store.get('local', LOW_HINT_KEY) === '1',
+  markLowHintSeen: () => store.set('local', LOW_HINT_KEY, '1')
 });
 
 const pointer = new PointerController($('stage'), video, {
@@ -318,6 +321,7 @@ function handleMessage(msg: HostMessage): void {
       return;
     case 'quality':
       $<HTMLSelectElement>('quality').value = msg.preset;
+      if (msg.preset === 'low') controlUi.onLowSelected();
       return;
     case 'input-state':
       controlUi.setAvailable(msg.available);
