@@ -75,7 +75,7 @@ async function applyQuality(): Promise<void> {
   // the SDP (withBitrateHints) are read once at connect, so a quality change
   // after that moves the ceiling and the scale, not the floor.
   enc.maxBitrate = spec.maxBitrate;
-  enc.maxFramerate = 30;
+  enc.maxFramerate = spec.maxFramerate;
   // Keep text sharp: under pressure, drop frames before dropping resolution.
   (params as RTCRtpSendParameters & { degradationPreference?: string }).degradationPreference = 'maintain-resolution';
   await sender.setParameters(params);

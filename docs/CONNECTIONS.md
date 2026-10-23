@@ -60,7 +60,7 @@ A phone can put both laptops on its network: for example the viewer on **USB tet
 
 ## 5. Bluetooth network (PAN): slow fallback
 
-Use this only when nothing else works. Expect low frame rates; choose **720p** in the viewer toolbar.
+Use this only when nothing else works. Expect low frame rates; choose **Low** in the viewer toolbar (720p if the link turns out to be faster than expected).
 
 1. Pair the two laptops over Bluetooth (both sides: Bluetooth settings > Add device).
 2. **Host (Windows 11)**: easiest is Mobile hotspot > Share over **Bluetooth** (section 3). Otherwise: Control Panel > Devices and Printers, right-click the viewer > Connect using > **Direct connection** (or Access point).

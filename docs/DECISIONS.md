@@ -79,3 +79,9 @@ Short architecture decision records. Newest last. Each says what we chose, what 
 - **Chose**: the host's engine opens one ordered, reliable WebRTC data channel (`input`) beside the video. The viewer sends absolute pointer positions (0..65535 across the picture, one per animation frame at most), button changes and wheel notches. The host drops moves above 250 per second but never buttons or wheel. When control ends, the host releases held buttons.
 - **Instead of**: sending input over the WebSocket, a separate unreliable channel for moves, or relative movement deltas.
 - **Why**: the data channel is encrypted and only the paired viewer has it, so input never touches the plain-HTTP WebSocket (ADR-004). One reliable ordered channel keeps clicks and moves in order and is simplest; on a LAN the cost of retransmits is small, and coalescing moves to one per frame stops a queue building up. Absolute positions mean a lost or dropped move never leaves the pointer in the wrong place, and they work the same with and without pointer lock. Cost: on a very slow link (Bluetooth) a backed-up channel adds delay; the viewer skips moves while the channel buffer is full.
+
+## ADR-014: A third quality preset for very slow links
+
+- **Chose**: add a `low` preset (480p, 15 fps, 0.3 / 0.6 / 1 Mbps min / start / max) next to 1080p and 720p, with a frame rate cap per preset. `PROTOCOL_VERSION` goes to 2 because `quality` and `set-quality` now carry a value an old peer would drop.
+- **Instead of**: automatic quality adaptation, or lowering the 720p floor.
+- **Why**: Bluetooth PAN gives roughly 1 to 2 Mbps, and the 720p floor of 1.5 Mbps stalls there. A fixed preset is small, testable and needs no new messages. The viewer is served by the host, so both sides always match. Automatic adaptation from the `stats` the viewer already sends is a later idea, and would also suit any future internet use. Cost: the user picks Low by hand.

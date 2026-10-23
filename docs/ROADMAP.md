@@ -24,7 +24,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | 009 | Host interfaces and smaller services         | host                   | Done   |
 | 010 | Own C# SendInput helper behind InputInjector | host                   | Done   |
 | 011 | Mouse events and pointer lock                | protocol, host, viewer | Done   |
-| 012 | Low-bandwidth preset                         | host, viewer           | Todo   |
+| 012 | Low-bandwidth preset                         | host, viewer           | Done   |
 
 ## v0.3: Keyboard
 
