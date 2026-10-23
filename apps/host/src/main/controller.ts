@@ -13,6 +13,7 @@ import { listLanAddresses } from './net/lan.js';
 import { Pairing } from './pairing.js';
 import type { InputInjector } from './platform/input-injector.js';
 import type { KeepAwake } from './platform/keep-awake.js';
+import type { PowerEvents } from './platform/power.js';
 import type { ScreenCapturer } from './platform/screen-capturer.js';
 import { InputBridge } from './input-bridge.js';
 import { ViewerSessions } from './session.js';
@@ -35,6 +36,7 @@ export interface ControllerOptions {
   capturer: ScreenCapturer;
   injector: InputInjector;
   keepAwake: KeepAwake;
+  power: PowerEvents;
   update: UpdateServices;
 }
 
@@ -147,6 +149,15 @@ export class HostController {
     );
     this.showHostWindow();
     this.showPinWindow();
+
+    this.opts.power.onSuspend(() => {
+      log.info('going to sleep, closing the viewer link');
+      this.sessions.dropActive('host asleep');
+    });
+    this.opts.power.onResume(() => {
+      log.info('woke up, checking the network now');
+      this.pollNetwork();
+    });
 
     this.pollNetwork();
     this.pollTimer = setInterval(() => this.pollNetwork(), NETWORK_POLL_MS);

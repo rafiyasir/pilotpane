@@ -12,6 +12,7 @@ import { HostController } from './controller.js';
 import { createLogger } from './log.js';
 import { ElectronScreenCapturer } from './platform/electron-capturer.js';
 import { ElectronKeepAwake } from './platform/electron-keep-awake.js';
+import { ElectronPowerEvents } from './platform/electron-power.js';
 import { HelperInputInjector } from './platform/helper-input-injector.js';
 import { NullInputInjector, type InputInjector } from './platform/input-injector.js';
 import { spawnHelper } from './platform/spawn-helper.js';
@@ -79,6 +80,7 @@ if (!app.requestSingleInstanceLock()) {
       capturer: new ElectronScreenCapturer(),
       injector: createInjector(join(hostDist, 'helper', 'pilotpane-input.exe')),
       keepAwake: new ElectronKeepAwake(),
+      power: new ElectronPowerEvents(),
       update: {
         updater: {
           manifestUrl: process.env.PILOTPANE_UPDATE_URL || DEFAULT_MANIFEST_URL,
