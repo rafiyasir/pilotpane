@@ -54,7 +54,7 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 | Viewer reconnecting                                   | Viewer: reconnecting   | v0.1    | Confirmed    |
 | Viewer error (version mismatch, cannot play, stopped) | Viewer: error          | v0.1    | Confirmed    |
 | Mouse and pointer lock hint                           | Mouse hint             | v0.2    | Confirmed    |
-| Low-bandwidth preset in the toolbar                   | none                   | v0.2    | Not designed |
+| Low-bandwidth preset in the toolbar                   | Low-bandwidth preset   | v0.2    | Confirmed    |
 | Keyboard capture mode and shortcut bar                | none                   | v0.3    | Not designed |
 | Host update available (version, notes, Download)      | Host: update available | v0.4    | Confirmed    |
 | Host updating (progress, then Restart to install)     | Host: updating         | v0.4    | Confirmed    |
@@ -64,6 +64,10 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 | Trusted devices                                       | none                   | v0.5    | Not designed |
 | Host screen off                                       | none                   | v0.6    | Not designed |
 | Download page (website on GitHub Pages)               | Download page          | v0.4    | Confirmed    |
+
+## Low-bandwidth preset (v0.2)
+
+Built only from existing components and tokens. The viewer's quality control is the existing select in the toolbar; it gains one option, "Low", after 720p. The first time someone picks Low, a Card appears at the bottom of the stream, like the mouse hint: `info` dot, "Low data mode is on.", "Smaller picture and fewer frames, for slow links. Pick 720p when the link is better.", and a plain "Got it". Shown once per browser, then hidden. No other states.
 
 ## Update screens (v0.4)
 
