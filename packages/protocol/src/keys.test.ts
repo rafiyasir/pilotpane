@@ -50,11 +50,12 @@ test('rejects bad key messages', () => {
   assert.equal(parseInputMessage(j({ type: 'key', code: 'KeyA'.repeat(60), down: true })), null);
 });
 
-test('tracker forwards a press once and ignores repeats', () => {
+test('tracker forwards a press, then its repeats, and ignores stray ones', () => {
   const t = new KeyTracker();
+  assert.equal(t.press('KeyA', true, true), null); // repeat of a key we never saw go down
   assert.deepEqual(t.press('KeyA', true, false), { type: 'key', code: 'KeyA', down: true });
-  assert.equal(t.press('KeyA', true, true), null);
-  assert.equal(t.press('KeyA', true, false), null);
+  assert.deepEqual(t.press('KeyA', true, true), { type: 'key', code: 'KeyA', down: true });
+  assert.equal(t.press('KeyA', true, false), null); // a second plain down is a glitch
   assert.deepEqual(t.press('KeyA', false, false), { type: 'key', code: 'KeyA', down: false });
 });
 
