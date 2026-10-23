@@ -93,6 +93,8 @@ export function parseHostMessage(raw: string): HostMessage | null {
     }
     case 'quality':
       return isQualityPreset(m.preset) ? { type: 'quality', preset: m.preset } : null;
+    case 'input-state':
+      return typeof m.available === 'boolean' ? { type: 'input-state', available: m.available } : null;
     case 'bye': {
       const r = m.reason;
       return r === 'host-stopped' || r === 'kicked' || r === 'new-pin' || r === 'capture-failed'
