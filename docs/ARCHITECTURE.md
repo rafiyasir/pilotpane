@@ -53,6 +53,7 @@ All messages are JSON text frames, typed in `packages/protocol/src/messages.ts` 
 |               | `offer`       | `sdp`                                                                   |
 |               | `ice`         | `candidate` or null                                                     |
 |               | `quality`     | `preset`: 1080p, 720p                                                   |
+|               | `input-state` | `available` (the host can put the viewer's mouse on its screen)         |
 |               | `bye`         | `reason`: host-stopped, kicked, new-pin, capture-failed                 |
 | viewer → host | `pair`        | `proof`                                                                 |
 |               | `resume`      | `token`                                                                 |
@@ -62,7 +63,9 @@ All messages are JSON text frames, typed in `packages/protocol/src/messages.ts` 
 |               | `stats`       | `fps`, `kbps`, `rttMs`, `width`, `height`, `codec`, `lossPct`           |
 |               | `leave`       |                                                                         |
 
-Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer`, `ice`, `quality`, `stop`) and `EngineEvent` (`offer`, `ice`, `connection`, `stopped`, `error`); UI windows send `HostAction`s. These are in `packages/protocol/src/host-internal.ts` and never cross the network.
+Mouse input never uses the WebSocket. The host's engine opens a WebRTC data channel named `input` next to the video, and the viewer sends one JSON message per event on it: `mouse-move` (`x`, `y`, absolute 0..65535 across the primary screen), `mouse-button` (`button`, `down`) and `mouse-wheel` (`dx`, `dy` notches, positive `dy` scrolls up). The engine checks each message with `parseInputMessage` and passes it to main as an `EngineEvent` (`input`). `input-bridge.ts` thins out floods of moves (250 per second), maps messages to `InputCommand`s for the `InputInjector`, and lets go of held buttons when the viewer leaves or the connection drops.
+
+Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer`, `ice`, `quality`, `stop`) and `EngineEvent` (`offer`, `ice`, `connection`, `input`, `stopped`, `error`); UI windows send `HostAction`s. These are in `packages/protocol/src/host-internal.ts` and never cross the network.
 
 ## Video
 
