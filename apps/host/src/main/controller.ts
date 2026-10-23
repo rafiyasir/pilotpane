@@ -381,6 +381,7 @@ export class HostController {
         return;
       case 'input':
         // Only the paired viewer has the data channel, but check anyway.
+        if (evt.msg.type === 'key') log.debug(`key ${evt.msg.code} ${evt.msg.down ? 'down' : 'up'}`);
         if (this.sessions.hasViewer) this.input.handle(evt.msg);
         return;
       case 'debug-stats':

@@ -5,6 +5,7 @@
 import type { HostMessage, ThemeName } from '/protocol/index.js';
 import { PIN_LENGTH, PROTOCOL_VERSION, THEMES, isQualityPreset, isThemeName, pinProof } from '/protocol/index.js';
 import { ControlUi } from './control.js';
+import { KeyboardController } from './keyboard.js';
 import { PointerController } from './pointer.js';
 import { Receiver } from './receiver.js';
 import { HostSocket } from './socket.js';
@@ -96,8 +97,15 @@ const controlUi = new ControlUi({
 
 const pointer = new PointerController($('stage'), video, {
   send: (msg) => receiver.sendInput(msg),
-  onChange: (state) => controlUi.onState(state),
+  onChange: (state) => {
+    if (state === 'viewing') keyboard.release();
+    controlUi.onState(state);
+  },
   onLockUnavailable: () => controlUi.lockUnavailable()
+});
+const keyboard = new KeyboardController({
+  send: (msg) => receiver.sendInput(msg),
+  isControlling: () => pointer.isControlling
 });
 
 // ---------- screens ----------

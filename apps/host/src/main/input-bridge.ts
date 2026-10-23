@@ -1,12 +1,12 @@
-import type { InputMessage } from '@pilotpane/protocol';
+import { keyCodeToVk, type InputMessage } from '@pilotpane/protocol';
 import type { InputInjector } from './platform/input-injector.js';
 
 /** A viewer cannot flood the helper: moves above this rate are dropped. */
 export const MAX_MOVES_PER_SECOND = 250;
 
 /**
- * Turns the viewer's mouse messages into InputCommands for the injector.
- * Buttons and wheel always go through (dropping a "button up" would leave it
+ * Turns the viewer's mouse and key messages into InputCommands for the injector.
+ * Buttons, keys and wheel always go through (dropping a "button up" or "key up" would leave it
  * stuck); only a flood of moves is thinned out.
  */
 export class InputBridge {
@@ -33,6 +33,11 @@ export class InputBridge {
       case 'mouse-wheel':
         this.injector.inject({ kind: 'wheel', dx: msg.dx, dy: msg.dy });
         return;
+      case 'key': {
+        const vk = keyCodeToVk(msg.code);
+        if (vk !== null) this.injector.inject({ kind: 'key', vk, down: msg.down });
+        return;
+      }
     }
   }
 
