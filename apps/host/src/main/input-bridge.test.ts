@@ -56,3 +56,22 @@ test('reports whether the injector can inject', () => {
   inj.available = false;
   assert.equal(new InputBridge(inj).available, false);
 });
+
+test('maps key messages to key commands and never drops them', () => {
+  const inj = new FakeInjector();
+  const bridge = new InputBridge(inj);
+  bridge.handle({ type: 'key', code: 'KeyA', down: true });
+  bridge.handle({ type: 'key', code: 'KeyA', down: false });
+  bridge.handle({ type: 'key', code: 'Bogus', down: true });
+  assert.deepEqual(inj.commands, [
+    { kind: 'key', vk: 0x41, down: true },
+    { kind: 'key', vk: 0x41, down: false }
+  ]);
+});
+
+test('keys are not rate limited', () => {
+  const inj = new FakeInjector();
+  const bridge = new InputBridge(inj, () => 5);
+  for (let i = 0; i < MAX_MOVES_PER_SECOND + 20; i++) bridge.handle({ type: 'key', code: 'KeyA', down: i % 2 === 0 });
+  assert.equal(inj.commands.length, MAX_MOVES_PER_SECOND + 20);
+});
