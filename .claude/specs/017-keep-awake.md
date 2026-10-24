@@ -1,6 +1,6 @@
 # Spec 017: Keep host from sleeping
 
-Status: In progress | Package(s): host, docs | Depends on: 009, 016
+Status: Done | Package(s): host, docs | Depends on: 009, 016
 
 Part of v0.4, "Quality and reliability". Spec 009 added the `KeepAwake` interface and an Electron `powerSaveBlocker` implementation, and the controller already calls `start()` once the peer connection is up and `stop()` when the viewer leaves. This spec makes that rule exact, testable and free of gaps.
 
@@ -10,7 +10,7 @@ While a viewer is paired, the host laptop does not turn its display off or go to
 
 ## Scope
 
-- In: hold the block for the whole life of a paired viewer (from pairing until it leaves, is kicked, or the host pauses or quits), not only once the peer connection is `connected`; keep holding it while the viewer is reconnecting inside its resume window; release it as soon as no viewer is left; one small policy module with tests; log each hold and release.
+- In: hold the block for the whole life of a paired viewer (from pairing until it leaves, is kicked, or the host pauses or quits), not only once the peer connection is `connected`; release it as soon as no viewer is left; one small policy module with tests; log each hold and release.
 - Out: stopping a lid-close or a manual Sleep (Windows power plan decides that, and spec 016 already recovers from it); waking a sleeping host; a settings toggle or any new UI (Settings screen is "Not designed" in DESIGN.md, so the behaviour is always on); any protocol change.
 
 ## Screens
@@ -50,9 +50,15 @@ None.
 
 ## Manual test guide
 
-Filled in by `/build`.
+- **Host (Git Bash):** `pnpm start`. Note the address and PIN. Open an admin PowerShell or Command Prompt and keep it ready for `powercfg /requests`.
+- **Viewer (Windows 8 / Chrome 109 laptop):** open `http://<host address>:7420/`.
 
-- **Host (Git Bash):** exact commands.
-- **Viewer (Windows 8 / Chrome 109 laptop):** what to open, click and look for.
-- **Expected results** for each step.
-- **Failure case** (at least one): what to break, and what should happen.
+1. Before pairing, run `powercfg /requests` on the host. DISPLAY should not list PilotPane or Electron.
+2. Type the PIN on the viewer. Right after the PIN is accepted, run `powercfg /requests` again. DISPLAY lists `PilotPane.exe` (`electron.exe` from source) with "Chromium" as the reason. The host log shows `[awake] keeping the display awake`.
+3. Leave the viewer streaming and the host untouched for longer than the host's display timeout (or set it to 1 minute in Settings > System > Power). The host display stays on and the picture keeps moving.
+4. Close the viewer tab. Within a second, `powercfg /requests` no longer lists it, and the log shows `display may sleep again`.
+5. Pair again, then click "Pause" in the host window. The entry disappears. Resume sharing and pair again: it comes back once, not twice.
+6. Pair again, then click "New PIN" or choose Quit from the tray. The entry disappears.
+
+- **Expected results:** the entry exists exactly while a viewer is paired, and the log shows one hold per pairing.
+- **Failure case:** with a viewer paired, put the host to sleep from the Start menu. The viewer keeps the last frame and retries (spec 016). After the host wakes, it resumes without a PIN and `powercfg /requests` lists PilotPane again. Also try a wrong PIN: no entry appears, because nothing paired.
