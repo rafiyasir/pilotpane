@@ -37,7 +37,7 @@
 6. Main picks the primary screen with `desktopCapturer` and sends `start { sourceId, quality }` to the engine.
 7. Engine captures, creates the peer connection (no STUN/TURN), sends the **offer** to main, which relays it → viewer.
 8. Viewer answers → `answer { sdp }`; ICE candidates trickle both ways as `ice` messages.
-9. Media flows peer to peer over the LAN. The viewer sends `stats` every 2 s; the host window shows them.
+9. From the moment a viewer is paired until it leaves, `AwakeGuard` (`awake-guard.ts`) holds a `KeepAwake` block (Electron `powerSaveBlocker`, `prevent-display-sleep`), so the idle timer cannot blank the display or sleep the host. It lets go when the viewer is gone, including on suspend, and takes the block again on the next pairing or resume. Media flows peer to peer over the LAN. The viewer sends `stats` every 2 s; the host window shows them.
 10. On a drop, the viewer reconnects with backoff (1, 2, 4, 8, 10 s) and sends `resume { token }` instead of the PIN, keeping the last frame on screen. The viewer also watches the bytes its transport receives (`LinkWatch`, `link-watch.ts`): none for 8 s counts as a drop even if no close arrives (host asleep, cable pulled). It retries at once when the browser fires `online` or the tab becomes visible. When the host suspends it closes the viewer's socket without a `bye` (`PowerEvents`), so the viewer keeps its token and retries; on resume the host re-checks its addresses straight away.
 
 ## Messages

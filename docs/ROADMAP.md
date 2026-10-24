@@ -39,7 +39,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | --- | ------------------------------- | ---------------- | ------ |
 | 015 | Quality presets                 | protocol, viewer | Done   |
 | 016 | Auto-reconnect after host sleep | host, viewer     | Done   |
-| 017 | Keep host from sleeping         | host             | Todo   |
+| 017 | Keep host from sleeping         | host             | Done   |
 
 ## v0.5: Daily-use comfort
 

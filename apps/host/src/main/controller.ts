@@ -17,6 +17,7 @@ import type { PowerEvents } from './platform/power.js';
 import type { ScreenCapturer } from './platform/screen-capturer.js';
 import { InputBridge } from './input-bridge.js';
 import { ViewerSessions } from './session.js';
+import { AwakeGuard } from './awake-guard.js';
 import { applyUpdate } from './updater/apply.js';
 import { Updater, type UpdaterOptions } from './updater/updater.js';
 import { saveSettings, type Settings } from './settings.js';
@@ -54,6 +55,7 @@ export class HostController {
   private readonly pairing = new Pairing();
   private readonly sessions: ViewerSessions;
   private readonly input: InputBridge;
+  private readonly awake: AwakeGuard;
   private server: LanServer;
   private readonly store: HostStateStore;
   private readonly updater: Updater;
@@ -91,10 +93,12 @@ export class HostController {
     });
 
     this.input = new InputBridge(opts.injector);
+    this.awake = new AwakeGuard(opts.keepAwake, createLogger('awake'));
     this.sessions = new ViewerSessions(this.pairing, {
       hostName: this.state.hostName,
       appVersion: this.state.appVersion,
       onPaired: (viewer) => {
+        this.awake.viewerPaired();
         this.patch({ status: 'connecting', viewer, stats: null, message: null });
         this.closePinWindow();
         this.sessions.toViewer({ type: 'input-state', available: this.input.available });
@@ -103,7 +107,7 @@ export class HostController {
       onViewerGone: () => {
         this.input.end();
         this.engine({ cmd: 'stop' });
-        this.opts.keepAwake.stop();
+        this.awake.viewerGone();
         this.patch({ status: this.paused ? 'paused' : 'ready', viewer: null, stats: null });
       },
       onAnswer: (sdp) => this.engine({ cmd: 'answer', sdp }),
@@ -170,7 +174,7 @@ export class HostController {
     if (this.lockTimer) clearTimeout(this.lockTimer);
     this.sessions.kick('host-stopped');
     this.server.closeAll();
-    this.opts.keepAwake.stop();
+    this.awake.dispose();
     this.opts.injector.dispose();
     this.tray?.destroy();
   }
@@ -385,7 +389,6 @@ export class HostController {
         if (evt.state !== 'connected' && evt.state !== 'connecting') this.input.end();
         if (evt.state === 'connected' && this.sessions.hasViewer) {
           this.patch({ status: 'streaming' });
-          this.opts.keepAwake.start();
         }
         return;
       case 'stopped':
