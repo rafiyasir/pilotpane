@@ -1,0 +1,218 @@
+/* PilotPane themes. Same tokens as the design canvas.
+   System fonts only: the app must work with no internet. */
+
+:root,
+:root[data-theme='cockpit'] {
+  --bg: #0e1726;
+  --surface: #16223a;
+  --surface2: #1d2c4a;
+  --text: #e8eef8;
+  --muted: #a3b3cc;
+  --line: #2c3d5e;
+  --accent: #f5a524;
+  --on-accent: #1a1300;
+  --ok: #3dd68c;
+  --err: #ff7a7a;
+  --info: #6cb6ff;
+  --desk: #0a101c;
+}
+
+:root[data-theme='daylight'] {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface2: #e9eef5;
+  --text: #0e1726;
+  --muted: #4a5a75;
+  --line: #d3dbe7;
+  --accent: #a85a0a;
+  --on-accent: #ffffff;
+  --ok: #12703f;
+  --err: #b42318;
+  --info: #1f5fbf;
+  --desk: #cbd5e3;
+}
+
+:root[data-theme='midnight'] {
+  --bg: #000000;
+  --surface: #0c0c0f;
+  --surface2: #16161a;
+  --text: #f2f2f2;
+  --muted: #a5a5ae;
+  --line: #2a2a30;
+  --accent: #ffb547;
+  --on-accent: #1a1300;
+  --ok: #4ade80;
+  --err: #ff7a7a;
+  --info: #7cc0ff;
+  --desk: #050505;
+}
+
+:root[data-theme='contrast'] {
+  --bg: #000000;
+  --surface: #000000;
+  --surface2: #141414;
+  --text: #ffffff;
+  --muted: #f0f0f0;
+  --line: #ffffff;
+  --accent: #ffe500;
+  --on-accent: #000000;
+  --ok: #00f06a;
+  --err: #ff5c5c;
+  --info: #33e1ff;
+  --desk: #000000;
+}
+
+:root {
+  --font-ui: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.label {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.btn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: 600 15px var(--font-ui);
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn:focus-visible,
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--err);
+  color: var(--err);
+}
+
+.chip {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font: 600 13px var(--font-ui);
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+.dot.ok {
+  background: var(--ok);
+}
+
+.dot.err {
+  background: var(--err);
+}
+
+.dot.info {
+  background: var(--info);
+}
+
+/* Theme swatch: 32 px circle inside a 44 px touch target. Colours are fixed
+   per theme (bg and accent from the blocks above), not theme variables. */
+.swatch {
+  --sw-bg: #0e1726;
+  --sw-accent: #f5a524;
+  width: 44px;
+  height: 44px;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+}
+
+.swatch::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at center, var(--sw-accent) 0, var(--sw-accent) 5px, var(--sw-bg) 5.5px);
+}
+
+.swatch[aria-pressed='true']::before {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+.swatch[data-theme-id='daylight'] {
+  --sw-bg: #f4f6fa;
+  --sw-accent: #a85a0a;
+}
+
+.swatch[data-theme-id='midnight'] {
+  --sw-bg: #000000;
+  --sw-accent: #ffb547;
+}
+
+.swatch[data-theme-id='contrast'] {
+  --sw-bg: #000000;
+  --sw-accent: #ffe500;
+}

@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src/main",
+    "outDir": "dist/main",
+    "tsBuildInfoFile": "dist/main.tsbuildinfo",
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2023"],
+    "types": ["node"]
+  },
+  "include": ["src/main"],
+  "references": [{ "path": "../../packages/protocol" }]
+}

@@ -1,0 +1,64 @@
+/* Sized in viewport units so it stays huge on any screen. */
+.pinscreen {
+  height: 100vh;
+  padding: 6vh 7vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.head .cursor {
+  fill: var(--accent);
+}
+
+.head h1 {
+  margin: 0;
+  font: 700 clamp(28px, 4vw, 56px) var(--font-display);
+}
+
+.pinlabel,
+.wherelabel {
+  font-size: clamp(18px, 2.2vw, 30px);
+  font-weight: 600;
+}
+
+.pinlabel {
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.bigpin {
+  font-weight: 700;
+  font-size: clamp(96px, 17vw, 260px);
+  line-height: 0.95;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.bigurl {
+  font-weight: 700;
+  font-size: clamp(36px, 4.6vw, 68px);
+  line-height: 1.1;
+  word-break: break-all;
+}
+
+.alt {
+  font-size: clamp(20px, 2.4vw, 34px);
+  white-space: pre-line;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 3px solid var(--line);
+  font-size: clamp(16px, 1.8vw, 26px);
+}
