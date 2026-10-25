@@ -1,10 +1,10 @@
 {
-  "version": "0.3.0",
-  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.3.0/PilotPane-Setup-0.3.0.exe",
-  "sha256": "0134c42699850cc659b0df161a9b4fe5dd5448c66cce5eb91a449ce783b5e68d",
-  "size": 158372864,
+  "version": "0.4.0",
+  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.0/PilotPane-Setup-0.4.0.exe",
+  "sha256": "8da6b43f15a702a407dccfb98884d662c06eab9e455e2b3c84e125e3516df001",
+  "size": 158377984,
   "notes": [
-    "Keyboard control and a shortcut bar"
+    "Auto quality, reconnect after sleep, keep awake, update fix"
   ],
-  "signature": "4Oa8UeD57zI8biIgBqXEFXZQM49NW64naDJEcXOSiOyVSPthuh3PmVnWp9K6PDWviV4aGAdVBZ0s7paqs4FCBQ=="
+  "signature": "RO2YdnTS5QVK22jsZugWpWuLn7xjzua0N2NgJ02v/XEB8Ik5GbaVBeRwgsS1fLn+fbFvwpf32GTX6JNmAJKdBQ=="
 }
