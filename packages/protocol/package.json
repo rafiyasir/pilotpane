@@ -1,6 +1,6 @@
 {
   "name": "@pilotpane/protocol",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Typed messages shared by the PilotPane host and viewer. Runs in Node and in old browsers.",
   "license": "MIT",
