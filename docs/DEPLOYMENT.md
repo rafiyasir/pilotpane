@@ -57,26 +57,31 @@ node scripts/sign-manifest.mjs keygen private/update-key
 
 1. Tag `main` as `vX.Y.Z` (see "Releasing" below). The tag must equal `v` plus the `package.json` version, or the workflow stops at its first step.
 2. `.github/workflows/release.yml` runs on `windows-latest`: tests, `pnpm package`, `pnpm installer`, `SHA256SUMS`, then a **draft** release holding the installer, the zip and the sums. Nothing is public yet.
-3. On your machine, from a branch off `main` (for example `chore/site-X.Y.Z`):
+3. Download the three draft files into a folder outside the repo (for example `D:\dream\pp-release\X.Y.Z`). On your machine, make a branch from `origin/main` (`git checkout -b chore/site-X.Y.Z origin/main`) and sign:
 
 ```bash
-pnpm release:sign -- --version X.Y.Z --key private/update-key/update-private.pem --note "What changed"
+pnpm release:sign -- --version X.Y.Z --dir <folder> --key private/update-key/update-private.pem --note "What changed"
 ```
 
 It downloads the three files from the draft with the GitHub CLI (or, without the CLI, download them from the draft release page in your browser into a folder and add `--dir <folder>`), refuses if the installer or zip does not match `SHA256SUMS`, signs the manifest, and writes `docs/update/manifest.json` and `docs/index.html` (version, size, SHA-256, download count). Up to three notes of 120 characters each. Use `--dir <folder>` to sign files you already downloaded, and `--out-dir <folder>` to write somewhere other than `docs/` for a trial run.
 
-4. Commit those two files, open a PR into `main`, merge it, then publish the draft release on GitHub (Edit, then Publish release). Pages now serves the download page at `https://rafiyasir.github.io/pilotpane/` and the manifest at `https://rafiyasir.github.io/pilotpane/update/manifest.json`. Merge `main` back into `dev`.
+4. Commit those two files, open a PR with **base `main`** (the default branch is `dev`, so GitHub proposes `dev`: change it), and merge it with a merge commit. Then publish the draft release on GitHub (Edit, then Publish release). Pages now serves the download page at `https://rafiyasir.github.io/pilotpane/` and the manifest at `https://rafiyasir.github.io/pilotpane/update/manifest.json`. Both generated files are listed in `.prettierignore`, so the format check skips them. If the PR went into `dev` by mistake, open a `dev` -> `main` PR to bring it over; Pages serves `main` and shows a 404 until the files are there.
 
 The page makes one request: its script asks the GitHub API for the download count and falls back to the number written at release time. The count means download requests, not installs, and includes in-app updates.
+
+Sign versions in order. The manifest names one version, the newest you signed, so signing an older version after a newer one tells installed apps that the old one is current.
+
+To check the real update path, install the previous version, click **Check for updates**, and confirm the app comes back on the new version. Install by hand only to test the installer itself. An update runs the old app's code, so a bug in the update path shows up only this way. The update script must not run with the install folder as its current folder, because that blocks the installer from swapping the folder (0.2.0 and 0.3.0 shipped with this bug; 0.4.0 fixed it). The silent installer writes errors to `%TEMP%\PilotPane-setup.log`.
 
 To try an update locally, serve a folder with a manifest and installer on `http://127.0.0.1` and start the app with `PILOTPANE_UPDATE_URL` pointing at the manifest (see the spec 026 test guide).
 
 ## Branches
 
-| Branch | Purpose       | How it gets there                          |
-| ------ | ------------- | ------------------------------------------ |
-| `main` | releases only | merge commit from `dev` at a release       |
-| `dev`  | integration   | spec, fix and docs PRs, "Rebase and merge" |
+| Branch             | Purpose                           | How it gets there                          |
+| ------------------ | --------------------------------- | ------------------------------------------ |
+| `main`             | releases only                     | merge commit from `dev` at a release       |
+| `dev`              | integration and default           | spec, fix and docs PRs, "Rebase and merge" |
+| `chore/site-X.Y.Z` | signed manifest and download page | PR into `main`, merge commit               |
 
 ## CI
 
@@ -90,7 +95,16 @@ To try an update locally, serve a folder with a manifest and installer on `http:
 4. Open a PR `dev` -> `main` and merge it with "Create a merge commit".
 5. Tag `main` as `vX.Y.Z`. Pushing the tag starts the release workflow.
 6. Sign and publish as described in "Publishing a release".
-7. Merge `main` back into `dev` if the release commits changed anything there.
+7. No merge back into `dev` is needed. The site PRs only change the two generated files on `main`.
+
+## Releasing an older version
+
+The first releases were made after the fact. `v0.1.0` to `v0.3.0` are tagged on short branches that start at the old commit (`release/v0.1.0` to `release/v0.3.0`):
+
+1. Branch from the commit where that version ended.
+2. Bump `version` in the root and the three workspace `package.json` files, because the workflow needs the tag to equal `v` plus that version. If the commit is older than the packaging and installer specs (024 to 028), copy the build scripts from a later commit as well. Do not change app code.
+3. Tag that commit and push only the tag. The branch can stay local.
+4. Sign and publish in order, as above.
 
 ## Journal site (GitHub Pages)
 
