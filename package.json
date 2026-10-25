@@ -1,6 +1,6 @@
 {
   "name": "pilotpane",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "description": "Control your Windows laptop from any device with a browser on your local network.",
   "license": "MIT",
