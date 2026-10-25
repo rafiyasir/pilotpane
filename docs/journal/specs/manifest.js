@@ -24,4 +24,5 @@ window.JOURNAL_FILES = [
   '026.js',
   '027.js',
   '028.js',
+  '030.js',
 ];
