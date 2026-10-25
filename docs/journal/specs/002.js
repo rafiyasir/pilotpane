@@ -5,11 +5,11 @@ window.JOURNAL.push({
   mergedDate: '2026-10-21',
   technologies: ['TypeScript', 'SHA-256', 'Secure contexts', 'Node test runner'],
   oneLine:
-    'Host and viewer now share one set of typed messages, one validator and one hand-written SHA-256, and the same code runs in Node and in Chrome 109.',
+    'Host and viewer now share one set of typed messages, one validator and one SHA-256 implemented in the repo, and the same code runs in Node and in Chrome 109.',
 
   what: {
     summary:
-      'A package with the message types, the only parser for network JSON, a SHA-256 written by hand and the PIN proof. Nine tests check known vectors, parity with `node:crypto` and valid and invalid messages.',
+      'A package with the message types, the only parser for network JSON, a SHA-256 implemented in the repo and the PIN proof. Nine tests check known vectors, parity with `node:crypto` and valid and invalid messages.',
     partsTouched: [
       {
         path: 'packages/protocol',
@@ -28,7 +28,7 @@ window.JOURNAL.push({
   why: {
     decisions: [
       {
-        chose: 'A hand-written SHA-256',
+        chose: 'A SHA-256 implemented in the repo',
         insteadOf: '`crypto.subtle` or a crypto library',
         reason:
           'The viewer is served over plain HTTP, which is not a secure context, so browsers hide `crypto.subtle` there. Our version runs the same in Node and Chrome 109 (ADR-007).',
