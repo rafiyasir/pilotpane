@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.1.0/PilotPane-Setup-0.1.0.exe",
+  "sha256": "3ae8c9e9db43d7ddf31aa71f49f1026c9bbd63cf4b725e2d5c5e0ee0660e6c41",
+  "size": 158332416,
+  "notes": [
+    "First release: view the host screen"
+  ],
+  "signature": "B1pXkd2dEMeWZjNxrjo7R5EIqf5v8pn3FPa3ZRHvYWqLf8e9Y8Urk7qBZerlhIvmsxOLfsAzX7m1glECdbuJCg=="
+}
