@@ -2,7 +2,7 @@
 
 ## The problem
 
-A Windows laptop (the **host**) has a hardware display fault: the picture jitters and text doubles, worse at high refresh rates and when warm. Until it's repaired, an old laptop (the **viewer**: Windows 8, Chrome 109, broken Wi-Fi antenna) should act as its screen, and later as its keyboard and mouse, over a local connection. No money, no cloud, and built by hand as a learning and portfolio project.
+A Windows laptop (the **host**) has a hardware display fault: the picture jitters and text doubles, worse at high refresh rates and when warm. Until it's repaired, an old laptop (the **viewer**: Windows 8, Chrome 109, broken Wi-Fi antenna) should act as its screen, and later as its keyboard and mouse, over a local connection. No money, no cloud, and built as a learning and portfolio project.
 
 ## What PilotPane is
 
@@ -14,7 +14,7 @@ A Windows laptop (the **host**) has a hardware display fault: the picture jitter
 
 1. People with a laptop whose screen is broken or failing.
 2. People with an old laptop or tablet who want to use it as a second screen or remote control.
-3. Developers who want a small, readable example of screen streaming, WebRTC signaling and a hand-written WebSocket server.
+3. Developers who want a small, readable example of screen streaming, WebRTC signaling and a WebSocket server implemented in the repo, with no library.
 
 ## Principles
 
