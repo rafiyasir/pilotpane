@@ -2,6 +2,10 @@
 
 All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 
+## [0.4.1] Update check
+
+- No behavior changes. This release checks that "Check for updates" now installs a new version from 0.4.0.
+
 ## [0.4.0] Quality and reliability
 
 - Auto quality: the viewer steps between 1080p, 720p and Low as the link gets worse or better, and remembers your choice.
