@@ -1,10 +1,10 @@
 {
-  "version": "0.4.0",
-  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.0/PilotPane-Setup-0.4.0.exe",
-  "sha256": "8da6b43f15a702a407dccfb98884d662c06eab9e455e2b3c84e125e3516df001",
+  "version": "0.4.1",
+  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.1/PilotPane-Setup-0.4.1.exe",
+  "sha256": "ea43db54a80fa5ad8e562d3173026d362e3d78fcea6b4514220775342f74b353",
   "size": 158377984,
   "notes": [
-    "Auto quality, reconnect after sleep, keep awake, update fix"
+    "Checks that Check for updates installs a new version"
   ],
-  "signature": "RO2YdnTS5QVK22jsZugWpWuLn7xjzua0N2NgJ02v/XEB8Ik5GbaVBeRwgsS1fLn+fbFvwpf32GTX6JNmAJKdBQ=="
+  "signature": "l9I7uZ8v2Smp3+SE7Xjnaxzd6utCdPrlJ1Jz8JHWnXKIf1nJjQRcJVTMb0AV839KHt3MmhUI3aM6hxkYc58FDQ=="
 }
