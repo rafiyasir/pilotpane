@@ -1,10 +1,10 @@
 {
-  "version": "0.2.0",
-  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.2.0/PilotPane-Setup-0.2.0.exe",
-  "sha256": "0748ddc809182750a95c3f8ed5e9e0312fb17eb386d324595d0cca9a645fee52",
-  "size": 158365184,
+  "version": "0.3.0",
+  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.3.0/PilotPane-Setup-0.3.0.exe",
+  "sha256": "0134c42699850cc659b0df161a9b4fe5dd5448c66cce5eb91a449ce783b5e68d",
+  "size": 158372864,
   "notes": [
-    "Mouse control and a Low-bandwidth preset"
+    "Keyboard control and a shortcut bar"
   ],
-  "signature": "9WMQyhQXwV7ops08+mWOrYMHoOUdBN+fXfQrUitpKoKcgJvCOFQuzRJIFSuSlgi9Ze+yhYZkKtaSWbUGjjY7Dw=="
+  "signature": "4Oa8UeD57zI8biIgBqXEFXZQM49NW64naDJEcXOSiOyVSPthuh3PmVnWp9K6PDWviV4aGAdVBZ0s7paqs4FCBQ=="
 }
