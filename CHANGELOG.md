@@ -8,12 +8,13 @@ All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 - Reconnect after host sleep: the viewer notices a silent link, keeps the last picture and comes back without a PIN when the host wakes.
 - Keep the host awake: while a viewer is paired, the host does not blank the display or fall asleep. It lets go when the viewer leaves or the host suspends.
 - Fixes for held keys, which now repeat, and for mouse wheel scrolling.
+- Fix: in-app updates now install. The update script used to run inside the install folder, which stopped the installer from replacing it. If you are on 0.2.0 or 0.3.0, run the new installer once by hand; updates work from 0.4.0 on.
 
 ## [0.3.0] Keyboard
 
 - Keyboard control: the viewer sends physical key codes and the host turns them into Windows virtual-key codes, so the host's layout decides the character.
 - Capture mode and a shortcut bar for Alt+Tab, Win, Alt+F4 and Ctrl+W. The bar can be moved, resized and faded. Ctrl+Alt+Shift frees the pointer to use the toolbar.
-- Known issues, fixed in 0.4.0: held keys do not repeat, and mouse wheel scrolling needs a fix.
+- Known issues, fixed in 0.4.0: held keys do not repeat, mouse wheel scrolling needs a fix, and "Check for updates" cannot install a new version (run the installer by hand).
 
 ## [0.2.0] Mouse, low bandwidth and shipping
 
