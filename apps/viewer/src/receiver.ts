@@ -2,6 +2,21 @@ import type { IceCandidate, InputMessage, StreamStats } from '/protocol/index.js
 import { INPUT_CHANNEL_LABEL } from '/protocol/index.js';
 
 /**
+ * Asks the browser to show frames as soon as they arrive instead of buffering for smoothness.
+ * On a LAN the extra delay only makes the pointer feel late. Both knobs are hints and either may
+ * be missing (playoutDelayHint is older, jitterBufferTarget came in Chrome 114), so each is optional.
+ */
+function lowLatency(receiver: RTCRtpReceiver): void {
+  const r = receiver as RTCRtpReceiver & { playoutDelayHint?: number | null; jitterBufferTarget?: number | null };
+  try {
+    if ('playoutDelayHint' in r) r.playoutDelayHint = 0;
+    if ('jitterBufferTarget' in r) r.jitterBufferTarget = 0;
+  } catch {
+    /* a hint the browser refuses is not an error */
+  }
+}
+
+/**
  * The receiving side of the WebRTC connection. The host makes the offer;
  * this answers it and shows the incoming video.
  */
@@ -27,6 +42,7 @@ export class Receiver {
     this.pc = pc;
 
     pc.ontrack = (e) => {
+      lowLatency(e.receiver);
       const stream = e.streams[0] ?? new MediaStream([e.track]);
       if (this.video.srcObject !== stream) {
         this.video.srcObject = stream;

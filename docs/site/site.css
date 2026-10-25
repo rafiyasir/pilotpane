@@ -108,72 +108,57 @@ a:hover {
   gap: 28px;
 }
 
-/* theme picker */
+/* theme picker: the same round swatches as the host and viewer (44px tap target, 32px circle, no text).
+   The swatch colours are fixed values that match theme.css, so each button shows its own theme. */
 .theme-bar {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 8px;
-  padding-top: 16px;
+  padding-top: 10px;
 }
 .theme-bar[hidden] {
   display: none;
 }
-.theme {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 14px 0 6px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--surface);
-  color: var(--text);
-  font: 600 13px var(--font-ui);
+.swatch {
+  --sw-bg: #0e1726;
+  --sw-accent: #f5a524;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 6px;
+  border: 0;
+  background: transparent;
   cursor: pointer;
 }
-.theme[aria-pressed='true'] {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-/* The swatches show each theme's own colours, so they are fixed values that match theme.css. */
-.sw {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(128, 128, 128, 0.5);
-  border-radius: 50%;
-}
-.sw i {
+.swatch::before {
+  content: '';
   display: block;
-  width: 10px;
-  height: 10px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
   border-radius: 50%;
+  background: radial-gradient(circle at center, var(--sw-accent) 0, var(--sw-accent) 5px, var(--sw-bg) 5.5px);
 }
-.sw-cockpit {
-  background: #0e1726;
+.swatch[aria-pressed='true']::before {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
-.sw-cockpit i {
-  background: #f5a524;
+.swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 8px;
 }
-.sw-daylight {
-  background: #f4f6fa;
+.swatch[data-theme-name='daylight'] {
+  --sw-bg: #f4f6fa;
+  --sw-accent: #a85a0a;
 }
-.sw-daylight i {
-  background: #a85a0a;
+.swatch[data-theme-name='midnight'] {
+  --sw-bg: #000000;
+  --sw-accent: #ffb547;
 }
-.sw-midnight {
-  background: #000000;
-}
-.sw-midnight i {
-  background: #ffb547;
-}
-.sw-contrast {
-  background: #000000;
-}
-.sw-contrast i {
-  background: #ffe500;
+.swatch[data-theme-name='contrast'] {
+  --sw-bg: #000000;
+  --sw-accent: #ffe500;
 }
 
 header {
@@ -555,6 +540,11 @@ footer a {
 }
 
 @media (max-width: 640px) {
+  /* The drawing shrinks with the screen, so its captions fall below readable size.
+     The block already has an aria-label, and the hero text says the same thing. */
+  .stage svg .t-ui {
+    display: none;
+  }
   .steps {
     grid-template-columns: 1fr;
   }
