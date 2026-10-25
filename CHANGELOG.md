@@ -29,7 +29,7 @@ All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 
 ## [0.1.0] See the screen
 
-Source snapshot, no installer.
+View only: no mouse or keyboard yet. Ships as an installer and a portable zip, with no in-app updates. To move to a newer version, run its installer over this one.
 
 - Host app (Electron): primary screen capture, WebRTC streaming (H.264 preferred), 1080p and 720p presets.
 - Own HTTP server and WebSocket (RFC 6455), listening only on private LAN addresses.
