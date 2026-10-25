@@ -95,6 +95,8 @@ if (!app.requestSingleInstanceLock()) {
         canInstall: app.isPackaged,
         spawn: (command, args) => {
           spawn(command, args, {
+            // Not the install folder: a process whose current folder is inside it stops the installer from swapping it.
+            cwd: app.getPath('temp'),
             detached: true,
             stdio: 'ignore',
             windowsHide: true,
