@@ -68,6 +68,7 @@ Built before spec 011 so the app can be shared. Spec numbers are permanent, so t
 | 026 | In-app updates (signed manifest)      | protocol, host | Done   |
 | 027 | Release pipeline and download website | tooling, docs  | Done   |
 | 028 | Secret scan (own script)              | tooling        | Done   |
+| 030 | First releases (0.1.0 to 0.4.1)       | tooling, docs  | Done   |
 
 ## Later
 
