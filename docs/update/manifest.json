@@ -1,10 +1,12 @@
 {
-  "version": "0.4.1",
-  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.1/PilotPane-Setup-0.4.1.exe",
-  "sha256": "ea43db54a80fa5ad8e562d3173026d362e3d78fcea6b4514220775342f74b353",
+  "version": "0.4.2",
+  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.2/PilotPane-Setup-0.4.2.exe",
+  "sha256": "352518440c9ff6eccf5c9bb4036d5b4aaf95a976629a7899127a46d12d29e380",
   "size": 158377984,
   "notes": [
-    "Checks that Check for updates installs a new version"
+    "Pointer follows more closely, at up to 60 frames per second",
+    "Download page works better on phones",
+    "The host may run warmer during long sessions"
   ],
-  "signature": "l9I7uZ8v2Smp3+SE7Xjnaxzd6utCdPrlJ1Jz8JHWnXKIf1nJjQRcJVTMb0AV839KHt3MmhUI3aM6hxkYc58FDQ=="
+  "signature": "OIhP9fI47kYbGrswTRtFfm1zDQLiwmKWXw5sy1ZC6fvsqtMpp748hdApsLXduQHqacA47IoYh9pecxMmfImLCw=="
 }
