@@ -2,6 +2,13 @@
 
 All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 
+## [0.4.2] Pointer feel
+
+- The pointer follows the touchpad more closely. The host now sends up to 60 frames per second at 1080p and 720p (it was 30, and often fewer), and asks Chrome for motion instead of slide-style sharpness. Text stays sharp because the picture keeps its size when the link is busy. The viewer also asks its browser for the smallest video buffer. Low stays at 15 frames per second.
+- The cost is more work and heat on the host, so a long session may run warmer. If the pointer slows down over a long session, tell us what the host log says.
+- The download page has round theme swatches like the app, and reads better on a phone.
+- Documentation: the release process and the first releases are written down.
+
 ## [0.4.1] Update check
 
 - No behavior changes. This release checks that "Check for updates" now installs a new version from 0.4.0.
