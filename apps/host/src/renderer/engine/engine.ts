@@ -36,7 +36,7 @@ async function capture(sourceId: string): Promise<MediaStream> {
         chromeMediaSourceId: sourceId,
         maxWidth: 1920,
         maxHeight: 1080,
-        maxFrameRate: 30
+        maxFrameRate: 60
       }
     }
   };
@@ -46,7 +46,7 @@ async function capture(sourceId: string): Promise<MediaStream> {
     console.warn('[engine] desktop getUserMedia failed, trying getDisplayMedia', first);
     return navigator.mediaDevices.getDisplayMedia({
       audio: false,
-      video: { width: { max: 1920 }, height: { max: 1080 }, frameRate: { max: 30 } }
+      video: { width: { max: 1920 }, height: { max: 1080 }, frameRate: { max: 60 } }
     });
   }
 }
@@ -116,7 +116,9 @@ async function start(sourceId: string, preset: QualityPreset): Promise<void> {
   stream = await capture(sourceId);
   const track = stream.getVideoTracks()[0];
   if (!track) throw new Error('screen capture returned no video');
-  track.contentHint = 'text';
+  // 'text' makes Chrome favour still sharpness and send few frames, which made the pointer lag.
+  // Resolution is still kept by degradationPreference, so text stays sharp.
+  track.contentHint = 'motion';
   track.addEventListener('ended', () => emit({ evt: 'error', message: 'Screen capture ended.' }));
 
   const peer = new RTCPeerConnection({ iceServers: [] }); // LAN only: no STUN, no TURN

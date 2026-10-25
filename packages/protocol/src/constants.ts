@@ -29,8 +29,8 @@ export interface QualitySpec {
 }
 
 export const QUALITY_SPECS: Record<QualityPreset, QualitySpec> = {
-  '1080p': { height: 1080, maxFramerate: 30, minBitrate: 3_000_000, startBitrate: 6_000_000, maxBitrate: 12_000_000 },
-  '720p': { height: 720, maxFramerate: 30, minBitrate: 1_500_000, startBitrate: 3_000_000, maxBitrate: 6_000_000 },
+  '1080p': { height: 1080, maxFramerate: 60, minBitrate: 3_000_000, startBitrate: 6_000_000, maxBitrate: 12_000_000 },
+  '720p': { height: 720, maxFramerate: 60, minBitrate: 1_500_000, startBitrate: 3_000_000, maxBitrate: 6_000_000 },
   // For very slow links such as Bluetooth PAN (about 1 to 2 Mbps in practice).
   low: { height: 480, maxFramerate: 15, minBitrate: 300_000, startBitrate: 600_000, maxBitrate: 1_000_000 }
 };
