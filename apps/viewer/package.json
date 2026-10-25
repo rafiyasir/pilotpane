@@ -1,6 +1,6 @@
 {
   "name": "@pilotpane/viewer",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "description": "PilotPane viewer: a static page served by the host. Works in Chrome 109 with nothing installed.",
   "license": "MIT",
