@@ -62,3 +62,7 @@ Filled in by `/build`.
 - **Viewer (Windows 8 / Chrome 109 laptop):** see the Done-when items above.
 - **Expected results** for each step.
 - **Failure case:** pause while a viewer is streaming, then quit the host from the tray instead of resuming; the viewer must show the normal reconnect messages, not a paused text.
+
+## Release
+
+Planned for 0.4.3. It changes `PROTOCOL_VERSION` (2 to 3), so say so in the changelog.
