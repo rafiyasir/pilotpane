@@ -45,6 +45,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | 033 | Local cursor on the viewer       | viewer                 | Todo        |
 | 034 | Pause that both sides understand | protocol, host, viewer | In progress |
 | 035 | Close notice and Quit button     | host                   | Todo        |
+| 036 | View-only mode                   | host, viewer           | Todo        |
 
 Planned releases: 031, 032, 034 and 035 ship as 0.4.3; 033 as 0.4.4. 0.5.0 stays for specs 018 to 021. Spec 034 changes `PROTOCOL_VERSION` (2 to 3), so call it out in the changelog.
 
