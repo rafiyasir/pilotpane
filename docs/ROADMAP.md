@@ -35,11 +35,18 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 
 ## v0.4: Quality and reliability
 
-| #   | Spec                            | Package          | Status |
-| --- | ------------------------------- | ---------------- | ------ |
-| 015 | Quality presets                 | protocol, viewer | Done   |
-| 016 | Auto-reconnect after host sleep | host, viewer     | Done   |
-| 017 | Keep host from sleeping         | host             | Done   |
+| #   | Spec                             | Package                | Status      |
+| --- | -------------------------------- | ---------------------- | ----------- |
+| 015 | Quality presets                  | protocol, viewer       | Done        |
+| 016 | Auto-reconnect after host sleep  | host, viewer           | Done        |
+| 017 | Keep host from sleeping          | host                   | Done        |
+| 031 | Performance and sharpness        | host, viewer           | Todo        |
+| 032 | Lighter package                  | tooling                | Todo        |
+| 033 | Local cursor on the viewer       | viewer                 | Todo        |
+| 034 | Pause that both sides understand | protocol, host, viewer | In progress |
+| 035 | Close notice and Quit button     | host                   | Todo        |
+
+Planned releases: 031, 032, 034 and 035 ship as 0.4.3; 033 as 0.4.4. 0.5.0 stays for specs 018 to 021. Spec 034 changes `PROTOCOL_VERSION` (2 to 3), so call it out in the changelog.
 
 ## v0.5: Daily-use comfort
 
