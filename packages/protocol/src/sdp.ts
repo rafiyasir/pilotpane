@@ -61,3 +61,38 @@ export function withBitrateHints(sdp: string, hints: BitrateHints): string {
   }
   return result.join(eol);
 }
+
+const FAMILY_BY_NAME: Record<string, string> = {
+  vp8: 'vp8',
+  vp9: 'vp9',
+  h264: 'h264',
+  h265: 'h265',
+  hevc: 'h265',
+  av1: 'av1'
+};
+
+/**
+ * The video codec families in an SDP offer (`vp8`, `h264`, ...), once each, in the order of the
+ * m=video payload list. RTX, RED and FEC payloads and audio are ignored.
+ */
+export function offeredCodecs(sdp: string): string[] {
+  const lines = sdp.split(/\r?\n/);
+  let order: string[] = [];
+  const names = new Map<string, string>();
+  let inVideo = false;
+  for (const line of lines) {
+    if (line.startsWith('m=')) {
+      inVideo = line.startsWith('m=video');
+      if (inVideo && order.length === 0) order = line.split(' ').slice(3);
+      continue;
+    }
+    const m = inVideo ? /^a=rtpmap:(\d+) ([^/\s]+)/.exec(line) : null;
+    if (m) names.set(m[1]!, m[2]!.toLowerCase());
+  }
+  const out: string[] = [];
+  for (const pt of order) {
+    const family = FAMILY_BY_NAME[names.get(pt) ?? ''];
+    if (family && !out.includes(family)) out.push(family);
+  }
+  return out;
+}

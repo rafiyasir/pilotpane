@@ -1,6 +1,6 @@
 # Spec 037: Automatic codec
 
-Status: Todo | Package(s): protocol, viewer | Depends on: 005, 031 (ADR-019)
+Status: Done | Package(s): protocol, viewer | Depends on: 005, 031 (ADR-019)
 
 ## Goal
 
@@ -86,10 +86,14 @@ navigator.mediaCapabilities
 
 If it errors, Chrome 109 has no usable answer and the fallback (H.264 first) is what will run there.
 
-- **Host (Git Bash):** `PILOTPANE_LOG=debug pnpm start`.
-- **Viewer (Windows 8 / Chrome 109 laptop):** pair, check **codec** in Stats, scroll for a minute, type.
-- **Expected results** for each step.
-- **Failure case:** block the capability call (or use a browser without it) and confirm the viewer plays with H.264.
+- **Host (Git Bash):** quit any running PilotPane, then `pnpm build && PILOTPANE_LOG=debug pnpm start`.
+- **Viewer (Windows 8 / Chrome 109 laptop):** open the host address, press F12 and open Console, then type the PIN. The console prints `codec order vp8, h264` or `codec order h264, vp8`. Open Stats and read **codec**. Scroll a long page for a minute, then type in a text box.
+- **Viewer (modern laptop):** the same steps.
+- **Expected results:**
+  - Modern viewer: console `codec order vp8, h264`, Stats codec VP8, scrolling sharp.
+  - Windows 8 viewer: Stats codec matches the first codec in the console line. It is VP8 only if your saved `decodingInfo` output said `smooth: true` for VP8, otherwise H.264. The picture is smooth either way.
+  - If `decodingInfo` errored on Chrome 109 earlier, the console line starts with `h264`.
+- **Failure case:** on the viewer, before pairing, run `Object.defineProperty(navigator, 'mediaCapabilities', { value: undefined })` in the console, then pair. Expected: `codec order h264, vp8`, Stats codec H.264, and the picture plays.
 
 ## Release
 
