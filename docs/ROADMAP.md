@@ -46,8 +46,10 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | 034 | Pause that both sides understand | protocol, host, viewer | Done   |
 | 035 | Close notice and Quit button     | host                   | Todo   |
 | 036 | View-only mode                   | host, viewer           | Todo   |
+| 037 | Automatic codec                  | protocol, viewer       | Todo   |
+| 038 | Codec choice in the toolbar      | protocol, viewer       | Todo   |
 
-Planned releases: 031, 032, 034 and 035 ship as 0.4.3; 033 as 0.4.4. 0.5.0 stays for specs 018 to 021. Spec 034 changes `PROTOCOL_VERSION` (2 to 3), so call it out in the changelog.
+Planned releases: 031, 032, 034, 035 and 037 ship as 0.4.3 (037 protects old viewers from 031's VP8 default); 033 and 038 as 0.4.4. Spec 038 needs a designed screen first. 0.5.0 stays for specs 018 to 021. Spec 034 changes `PROTOCOL_VERSION` (2 to 3), so call it out in the changelog.
 
 ## v0.5: Daily-use comfort
 
