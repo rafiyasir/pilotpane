@@ -46,6 +46,7 @@ window.JOURNAL_ROADMAP = {
         ['015', 'Quality presets'],
         ['016', 'Auto-reconnect'],
         ['017', 'Keep host awake'],
+        ['031', 'Performance and sharpness'],
         ['034', 'Pause that both sides understand']
       ]
     },
