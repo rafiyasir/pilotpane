@@ -40,7 +40,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 | 015 | Quality presets                  | protocol, viewer       | Done   |
 | 016 | Auto-reconnect after host sleep  | host, viewer           | Done   |
 | 017 | Keep host from sleeping          | host                   | Done   |
-| 031 | Performance and sharpness        | host, viewer           | Todo   |
+| 031 | Performance and sharpness        | host, viewer           | Done   |
 | 032 | Lighter package                  | tooling                | Todo   |
 | 033 | Local cursor on the viewer       | viewer                 | Todo   |
 | 034 | Pause that both sides understand | protocol, host, viewer | Done   |

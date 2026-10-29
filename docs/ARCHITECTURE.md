@@ -17,7 +17,7 @@
  │        │ IPC (preload bridge, sender checked)                        │        │  (receive only)         │
  │        ▼                                                             │ WebRTC │                         │
  │  Engine window (hidden renderer)                                     │◄══════►│  <video>                │
- │     desktop capture → RTCPeerConnection (send only, H.264 preferred) │ media  │  stats overlay          │
+ │     desktop capture → RTCPeerConnection (send only, VP8 preferred)   │ media  │  stats overlay          │
  │  Host window (option A)  ·  PIN window (option B, full screen)       │        │                         │
  └──────────────────────────────────────────────────────────────────────┘        └────────────────────────┘
 ```
@@ -69,9 +69,10 @@ Inside the host, main and the engine talk with `EngineCommand` (`start`, `answer
 
 ## Video
 
-- Capture: primary display, up to 1920×1080 at up to 60 fps, `contentHint = "motion"` (ADR-016). The viewer also asks its receiver for the smallest playout buffer (`lowLatency` in `receiver.ts`), because on a LAN extra buffering only delays the pointer.
-- Codec: H.264 preferred when both sides support it, otherwise VP8.
+- Capture: primary display, up to 1920×1080 at up to 60 fps, `contentHint = "detail"` (ADR-019). The viewer also asks its receiver for the smallest playout buffer (`lowLatency` in `receiver.ts`), because on a LAN extra buffering only delays the pointer.
+- Codec: VP8 first (software, sharp in motion), then H.264, then the rest (`preferCodecs`, ADR-019). The viewer decodes whichever the answer picks.
 - Presets: 1080p (min 3, start 6, max 12 Mbps), 720p (min 1.5, start 3, max 6 Mbps) and Low (480p, 15 fps, min 0.3, start 0.6, max 1 Mbps, for Bluetooth and other very slow links). Each preset also sets the frame rate cap: 60 fps for 1080p and 720p, 15 for Low. The cap is applied with `scaleResolutionDownBy` and `maxBitrate`; min and start go into the answer SDP as `x-google-*-bitrate` hints (`withBitrateHints`) so motion bursts are not encoded at a low starting bitrate; `degradationPreference = maintain-resolution` keeps text sharp by dropping frames first.
+- Host load: `HostLoadGovernor` (`host-load.ts`) reads the encoder's `qualityLimitationReason`; after about 5 s of `cpu` it lowers a private ceiling (30 then 20 fps, then 720p) inside the engine, and raises it again after 30 s without it (ADR-018). The viewer is not told.
 - Auto: the viewer's "Auto" choice runs `autoStep` (`auto-quality.ts`) on the stats it already measures each second. It steps down one preset after about 6 s of loss of 3% or more or a round trip over 250 ms, and up after about 30 s of a quiet link, at most once per 15 s, and sends the existing `set-quality`. Frame rate is ignored because a still desktop sends few frames. The viewer remembers its choice (Auto or a preset) in browser storage and restores it after pairing.
 
 ## Extension points

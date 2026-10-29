@@ -55,7 +55,11 @@ export type EngineCommand =
   | { cmd: 'answer'; sdp: string }
   | { cmd: 'ice'; candidate: IceCandidate | null }
   | { cmd: 'quality'; preset: QualityPreset }
+  | { cmd: 'load-level'; level: LoadLevel }
   | { cmd: 'stop' };
+
+/** How far the host has stepped the stream down because its CPU is busy: 0 none, 2 most. */
+export type LoadLevel = 0 | 1 | 2;
 
 /** Engine window -> main process. */
 export type EngineEvent =
@@ -70,6 +74,10 @@ export type EngineEvent =
       framesPerSecond: number;
       targetBitrate: number;
       qualityLimitationReason: string;
+      encoderImplementation: string;
+      powerEfficientEncoder: boolean;
+      /** Seconds the encoder has been limited by the CPU since the stream began. */
+      cpuLimitedSec: number;
     }
   | { evt: 'error'; message: string };
 

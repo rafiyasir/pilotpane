@@ -25,6 +25,8 @@ import type { ScreenCapturer } from './platform/screen-capturer.js';
 import { InputBridge } from './input-bridge.js';
 import { ViewerSessions } from './session.js';
 import { AwakeGuard } from './awake-guard.js';
+import { freemem } from 'node:os';
+import { HostLoadGovernor } from './host-load.js';
 import { applyUpdate } from './updater/apply.js';
 import { Updater, type UpdaterOptions } from './updater/updater.js';
 import { saveSettings, type Settings } from './settings.js';
@@ -63,6 +65,7 @@ export class HostController {
   private readonly sessions: ViewerSessions;
   private readonly input: InputBridge;
   private readonly awake: AwakeGuard;
+  private readonly load: HostLoadGovernor;
   private server: LanServer;
   private readonly store: HostStateStore;
   private readonly updater: Updater;
@@ -100,6 +103,7 @@ export class HostController {
     });
 
     this.input = new InputBridge(opts.injector);
+    this.load = new HostLoadGovernor();
     this.awake = new AwakeGuard(opts.keepAwake, createLogger('awake'));
     this.sessions = new ViewerSessions(this.pairing, {
       hostName: this.state.hostName,
@@ -114,6 +118,7 @@ export class HostController {
       onViewerGone: () => {
         this.input.end();
         this.engine({ cmd: 'stop' });
+        this.load.reset();
         this.awake.viewerGone();
         this.patch({ status: this.paused ? 'paused' : 'ready', viewer: null, stats: null });
       },
@@ -392,6 +397,13 @@ export class HostController {
     }
   }
 
+  private stepLoad(reason: string): void {
+    const level = this.load.sample(reason);
+    if (level === null) return;
+    log.info(`host is busy: stream load level ${level}`);
+    this.engine({ cmd: 'load-level', level });
+  }
+
   private handleEngineEvent(evt: EngineEvent): void {
     switch (evt.evt) {
       case 'offer':
@@ -416,8 +428,9 @@ export class HostController {
         return;
       case 'debug-stats':
         log.debug(
-          `send: ${evt.frameWidth}px ${evt.framesPerSecond} fps, target ${Math.round(evt.targetBitrate / 1000)} kbps, limited by ${evt.qualityLimitationReason}`
+          `send: ${evt.frameWidth}px ${evt.framesPerSecond} fps, target ${Math.round(evt.targetBitrate / 1000)} kbps, limited by ${evt.qualityLimitationReason} (cpu ${evt.cpuLimitedSec} s), encoder ${evt.encoderImplementation}${evt.powerEfficientEncoder ? ' (hardware)' : ''}, load level ${this.load.level}, free RAM ${Math.round(freemem() / 1_048_576)} MB`
         );
+        this.stepLoad(evt.qualityLimitationReason);
         return;
       case 'error':
         log.error(`engine: ${evt.message}`);
