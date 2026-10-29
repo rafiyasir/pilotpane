@@ -1,5 +1,5 @@
 /** Bumped when a message shape changes in a way old peers can't read. */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 /** Default HTTP + WebSocket port on the host. */
 export const DEFAULT_PORT = 7420;

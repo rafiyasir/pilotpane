@@ -29,7 +29,7 @@ export type HostMessage =
   | { type: 'quality'; preset: QualityPreset }
   /** Whether the host can put the viewer's mouse on its screen. */
   | { type: 'input-state'; available: boolean }
-  | { type: 'bye'; reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-failed' };
+  | { type: 'bye'; reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-failed' | 'paused' };
 
 // ---------- Viewer -> host (over the WebSocket) ----------
 
