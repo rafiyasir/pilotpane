@@ -1,6 +1,6 @@
-# Spec 032: Lighter package (DRAFT)
+# Spec 032: Lighter package (DROPPED)
 
-Status: Todo | Package(s): tooling | Depends on: 024, 025
+Status: Dropped | Package(s): tooling | Depends on: 024, 025
 
 Draft from real use: the installer is about 151 MB and the installed app about 350 MB. Most of that is Electron itself.
 
@@ -39,6 +39,10 @@ Expected result: about 300 MB installed and about 120 MB installer.
 - [ ] The package script fails when the size budget is exceeded.
 - [ ] `pnpm format:check`, `pnpm build`, `pnpm test`, `pnpm scan` pass.
 
+## Why dropped
+
+Only the 55 Chromium language packs (about 49 MB, about 12 MB zipped) were safely removable, a saving of roughly 8% of the installer. The rest is Chromium itself (236 MB), which cannot shrink without leaving Electron (ADR-001), and the GPU fallback DLLs are not worth the risk. Not worth a release slot.
+
 ## Release
 
-Planned for 0.4.3 with spec 031.
+Was planned for 0.4.3 with spec 031.
