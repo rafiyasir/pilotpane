@@ -4,7 +4,14 @@
  */
 import { BrowserWindow, app, ipcMain } from 'electron';
 import { hostname } from 'node:os';
-import type { EngineCommand, EngineEvent, HostAction, HostState, QualityPreset } from '@pilotpane/protocol';
+import type {
+  EngineCommand,
+  EngineEvent,
+  HostAction,
+  HostMessage,
+  HostState,
+  QualityPreset
+} from '@pilotpane/protocol';
 import { isQualityPreset, isThemeName } from '@pilotpane/protocol';
 import { HostStateStore } from './host-state.js';
 import { createLogger } from './log.js';
@@ -185,6 +192,11 @@ export class HostController {
     if (!this.state.viewer) this.showPinWindow();
   }
 
+  /** The big PIN is only useful while the host can be reached. */
+  private canShowPin(): boolean {
+    return !this.paused && !this.quitting;
+  }
+
   showHostWindow(): void {
     if (this.hostWindow && !this.hostWindow.isDestroyed()) {
       this.hostWindow.show();
@@ -226,6 +238,8 @@ export class HostController {
       ],
       onSocket: (conn, info) => {
         if (this.paused) {
+          // Tell a waiting viewer why, so it keeps retrying instead of giving up.
+          conn.send(JSON.stringify({ type: 'bye', reason: 'paused' } satisfies HostMessage));
           conn.close(1000, 'paused');
           return;
         }
@@ -275,14 +289,16 @@ export class HostController {
         return;
       case 'pause':
         this.paused = true;
-        this.sessions.kick('host-stopped');
+        this.sessions.kick('paused');
         this.server.sync([]);
+        this.closePinWindow();
         this.patch({ status: 'paused' });
         return;
       case 'resume':
         this.paused = false;
         this.patch({ status: 'ready' });
         this.pollNetwork();
+        if (!this.state.viewer) this.showPinWindow();
         return;
       case 'show-pin-screen':
         this.showPinWindow();
@@ -414,6 +430,7 @@ export class HostController {
   // ---------- windows ----------
 
   private showPinWindow(): void {
+    if (!this.canShowPin()) return;
     if (this.pinWindow && !this.pinWindow.isDestroyed()) {
       this.pinWindow.show();
       this.pinWindow.focus();

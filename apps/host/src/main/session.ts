@@ -147,7 +147,7 @@ export class ViewerSessions {
   }
 
   /** Disconnects the active viewer with a reason it can show. */
-  kick(reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-failed'): void {
+  kick(reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-failed' | 'paused'): void {
     const current = this.active;
     if (!current) return;
     this.send(current.conn, { type: 'bye', reason });

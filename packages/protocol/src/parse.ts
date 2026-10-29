@@ -97,7 +97,7 @@ export function parseHostMessage(raw: string): HostMessage | null {
       return typeof m.available === 'boolean' ? { type: 'input-state', available: m.available } : null;
     case 'bye': {
       const r = m.reason;
-      return r === 'host-stopped' || r === 'kicked' || r === 'new-pin' || r === 'capture-failed'
+      return r === 'host-stopped' || r === 'kicked' || r === 'new-pin' || r === 'capture-failed' || r === 'paused'
         ? { type: 'bye', reason: r }
         : null;
     }
