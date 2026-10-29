@@ -54,7 +54,7 @@ All messages are JSON text frames, typed in `packages/protocol/src/messages.ts` 
 |               | `ice`         | `candidate` or null                                                     |
 |               | `quality`     | `preset`: 1080p, 720p, low                                              |
 |               | `input-state` | `available` (the host can put the viewer's mouse on its screen)         |
-|               | `bye`         | `reason`: host-stopped, kicked, new-pin, capture-failed                 |
+|               | `bye`         | `reason`: host-stopped, kicked, new-pin, capture-failed, paused         |
 | viewer → host | `pair`        | `proof`                                                                 |
 |               | `resume`      | `token`                                                                 |
 |               | `answer`      | `sdp`                                                                   |

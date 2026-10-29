@@ -1,6 +1,6 @@
 # Spec 034: Pause that the host and the viewer both understand
 
-Status: In progress | Package(s): protocol, host, viewer | Depends on: 007, 016
+Status: Done | Package(s): protocol, host, viewer | Depends on: 007, 016
 
 ## Goal
 
@@ -56,12 +56,16 @@ None.
 
 ## Manual test guide
 
-Filled in by `/build`.
+Host: `pnpm start` in Git Bash (the build runs first). Note the address and PIN. Viewer: Chrome on the Windows 8 laptop.
 
-- **Host (Git Bash):** `pnpm start`, then Pause from the host window.
-- **Viewer (Windows 8 / Chrome 109 laptop):** see the Done-when items above.
-- **Expected results** for each step.
-- **Failure case:** pause while a viewer is streaming, then quit the host from the tray instead of resuming; the viewer must show the normal reconnect messages, not a paused text.
+1. **Pair.** On the viewer open `http://<address>:7420/`, type the PIN. Expected: the screen streams and the host PIN window closes.
+2. **Pause while streaming.** In the host window click Pause. Expected: the viewer keeps the last frame and shows "Sharing is paused on <host>. Waiting for it to resume." No Reconnect button, no error card. The host shows the paused card and **no** PIN window.
+3. **Open the app while paused.** Click the tray icon, then run `pnpm start` again in a second Git Bash. Expected: the host window shows "Sharing is paused" with "Resume sharing"; the big PIN screen never appears.
+4. **Resume.** Click "Resume sharing". Expected: the big PIN window appears briefly only if no viewer is connected; within about 10 s the viewer reconnects by itself (no PIN, no reload) and the picture returns, and the PIN window closes again.
+5. **Waiting at the PIN form.** Close the viewer tab and open the address again (PIN form shown, do not type). On the host click Pause. Expected: the viewer card changes to "Sharing is paused" with the waiting text and keeps retrying. Click Resume: the PIN form comes back by itself. (A page reload while paused only shows Chrome's own "can't reach" page, because the listeners are closed.)
+6. **Resume with nobody connected.** Close the viewer tab, Pause, then Resume. Expected: the PIN window shows again.
+
+**Failure case:** stream, click Pause, then quit PilotPane from the tray without resuming. Expected: the viewer first shows the paused text, then on the next attempt (up to 10 s) changes to "Can't reach the host" with the attempt counter (the normal reconnect text, not the paused one). Also: Quit from the tray while streaming (no pause) still shows "The host stopped sharing".
 
 ## Release
 
