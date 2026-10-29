@@ -2,7 +2,7 @@
 
 Each version is useful on its own and ships when its specs' acceptance criteria pass on real hardware (including the Windows 8 / Chrome 109 viewer).
 
-Spec numbers are permanent. Status: Todo, In progress, Done.
+Spec numbers are permanent. Status: Todo, In progress, Done, Dropped.
 
 ## v0.1: See the screen
 
@@ -35,21 +35,21 @@ Spec numbers are permanent. Status: Todo, In progress, Done.
 
 ## v0.4: Quality and reliability
 
-| #   | Spec                             | Package                | Status |
-| --- | -------------------------------- | ---------------------- | ------ |
-| 015 | Quality presets                  | protocol, viewer       | Done   |
-| 016 | Auto-reconnect after host sleep  | host, viewer           | Done   |
-| 017 | Keep host from sleeping          | host                   | Done   |
-| 031 | Performance and sharpness        | host, viewer           | Done   |
-| 032 | Lighter package                  | tooling                | Todo   |
-| 033 | Local cursor on the viewer       | viewer                 | Todo   |
-| 034 | Pause that both sides understand | protocol, host, viewer | Done   |
-| 035 | Close notice and Quit button     | host                   | Todo   |
-| 036 | View-only mode                   | host, viewer           | Todo   |
-| 037 | Automatic codec                  | protocol, viewer       | Done   |
-| 038 | Codec choice in the toolbar      | protocol, viewer       | Todo   |
+| #   | Spec                             | Package                | Status  |
+| --- | -------------------------------- | ---------------------- | ------- |
+| 015 | Quality presets                  | protocol, viewer       | Done    |
+| 016 | Auto-reconnect after host sleep  | host, viewer           | Done    |
+| 017 | Keep host from sleeping          | host                   | Done    |
+| 031 | Performance and sharpness        | host, viewer           | Done    |
+| 032 | Lighter package                  | tooling                | Dropped |
+| 033 | Local cursor on the viewer       | viewer                 | Todo    |
+| 034 | Pause that both sides understand | protocol, host, viewer | Done    |
+| 035 | Close notice and Quit button     | host                   | Todo    |
+| 036 | View-only mode                   | host, viewer           | Todo    |
+| 037 | Automatic codec                  | protocol, viewer       | Done    |
+| 038 | Codec choice in the toolbar      | protocol, viewer       | Todo    |
 
-Planned releases: 031, 032, 034, 035 and 037 ship as 0.4.3 (037 protects old viewers from 031's VP8 default); 033 and 038 as 0.4.4. Spec 038 needs a designed screen first. 0.5.0 stays for specs 018 to 021. Spec 034 changes `PROTOCOL_VERSION` (2 to 3), so call it out in the changelog.
+Planned releases: 031, 034, 035 and 037 ship as 0.4.3 (037 protects old viewers from 031's VP8 default); 033 and 038 as 0.4.4. Spec 038 needs a designed screen first. 0.5.0 stays for specs 018 to 021. Spec 034 changes `PROTOCOL_VERSION` (2 to 3), so call it out in the changelog.
 
 ## v0.5: Daily-use comfort
 
