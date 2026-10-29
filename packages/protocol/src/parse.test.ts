@@ -39,6 +39,7 @@ test('invalid viewer messages are rejected', () => {
 test('host messages parse and reject', () => {
   assert.deepEqual(parseHostMessage('{"type":"busy"}'), { type: 'busy' });
   assert.deepEqual(parseHostMessage('{"type":"bye","reason":"new-pin"}'), { type: 'bye', reason: 'new-pin' });
+  assert.deepEqual(parseHostMessage('{"type":"bye","reason":"paused"}'), { type: 'bye', reason: 'paused' });
   assert.equal(parseHostMessage('{"type":"bye","reason":"other"}'), null);
   assert.equal(parseHostMessage('{"type":"hello","protocol":1}'), null);
 });
