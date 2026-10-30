@@ -2,6 +2,13 @@
 
 All notable changes. Versions follow the [roadmap](docs/ROADMAP.md).
 
+## [0.4.3] Sharper scrolling and a Quit button
+
+- Scrolling stays sharp. The host now offers VP8 first and keeps text sharp in motion. If the host's processor gets busy, it lowers the frame rate and then the size by itself, and raises them again when it calms down.
+- The viewer picks the best video codec for its own machine, so an older laptop is not stuck with a codec it decodes slowly. If its browser cannot say, it uses H.264.
+- Pause is clear on both sides. The viewer shows that sharing is paused, keeps the last picture and comes back by itself when you resume. The big PIN screen stays away while paused. This changes the protocol version from 2 to 3, and the host serves the viewer, so both always match.
+- Closing the host window now explains itself the first time: a short card says PilotPane is still running and where to find its icon. A Quit PilotPane button in the host window ends the app, and asks first if a viewer is connected.
+
 ## [0.4.2] Pointer feel
 
 - The pointer follows the touchpad more closely. The host now sends up to 60 frames per second at 1080p and 720p (it was 30, and often fewer), and asks Chrome for motion instead of slide-style sharpness. Text stays sharp because the picture keeps its size when the link is busy. The viewer also asks its browser for the smallest video buffer. Low stays at 15 frames per second.

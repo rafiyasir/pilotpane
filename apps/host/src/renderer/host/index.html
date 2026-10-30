@@ -23,6 +23,32 @@
         <div class="themes" id="themes" role="group" aria-label="Theme"></div>
       </header>
 
+      <!-- First close: the window stays open and explains that the app keeps running -->
+      <section id="close-card" class="note-card" aria-live="polite" hidden>
+        <div class="note-head">
+          <span class="dot info"></span>
+          <h2>PilotPane is still running</h2>
+        </div>
+        <p>Find its icon near the clock to open this window again.</p>
+        <div class="actions">
+          <button class="btn btn-primary" id="close-keep" type="button">Keep in tray</button>
+          <button class="btn" id="close-quit" type="button">Quit PilotPane</button>
+        </div>
+      </section>
+
+      <!-- Quit while a viewer is connected -->
+      <section id="quit-card" class="note-card" aria-live="polite" hidden>
+        <div class="note-head">
+          <span class="dot"></span>
+          <h2>Quit PilotPane?</h2>
+        </div>
+        <p>The connected viewer will lose its picture.</p>
+        <div class="actions">
+          <button class="btn btn-danger" id="quit-confirm" type="button">Quit</button>
+          <button class="btn" id="quit-cancel" type="button">Stay open</button>
+        </div>
+      </section>
+
       <!-- Ready: waiting for a viewer -->
       <section id="view-ready" class="view" hidden>
         <div class="status">
@@ -136,6 +162,7 @@
       <footer class="foot">
         <span>LAN only · 1 viewer at a time</span>
         <span class="foot-right">
+          <button class="btn" id="btn-quit" type="button">Quit PilotPane</button>
           <button class="btn" id="btn-check-update" type="button">Check for updates</button>
           <span class="mono" id="version">v0.1.0</span>
         </span>

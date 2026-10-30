@@ -1,5 +1,6 @@
 import type { IceCandidate, InputMessage, StreamStats } from '/protocol/index.js';
-import { INPUT_CHANNEL_LABEL } from '/protocol/index.js';
+import { INPUT_CHANNEL_LABEL, chooseCodec, codecFamily, offeredCodecs } from '/protocol/index.js';
+import { probeCodecs } from './codec-probe.js';
 
 /**
  * Asks the browser to show frames as soon as they arrive instead of buffering for smoothness.
@@ -68,9 +69,34 @@ export class Receiver {
     await pc.setRemoteDescription({ type: 'offer', sdp });
     for (const c of this.pendingIce) await pc.addIceCandidate(c);
     this.pendingIce = [];
+    await this.preferCodecs(pc, sdp);
+    if (pc !== this.pc) return;
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
     this.hooks.sendAnswer(pc.localDescription?.sdp ?? answer.sdp ?? '');
+  }
+
+  /**
+   * Puts the codecs in the order `chooseCodec` picks before the answer is made (ADR-020). The
+   * browser is only asked to reorder what it already has; any failure leaves its default order.
+   */
+  private async preferCodecs(pc: RTCPeerConnection, offer: string): Promise<void> {
+    try {
+      const transceiver = pc.getTransceivers().find((t) => t.receiver.track.kind === 'video');
+      const caps =
+        typeof RTCRtpReceiver.getCapabilities === 'function' ? RTCRtpReceiver.getCapabilities('video') : null;
+      if (!transceiver || !caps || typeof transceiver.setCodecPreferences !== 'function') return;
+      const order = chooseCodec(offeredCodecs(offer), await probeCodecs());
+      const rank = (c: RTCRtpCodec): number => {
+        const i = order.indexOf(codecFamily(c.mimeType));
+        return i === -1 ? order.length : i; // rtx, red, fec and unlisted codecs stay last
+      };
+      const sorted = caps.codecs.map((c, i) => ({ c, i })).sort((a, b) => rank(a.c) - rank(b.c) || a.i - b.i);
+      transceiver.setCodecPreferences(sorted.map((x) => x.c));
+      console.info('codec order', order.join(', '));
+    } catch (err) {
+      console.warn('codec order not applied', err);
+    }
   }
 
   async addIce(candidate: IceCandidate | null): Promise<void> {

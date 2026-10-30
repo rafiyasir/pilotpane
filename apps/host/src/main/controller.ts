@@ -4,7 +4,14 @@
  */
 import { BrowserWindow, app, ipcMain } from 'electron';
 import { hostname } from 'node:os';
-import type { EngineCommand, EngineEvent, HostAction, HostState, QualityPreset } from '@pilotpane/protocol';
+import type {
+  EngineCommand,
+  EngineEvent,
+  HostAction,
+  HostMessage,
+  HostState,
+  QualityPreset
+} from '@pilotpane/protocol';
 import { isQualityPreset, isThemeName } from '@pilotpane/protocol';
 import { HostStateStore } from './host-state.js';
 import { createLogger } from './log.js';
@@ -18,6 +25,9 @@ import type { ScreenCapturer } from './platform/screen-capturer.js';
 import { InputBridge } from './input-bridge.js';
 import { ViewerSessions } from './session.js';
 import { AwakeGuard } from './awake-guard.js';
+import { freemem } from 'node:os';
+import { closeDecision } from './close-notice.js';
+import { HostLoadGovernor } from './host-load.js';
 import { applyUpdate } from './updater/apply.js';
 import { Updater, type UpdaterOptions } from './updater/updater.js';
 import { saveSettings, type Settings } from './settings.js';
@@ -56,11 +66,13 @@ export class HostController {
   private readonly sessions: ViewerSessions;
   private readonly input: InputBridge;
   private readonly awake: AwakeGuard;
+  private readonly load: HostLoadGovernor;
   private server: LanServer;
   private readonly store: HostStateStore;
   private readonly updater: Updater;
   private paused = false;
   private quitting = false;
+  private closeNoticeSeen: boolean;
   private pollTimer: NodeJS.Timeout | null = null;
   private lockTimer: NodeJS.Timeout | null = null;
 
@@ -70,6 +82,7 @@ export class HostController {
   private tray: HostTray | null = null;
 
   constructor(private readonly opts: ControllerOptions) {
+    this.closeNoticeSeen = opts.settings.closeNoticeSeen;
     this.store = new HostStateStore({
       status: 'starting',
       appVersion: app.getVersion(),
@@ -83,7 +96,8 @@ export class HostController {
       stats: null,
       lockedUntil: null,
       message: null,
-      update: { phase: 'idle' }
+      update: { phase: 'idle' },
+      closeNotice: false
     });
 
     this.updater = new Updater({
@@ -93,6 +107,7 @@ export class HostController {
     });
 
     this.input = new InputBridge(opts.injector);
+    this.load = new HostLoadGovernor();
     this.awake = new AwakeGuard(opts.keepAwake, createLogger('awake'));
     this.sessions = new ViewerSessions(this.pairing, {
       hostName: this.state.hostName,
@@ -107,6 +122,7 @@ export class HostController {
       onViewerGone: () => {
         this.input.end();
         this.engine({ cmd: 'stop' });
+        this.load.reset();
         this.awake.viewerGone();
         this.patch({ status: this.paused ? 'paused' : 'ready', viewer: null, stats: null });
       },
@@ -185,6 +201,11 @@ export class HostController {
     if (!this.state.viewer) this.showPinWindow();
   }
 
+  /** The big PIN is only useful while the host can be reached. */
+  private canShowPin(): boolean {
+    return !this.paused && !this.quitting;
+  }
+
   showHostWindow(): void {
     if (this.hostWindow && !this.hostWindow.isDestroyed()) {
       this.hostWindow.show();
@@ -193,11 +214,16 @@ export class HostController {
     }
     const win = createHostWindow(this.opts.windows, this.state.theme);
     win.on('close', (e) => {
-      if (!this.quitting) {
-        // Closing the window only hides it; the host keeps sharing from the tray.
-        e.preventDefault();
-        win.hide();
-      }
+      const decision = closeDecision({
+        quitting: this.quitting,
+        noticeSeen: this.closeNoticeSeen,
+        noticeShowing: this.state.closeNotice
+      });
+      if (decision === 'quit') return;
+      // Closing the window only hides it; the host keeps sharing from the tray.
+      e.preventDefault();
+      if (decision === 'hold') this.patch({ closeNotice: true });
+      else this.keepInTray();
     });
     this.hostWindow = win;
   }
@@ -226,6 +252,8 @@ export class HostController {
       ],
       onSocket: (conn, info) => {
         if (this.paused) {
+          // Tell a waiting viewer why, so it keeps retrying instead of giving up.
+          conn.send(JSON.stringify({ type: 'bye', reason: 'paused' } satisfies HostMessage));
           conn.close(1000, 'paused');
           return;
         }
@@ -275,14 +303,16 @@ export class HostController {
         return;
       case 'pause':
         this.paused = true;
-        this.sessions.kick('host-stopped');
+        this.sessions.kick('paused');
         this.server.sync([]);
+        this.closePinWindow();
         this.patch({ status: 'paused' });
         return;
       case 'resume':
         this.paused = false;
         this.patch({ status: 'ready' });
         this.pollNetwork();
+        if (!this.state.viewer) this.showPinWindow();
         return;
       case 'show-pin-screen':
         this.showPinWindow();
@@ -317,10 +347,21 @@ export class HostController {
       case 'dismiss-update':
         this.updater.dismiss();
         return;
+      case 'keep-in-tray':
+        this.keepInTray();
+        return;
       case 'quit':
         app.quit();
         return;
     }
+  }
+
+  /** Hides the window and remembers that the first-close card was answered. */
+  private keepInTray(): void {
+    this.closeNoticeSeen = true;
+    this.patch({ closeNotice: false });
+    this.persist();
+    if (this.hostWindow && !this.hostWindow.isDestroyed()) this.hostWindow.hide();
   }
 
   private installUpdate(): void {
@@ -344,7 +385,8 @@ export class HostController {
     saveSettings(this.opts.settingsFile, {
       port: this.state.port,
       theme: this.state.theme,
-      quality: this.state.quality
+      quality: this.state.quality,
+      closeNoticeSeen: this.closeNoticeSeen
     });
   }
 
@@ -376,6 +418,13 @@ export class HostController {
     }
   }
 
+  private stepLoad(reason: string): void {
+    const level = this.load.sample(reason);
+    if (level === null) return;
+    log.info(`host is busy: stream load level ${level}`);
+    this.engine({ cmd: 'load-level', level });
+  }
+
   private handleEngineEvent(evt: EngineEvent): void {
     switch (evt.evt) {
       case 'offer':
@@ -400,8 +449,9 @@ export class HostController {
         return;
       case 'debug-stats':
         log.debug(
-          `send: ${evt.frameWidth}px ${evt.framesPerSecond} fps, target ${Math.round(evt.targetBitrate / 1000)} kbps, limited by ${evt.qualityLimitationReason}`
+          `send: ${evt.frameWidth}px ${evt.framesPerSecond} fps, target ${Math.round(evt.targetBitrate / 1000)} kbps, limited by ${evt.qualityLimitationReason} (cpu ${evt.cpuLimitedSec} s), encoder ${evt.encoderImplementation}${evt.powerEfficientEncoder ? ' (hardware)' : ''}, load level ${this.load.level}, free RAM ${Math.round(freemem() / 1_048_576)} MB`
         );
+        this.stepLoad(evt.qualityLimitationReason);
         return;
       case 'error':
         log.error(`engine: ${evt.message}`);
@@ -414,6 +464,7 @@ export class HostController {
   // ---------- windows ----------
 
   private showPinWindow(): void {
+    if (!this.canShowPin()) return;
     if (this.pinWindow && !this.pinWindow.isDestroyed()) {
       this.pinWindow.show();
       this.pinWindow.focus();

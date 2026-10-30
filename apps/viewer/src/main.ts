@@ -69,6 +69,8 @@ let phase: Phase = 'connecting';
 let nonce: string | null = null;
 let hostName = 'the host';
 let userStopped = false;
+/** The host said `bye paused`: keep retrying and say why. */
+let hostPaused = false;
 let retryCount = 0;
 let retryTimer: number | undefined;
 let lockTimer: number | undefined;
@@ -310,6 +312,7 @@ function handleMessage(msg: HostMessage): void {
       return;
     }
     case 'paired':
+      hostPaused = false;
       store.set('session', TOKEN_KEY, msg.token);
       if (phase === 'reconnecting') return; // keep the last frame on screen
       phase = 'starting';
@@ -375,7 +378,13 @@ function handleMessage(msg: HostMessage): void {
   }
 }
 
-function handleBye(reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-failed'): void {
+function handleBye(reason: 'host-stopped' | 'kicked' | 'new-pin' | 'capture-failed' | 'paused'): void {
+  if (reason === 'paused') {
+    // The socket closes right after this; its close event runs onDrop and the retry loop.
+    hostPaused = true;
+    return;
+  }
+  hostPaused = false;
   stop();
   if (reason === 'new-pin') {
     store.set('session', TOKEN_KEY, null);
@@ -427,7 +436,9 @@ function scheduleRetry(overStage: boolean): void {
   window.clearTimeout(retryTimer);
   const delay = (RETRY_DELAYS_S[Math.min(retryCount, RETRY_DELAYS_S.length - 1)] ?? 10) * 1000;
   retryCount += 1;
-  const text = `Trying again, attempt ${retryCount}. The last picture stays on screen.`;
+  const text = hostPaused
+    ? `Sharing is paused on ${hostName}. Waiting for it to resume.`
+    : `Trying again, attempt ${retryCount}. The last picture stays on screen.`;
   if (overStage) {
     $('reconnecting').hidden = false;
     $('reconnecting-text').textContent = text;
@@ -435,13 +446,18 @@ function scheduleRetry(overStage: boolean): void {
     showCard({
       label: 'Reconnecting',
       tone: 'accent',
-      title: "Can't reach the host",
-      text: `Check that PilotPane is running and both laptops share a network. Attempt ${retryCount}.`,
+      title: hostPaused ? 'Sharing is paused' : "Can't reach the host",
+      text: hostPaused
+        ? `Sharing is paused on ${hostName}. Waiting for it to resume.`
+        : `Check that PilotPane is running and both laptops share a network. Attempt ${retryCount}.`,
       spinner: true,
       primary: { text: 'Stop trying', run: stopTrying }
     });
   }
-  retryTimer = window.setTimeout(() => socket.connect(), delay);
+  retryTimer = window.setTimeout(() => {
+    hostPaused = false; // a paused host says so again; a host that quit does not
+    socket.connect();
+  }, delay);
 }
 
 /** The browser is back (network up, tab shown): skip the wait before the next try. */
@@ -450,6 +466,7 @@ function retrySoon(): void {
   if (phase !== 'reconnecting' && phase !== 'connecting') return;
   window.clearTimeout(retryTimer);
   retryCount = 0;
+  hostPaused = false;
   socket.connect();
 }
 
@@ -460,6 +477,7 @@ document.addEventListener('visibilitychange', () => {
 
 function stop(): void {
   userStopped = true;
+  hostPaused = false;
   window.clearTimeout(retryTimer);
   window.clearInterval(lockTimer);
   endControl();

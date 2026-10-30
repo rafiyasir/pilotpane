@@ -1,4 +1,5 @@
 export * from './auto-quality.js';
+export * from './codec-choice.js';
 export * from './constants.js';
 export * from './input.js';
 export * from './key-tracker.js';

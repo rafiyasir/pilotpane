@@ -21,6 +21,21 @@ test('the low quality preset survives a save and a load', () => {
   });
 });
 
+test('the close notice flag survives a save and a load', () => {
+  inTempDir((file) => {
+    assert.equal(loadSettings(file).closeNoticeSeen, false);
+    saveSettings(file, { ...DEFAULT_SETTINGS, closeNoticeSeen: true });
+    assert.equal(loadSettings(file).closeNoticeSeen, true);
+  });
+});
+
+test('a junk close notice flag counts as not seen', () => {
+  inTempDir((file) => {
+    writeFileSync(file, JSON.stringify({ closeNoticeSeen: 'yes' }));
+    assert.equal(loadSettings(file).closeNoticeSeen, false);
+  });
+});
+
 test('a junk stored quality falls back to the default', () => {
   inTempDir((file) => {
     writeFileSync(file, JSON.stringify({ quality: '4k' }));

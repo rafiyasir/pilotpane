@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { withBitrateHints } from './sdp.js';
+import { offeredCodecs, withBitrateHints } from './sdp.js';
 
 const hints = { minBitrate: 3_000_000, startBitrate: 6_000_000, maxBitrate: 12_000_000 };
 const EXTRA = 'x-google-min-bitrate=3000;x-google-start-bitrate=6000;x-google-max-bitrate=12000';
@@ -58,4 +58,27 @@ test('is idempotent', () => {
   ]);
   const once = withBitrateHints(sdp, hints);
   assert.equal(withBitrateHints(once, hints), once);
+});
+
+const video = (pts: string, rest: string[]) => join([...head, `m=video 9 UDP/TLS/RTP/SAVPF ${pts}`, ...rest]);
+
+test('offeredCodecs lists families in payload order and ignores rtx, red and audio', () => {
+  const sdp = video('96 97 102 103 104 105', [
+    'a=rtpmap:96 VP8/90000',
+    'a=rtpmap:97 rtx/90000',
+    'a=rtpmap:102 H264/90000',
+    'a=rtpmap:103 H264/90000',
+    'a=rtpmap:104 red/90000',
+    'a=rtpmap:105 ulpfec/90000'
+  ]);
+  assert.deepEqual(offeredCodecs(sdp), ['vp8', 'h264']);
+});
+
+test('offeredCodecs follows the m=video line, not the rtpmap order', () => {
+  const sdp = video('102 96', ['a=rtpmap:96 VP8/90000', 'a=rtpmap:102 H264/90000']);
+  assert.deepEqual(offeredCodecs(sdp), ['h264', 'vp8']);
+});
+
+test('offeredCodecs returns nothing without video', () => {
+  assert.deepEqual(offeredCodecs(join(head)), []);
 });

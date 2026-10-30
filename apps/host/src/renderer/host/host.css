@@ -221,7 +221,8 @@
   gap: 12px;
 }
 
-/* Update card (Card: surface, 1 px line, radius 8, padding 16) */
+/* Close and quit cards share the Card look of the update card */
+.note-card,
 .update-card {
   display: flex;
   flex-direction: column;
@@ -233,20 +234,32 @@
   border-radius: 8px;
 }
 
-.update-head {
+.update-head,
+.note-head {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.update-head h2 {
+.update-head h2,
+.note-head h2 {
   margin: 0;
   font: 600 18px var(--font-display);
 }
 
-.update-card p {
+.update-card p,
+.note-card p {
   margin: 0;
   color: var(--muted);
+  line-height: 1.5;
+}
+
+.dot.info {
+  background: var(--info);
+}
+
+#btn-quit.armed {
+  border-color: var(--accent);
 }
 
 .update-card ul {
