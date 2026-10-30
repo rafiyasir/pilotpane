@@ -26,6 +26,7 @@ import { InputBridge } from './input-bridge.js';
 import { ViewerSessions } from './session.js';
 import { AwakeGuard } from './awake-guard.js';
 import { freemem } from 'node:os';
+import { closeDecision } from './close-notice.js';
 import { HostLoadGovernor } from './host-load.js';
 import { applyUpdate } from './updater/apply.js';
 import { Updater, type UpdaterOptions } from './updater/updater.js';
@@ -71,6 +72,7 @@ export class HostController {
   private readonly updater: Updater;
   private paused = false;
   private quitting = false;
+  private closeNoticeSeen: boolean;
   private pollTimer: NodeJS.Timeout | null = null;
   private lockTimer: NodeJS.Timeout | null = null;
 
@@ -80,6 +82,7 @@ export class HostController {
   private tray: HostTray | null = null;
 
   constructor(private readonly opts: ControllerOptions) {
+    this.closeNoticeSeen = opts.settings.closeNoticeSeen;
     this.store = new HostStateStore({
       status: 'starting',
       appVersion: app.getVersion(),
@@ -93,7 +96,8 @@ export class HostController {
       stats: null,
       lockedUntil: null,
       message: null,
-      update: { phase: 'idle' }
+      update: { phase: 'idle' },
+      closeNotice: false
     });
 
     this.updater = new Updater({
@@ -210,11 +214,16 @@ export class HostController {
     }
     const win = createHostWindow(this.opts.windows, this.state.theme);
     win.on('close', (e) => {
-      if (!this.quitting) {
-        // Closing the window only hides it; the host keeps sharing from the tray.
-        e.preventDefault();
-        win.hide();
-      }
+      const decision = closeDecision({
+        quitting: this.quitting,
+        noticeSeen: this.closeNoticeSeen,
+        noticeShowing: this.state.closeNotice
+      });
+      if (decision === 'quit') return;
+      // Closing the window only hides it; the host keeps sharing from the tray.
+      e.preventDefault();
+      if (decision === 'hold') this.patch({ closeNotice: true });
+      else this.keepInTray();
     });
     this.hostWindow = win;
   }
@@ -338,10 +347,21 @@ export class HostController {
       case 'dismiss-update':
         this.updater.dismiss();
         return;
+      case 'keep-in-tray':
+        this.keepInTray();
+        return;
       case 'quit':
         app.quit();
         return;
     }
+  }
+
+  /** Hides the window and remembers that the first-close card was answered. */
+  private keepInTray(): void {
+    this.closeNoticeSeen = true;
+    this.patch({ closeNotice: false });
+    this.persist();
+    if (this.hostWindow && !this.hostWindow.isDestroyed()) this.hostWindow.hide();
   }
 
   private installUpdate(): void {
@@ -365,7 +385,8 @@ export class HostController {
     saveSettings(this.opts.settingsFile, {
       port: this.state.port,
       theme: this.state.theme,
-      quality: this.state.quality
+      quality: this.state.quality,
+      closeNoticeSeen: this.closeNoticeSeen
     });
   }
 
