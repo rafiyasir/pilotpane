@@ -10,6 +10,19 @@ const THEME_NAMES: Record<ThemeName, string> = {
 };
 
 let state: HostState | null = null;
+let confirmingQuit = false;
+
+/** Quit asks first only when a viewer would lose its picture. */
+function setConfirmingQuit(on: boolean): void {
+  confirmingQuit = on;
+  $('quit-card').hidden = !on;
+  $('btn-quit').classList.toggle('armed', on);
+}
+
+function requestQuit(): void {
+  if (state?.viewer) setConfirmingQuit(true);
+  else api.act({ action: 'quit' });
+}
 
 function buildThemeChips(): void {
   const box = $('themes');
@@ -189,6 +202,8 @@ function render(s: HostState): void {
   });
   $('version').textContent = `v${s.appVersion}`;
   renderUpdate(s.update, s.appVersion);
+  $('close-card').hidden = !s.closeNotice;
+  if (confirmingQuit && !s.viewer) setConfirmingQuit(false); // the viewer left, nothing to confirm
 
   if (s.viewer && (s.status === 'connecting' || s.status === 'streaming')) {
     show('connected');
@@ -231,6 +246,11 @@ $('btn-new-pin').addEventListener('click', () => api.act({ action: 'new-pin' }))
 $('btn-new-pin-2').addEventListener('click', () => api.act({ action: 'new-pin' }));
 $('btn-show-pin').addEventListener('click', () => api.act({ action: 'show-pin-screen' }));
 $('btn-pause').addEventListener('click', () => api.act({ action: 'pause' }));
+$('btn-quit').addEventListener('click', requestQuit);
+$('close-keep').addEventListener('click', () => api.act({ action: 'keep-in-tray' }));
+$('close-quit').addEventListener('click', () => api.act({ action: 'quit' }));
+$('quit-confirm').addEventListener('click', () => api.act({ action: 'quit' }));
+$('quit-cancel').addEventListener('click', () => setConfirmingQuit(false));
 $('btn-check-update').addEventListener('click', () => api.act({ action: 'check-for-updates' }));
 $('btn-disconnect').addEventListener('click', () => api.act({ action: 'disconnect-viewer' }));
 

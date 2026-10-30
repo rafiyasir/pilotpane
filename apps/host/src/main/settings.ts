@@ -9,9 +9,16 @@ export interface Settings {
   port: number;
   theme: ThemeName;
   quality: QualityPreset;
+  /** The first-close card has been answered, so closing the window just hides it. */
+  closeNoticeSeen: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { port: DEFAULT_PORT, theme: 'cockpit', quality: '1080p' };
+export const DEFAULT_SETTINGS: Settings = {
+  port: DEFAULT_PORT,
+  theme: 'cockpit',
+  quality: '1080p',
+  closeNoticeSeen: false
+};
 
 /** Reads settings.json, falling back to defaults for anything missing or invalid. */
 export function loadSettings(file: string): Settings {
@@ -25,7 +32,8 @@ export function loadSettings(file: string): Settings {
     return {
       port,
       theme: isThemeName(s.theme) ? s.theme : DEFAULT_SETTINGS.theme,
-      quality: isQualityPreset(s.quality) ? s.quality : DEFAULT_SETTINGS.quality
+      quality: isQualityPreset(s.quality) ? s.quality : DEFAULT_SETTINGS.quality,
+      closeNoticeSeen: s.closeNoticeSeen === true
     };
   } catch {
     return { ...DEFAULT_SETTINGS };
