@@ -4,7 +4,7 @@
 
 PilotPane turns any laptop with a browser into a screen for your Windows PC, over your own local network. Nothing to install on the viewer, no account, no cloud. It was built to rescue a laptop with a broken display, using an old Windows 8 laptop running Chrome 109 as the screen.
 
-> **Status: v0.4.2, an early release.** The viewer shows the host's screen live and controls it with mouse and keyboard. It picks the picture quality for you and reconnects by itself after the host sleeps. See the [roadmap](docs/ROADMAP.md) for what is next.
+> **Status: v0.4.3, an early release.** The viewer shows the host's screen live and controls it with mouse and keyboard. It picks the picture quality for you and reconnects by itself after the host sleeps. See the [roadmap](docs/ROADMAP.md) for what is next.
 
 <!-- demo -->
 
