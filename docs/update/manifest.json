@@ -1,12 +1,12 @@
 {
-  "version": "0.4.2",
-  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.2/PilotPane-Setup-0.4.2.exe",
-  "sha256": "352518440c9ff6eccf5c9bb4036d5b4aaf95a976629a7899127a46d12d29e380",
-  "size": 158377984,
+  "version": "0.4.3",
+  "url": "https://github.com/rafiyasir/pilotpane/releases/download/v0.4.3/PilotPane-Setup-0.4.3.exe",
+  "sha256": "7298a32ae8779fb033c728b862012cb448318f259e724590378f3d2352b2dc64",
+  "size": 158384128,
   "notes": [
-    "Pointer follows more closely, at up to 60 frames per second",
-    "Download page works better on phones",
-    "The host may run warmer during long sessions"
+    "Scrolling stays sharp, and the host eases off by itself when it is busy.",
+    "The viewer picks the best video codec for its own machine.",
+    "A Quit button in the host window, and a short note the first time you close it."
   ],
-  "signature": "OIhP9fI47kYbGrswTRtFfm1zDQLiwmKWXw5sy1ZC6fvsqtMpp748hdApsLXduQHqacA47IoYh9pecxMmfImLCw=="
+  "signature": "6w3jGkC6vL8HzKWPj1CuqX2deXiaEiRM4cTiD6jsBV3ekS6RvKS706Dr8taLSgW8ptRR4N+bnUYjj/v+OTkbDA=="
 }
