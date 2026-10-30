@@ -47,6 +47,8 @@ export interface HostState {
   lockedUntil: number | null;
   message: string | null;
   update: UpdateState;
+  /** The first window close was held and the "keeps running" card is showing. */
+  closeNotice: boolean;
 }
 
 /** Main process -> engine window. */
@@ -95,6 +97,7 @@ export type HostAction =
   | { action: 'download-update' }
   | { action: 'install-update' }
   | { action: 'dismiss-update' }
+  | { action: 'keep-in-tray' }
   | { action: 'quit' };
 
 /** What the preload script exposes as window.pilotpane. */
