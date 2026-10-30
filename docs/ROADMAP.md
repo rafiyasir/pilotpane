@@ -44,7 +44,7 @@ Spec numbers are permanent. Status: Todo, In progress, Done, Dropped.
 | 032 | Lighter package                  | tooling                | Dropped |
 | 033 | Local cursor on the viewer       | viewer                 | Todo    |
 | 034 | Pause that both sides understand | protocol, host, viewer | Done    |
-| 035 | Close notice and Quit button     | host                   | Todo    |
+| 035 | Close notice and Quit button     | protocol, host         | Done    |
 | 036 | View-only mode                   | host, viewer           | Todo    |
 | 037 | Automatic codec                  | protocol, viewer       | Done    |
 | 038 | Codec choice in the toolbar      | protocol, viewer       | Todo    |

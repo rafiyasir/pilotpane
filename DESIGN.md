@@ -60,6 +60,9 @@ Status: Confirmed = build to the canvas. Not designed = stop and ask for a desig
 | Host updating (progress, then Restart to install)     | Host: updating         | v0.4    | Confirmed    |
 | Host update problem (check failed, bad signature)     | Host: update problem   | v0.4    | Confirmed    |
 | Tray menu item "Check for updates"                    | Tray menu              | v0.4    | Confirmed    |
+| Host first close (keeps running notice)               | Host: first close      | v0.4    | Confirmed    |
+| Host Quit button in the footer                        | Host: ready            | v0.4    | Confirmed    |
+| Host quit with a viewer connected (confirm)           | Host: quit with viewer | v0.4    | Confirmed    |
 | Settings (HTTPS, clipboard, start on login)           | none                   | v0.5    | Not designed |
 | Trusted devices                                       | none                   | v0.5    | Not designed |
 | Host screen off                                       | none                   | v0.6    | Not designed |
@@ -94,6 +97,16 @@ Built only from existing components and tokens, in all four themes. They appear 
 | Updating       | Status dot `accent`, "Downloading X". Thin progress bar (8 px, `line` track, `accent` fill), mono "41 of 66 MB". Then "Checking the update". When ready: primary "Restart to install".                                                                                                               |
 | Update problem | Status dot `err`, "Could not update". Card explains in plain words and says the current version is kept (for example "The update did not pass the safety check, so it was not installed."). Primary "Try again", plain "Keep this version". Covers no connection, bad signature and failed download. |
 | Tray item      | One menu item "Check for updates" after "New PIN". Always this text; results show in the host window.                                                                                                                                                                                                |
+
+## Close and quit (v0.4)
+
+Built only from existing components and tokens, in all four themes. Closing the host window only hides it, so a notice in a hidden window would never be seen. The first close is held instead and the Card appears in the window.
+
+| Screen             | Content                                                                                                                                                                                                                       |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First close        | Card under the header, like the update card. `info` dot, "PilotPane is still running", then "Find its icon near the clock to open this window again." Primary "Keep in tray", plain "Quit PilotPane". Shown once, remembered. |
+| Quit button        | Plain Button "Quit PilotPane" in the footer, left of "Check for updates". Not the danger variant, so it is not mistaken for Pause or Disconnect. With no viewer connected it quits at once.                                   |
+| Quit with a viewer | Card under the header. `accent` dot, "Quit PilotPane?", "The connected viewer will lose its picture." Danger "Quit", plain "Stay open". The footer Quit button gets an `accent` border while this Card is open.               |
 
 ## Mouse and pointer lock hint (v0.2)
 
